@@ -3,6 +3,7 @@ package org.isatools.plugins.metabolights.assignments.ui;
 
 import com.sun.awt.AWTUtilities;
 import org.isatools.isacreator.common.UIHelper;
+import org.isatools.isacreator.effects.AnimatableJFrame;
 import org.isatools.isacreator.effects.FooterPanel;
 import org.isatools.isacreator.effects.HUDTitleBar;
 import org.isatools.isacreator.gui.ISAcreator;
@@ -14,7 +15,13 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
 
-public class EditorUI extends JFrame {
+public class EditorUI extends AnimatableJFrame {
+
+
+    public static final float DESIRED_OPACITY = .93f;
+
+    private String currentCellValue;
+    private String newCellValue;
 
     static {
 
@@ -22,23 +29,16 @@ public class EditorUI extends JFrame {
 
         ResourceInjector.get("metabolights-fileeditor-package.style").load(
                 EditorUI.class.getResource("/dependency-injections/metabolights-fileeditor-package.properties"));
+
+        ResourceInjector.get("filechooser-package.style").load(
+                ISAcreator.class.getResource("/dependency-injections/filechooser-package.properties"));
     }
 
-
     @InjectedResource
-    private Image convertIcon, convertIconInactive;
+    private Image logo, logoInactive;
 
-    private ISAcreator isacreatorEnvironment;
-
-    public static final float DESIRED_OPACITY = .93f;
-
-    private JPanel swappableContainer;
-
-    public EditorUI(ISAcreator isacreatorEnvironment) {
-
+    public EditorUI() {
         ResourceInjector.get("metabolights-fileeditor-package.style").inject(this);
-
-        this.isacreatorEnvironment = isacreatorEnvironment;
     }
 
     public void createGUI() {
@@ -51,21 +51,17 @@ public class EditorUI extends JFrame {
 
         AWTUtilities.setWindowOpacity(this, DESIRED_OPACITY);
 
-        HUDTitleBar titlePanel = new HUDTitleBar(convertIcon, convertIconInactive);
+        HUDTitleBar titlePanel = new HUDTitleBar(logo, logoInactive);
 
         add(titlePanel, BorderLayout.NORTH);
         titlePanel.installListeners();
 
         ((JComponent) getContentPane()).setBorder(new EtchedBorder(UIHelper.LIGHT_GREEN_COLOR, UIHelper.LIGHT_GREEN_COLOR));
 
-        Container loadingInfo = UIHelper.padComponentVerticalBox(100, new JLabel("Awesome"));
+        DataEntrySheet sheet = new DataEntrySheet(this);
+        sheet.createGUI();
 
-        swappableContainer = new JPanel();
-        swappableContainer.add(loadingInfo);
-        swappableContainer.setBorder(new EmptyBorder(1, 1, 1, 1));
-        swappableContainer.setPreferredSize(new Dimension(750, 450));
-
-        add(swappableContainer, BorderLayout.CENTER);
+        add(sheet, BorderLayout.CENTER);
 
         FooterPanel footer = new FooterPanel(this);
         add(footer, BorderLayout.SOUTH);
@@ -73,14 +69,11 @@ public class EditorUI extends JFrame {
         pack();
     }
 
-
-    private void swapContainers(Container newContainer) {
-        if (newContainer != null) {
-            swappableContainer.removeAll();
-            swappableContainer.add(newContainer);
-            swappableContainer.repaint();
-            swappableContainer.validate();
-        }
+    public void setCurrentCellValue(String currentCellValue) {
+        this.currentCellValue = currentCellValue;
     }
 
+    public String getNewCellValue() {
+        return newCellValue;
+    }
 }

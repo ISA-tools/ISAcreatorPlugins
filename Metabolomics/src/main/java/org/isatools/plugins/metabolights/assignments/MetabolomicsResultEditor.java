@@ -3,11 +3,16 @@ package org.isatools.plugins.metabolights.assignments;
 
 import org.isatools.isacreator.ontologyselectiontool.OntologySelectionTool;
 import org.isatools.isacreator.plugins.AbstractPluginSpreadsheetWidget;
+import org.isatools.isacreator.plugins.DefaultWindowListener;
 import org.isatools.isacreator.plugins.registries.SpreadsheetPluginRegistry;
 import org.isatools.plugins.metabolights.assignments.ui.EditorUI;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,28 +24,40 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     EditorUI editorUI;
 
     public MetabolomicsResultEditor() {
-
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                EditorUI editorUI = new EditorUI(null);
-                editorUI.createGUI();
-                editorUI.setLocationRelativeTo(null);
-                editorUI.setAlwaysOnTop(true);
-                editorUI.setVisible(true);
-            }
-        });
-
+        super();
     }
 
     @Override
     public void instantiateComponent() {
-        editorUI = new EditorUI(null);
+        editorUI = new EditorUI();
         editorUI.createGUI();
         editorUI.setLocationRelativeTo(null);
         editorUI.setAlwaysOnTop(true);
+
+        editorUI.addPropertyChangeListener("confirm",
+                new PropertyChangeListener() {
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        setCellValue(editorUI.getNewCellValue());
+                        stopCellEditing();
+                    }
+                });
+        editorUI.addPropertyChangeListener("cancel",
+                new PropertyChangeListener() {
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        setCellValue(getOriginalValue());
+                        cancelCellEditing();
+                    }
+                });
+
+        editorUI.addWindowListener(new DefaultWindowListener() {
+            public void windowActivated(WindowEvent event) {
+                firePropertyChange("confirm", true, false);
+            }
+
+            public void windowDeactivated(WindowEvent event) {
+                firePropertyChange("cancel", false, true);
+            }
+        });
     }
 
     @Override
@@ -50,12 +67,14 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
 
     @Override
     public void showComponent() {
+        System.out.println("Original value of cell is " + getOriginalValue());
+        editorUI.setCurrentCellValue(getOriginalValue());
         editorUI.setVisible(true);
     }
 
     @Override
     public String getCellValue() {
-        return "Awesome";
+        return editorUI.getNewCellValue();
     }
 
     @Override
@@ -74,6 +93,9 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
                     desktopBounds.height;
             point.y = point.y - difference;
         }
+
+
+        editorUI.setLocation(point);
     }
 
     public void registerCellEditor() {
@@ -91,4 +113,6 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
 
         return targetColumns;
     }
+
+
 }
