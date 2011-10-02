@@ -19,7 +19,7 @@
 <project>
     <modelVersion>4.0.0</modelVersion>
     <packaging>bundle</packaging>
-    <name>Plugin to provide ISAvalidator and ISAconverter functionality inside ISAcreator</name>
+    <name>Plugin to provide ability to edit small molecule description data in ISAcreator.</name>
     <description>Test</description>
     <groupId>org.isatools.plugins.metabolights</groupId>
     <artifactId>metabolomics</artifactId>

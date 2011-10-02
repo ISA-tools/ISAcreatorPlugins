@@ -18,8 +18,8 @@ import java.util.Set;
 
 public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
 
-    private static int WIDTH = 500;
-    private static int HEIGHT = 400;
+    public static int WIDTH = 700;
+    public static int HEIGHT = 400;
 
     EditorUI editorUI;
 
@@ -37,25 +37,26 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
         editorUI.addPropertyChangeListener("confirm",
                 new PropertyChangeListener() {
                     public void propertyChange(PropertyChangeEvent evt) {
-                        setCellValue(editorUI.getNewCellValue());
+                        System.out.println("Cell editing confirmed");
+                        setCellValue(getCellValue());
                         stopCellEditing();
                     }
                 });
         editorUI.addPropertyChangeListener("cancel",
                 new PropertyChangeListener() {
                     public void propertyChange(PropertyChangeEvent evt) {
+                        System.out.println("Cell editing cancelled");
                         setCellValue(getOriginalValue());
                         cancelCellEditing();
                     }
                 });
 
         editorUI.addWindowListener(new DefaultWindowListener() {
-            public void windowActivated(WindowEvent event) {
-                firePropertyChange("confirm", true, false);
-            }
 
             public void windowDeactivated(WindowEvent event) {
-                firePropertyChange("cancel", false, true);
+                System.out.println("Cell editing cancelled");
+                setCellValue(editorUI.getNewCellValue());
+                cancelCellEditing();
             }
         });
     }
@@ -109,8 +110,6 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     public Set<String> targetColumns() {
         Set<String> targetColumns = new HashSet<String>();
         targetColumns.add("Metabolite Assignment File");
-        targetColumns.add("Sample Name");
-
         return targetColumns;
     }
 
