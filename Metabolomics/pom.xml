@@ -35,6 +35,7 @@
             <groupId>org.isatools</groupId>
             <artifactId>isacreator</artifactId>
             <version>1.5.0.beta2</version>
+            <classifier>jar-with-dependencies</classifier>
         </dependency>
 
     </dependencies>
