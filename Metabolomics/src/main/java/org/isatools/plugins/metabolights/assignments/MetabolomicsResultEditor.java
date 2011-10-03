@@ -110,7 +110,6 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     public Set<String> targetColumns() {
         Set<String> targetColumns = new HashSet<String>();
         targetColumns.add("Metabolite Assignment File");
-        targetColumns.add("Sample Name");
         return targetColumns;
     }
 
