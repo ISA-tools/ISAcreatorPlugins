@@ -31,7 +31,6 @@ public class EditorUI extends AnimatableJFrame {
     private String currentCellValue;
     private String newCellValue;
 
-//    private JPanel swappableContainer;
 
     static {
         ResourceInjector.addModule("org.jdesktop.fuse.swing.SwingModule");
@@ -68,29 +67,20 @@ public class EditorUI extends AnimatableJFrame {
 
         ((JComponent) getContentPane()).setBorder(new EtchedBorder(UIHelper.LIGHT_GREEN_COLOR, UIHelper.LIGHT_GREEN_COLOR));
 
-        DataEntrySheet sheet = new DataEntrySheet(EditorUI.this, loadConfiguration());
-        sheet.createGUI();
-
-        add(sheet, BorderLayout.CENTER);
+        createCentralPanel();
 
         createSouthPanel();
 
         pack();
     }
 
-//    private void instantiateOptionPanel() {
-//        OptionPane optionPane = new OptionPane();
-//        optionPane.createGUI();
-//        optionPane.addPropertyChangeListener("createNew", new PropertyChangeListener() {
-//            public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-//                DataEntrySheet sheet = new DataEntrySheet(EditorUI.this);
-//                sheet.createGUI();
-//                swapContainers(sheet);
-//            }
-//        });
-//
-//        swappableContainer.add(optionPane);
-//    }
+
+
+    private void createCentralPanel() {
+        DataEntrySheet sheet = new DataEntrySheet(EditorUI.this, loadConfiguration());
+        sheet.createGUI();
+        add(sheet, BorderLayout.CENTER);
+    }
 
     /**
      * Contains the footer panel to allow resizing of the window and a button to save the changes.
