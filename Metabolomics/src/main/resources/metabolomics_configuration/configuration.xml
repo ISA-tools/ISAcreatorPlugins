@@ -2,47 +2,84 @@
     <isatab-configuration table-name="metaboliteprofiling_mztab">
         <measurement term-label="metabolite profiling" term-accession="" source-abbreviation=""/>
         <technology term-label="" term-accession="" source-abbreviation=""/>
-        <field header="identifier" data-type="String" is-file-field="false" is-multiple-value="true"
-               is-required="true">
+        <field header="identifier" data-type="String" is-file-field="false" is-multiple-value="true" is-required="true">
             <description>
-                A list of “|” separated possible identifiers for these small molecules. e.g. “KEGG:C000017”“CHEBI:12345”
+                A list of "|" separated possible identifiers for these small molecules. e.g. "KEGG:C000017|CHEBI:12345"
             </description>
             <default-value></default-value>
         </field>
-        <field header="chemical_formula" data-type="String" is-file-field="false" is-multiple-value="false"
-               is-required="true">
-            <description>The chemical formula of the identified compound.</description>
+        <field header="unit_id" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
+            <description>The unit the small molecule was identified in</description>
             <default-value></default-value>
         </field>
-        <field header="description" data-type="String" is-file-field="false" is-multiple-value="false"
-               is-required="false">
+        <field header="chemical_formula" data-type="String" is-file-field="false" is-multiple-value="false" is-required="true">
+            <description>The chemical formula of the identified compound</description>
+            <default-value></default-value>
+        </field>
+        <field header="description" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
             <description>The small molecule's description/name</description>
             <default-value></default-value>
         </field>
-        <field header="mass_to_charge" data-type="Double" is-file-field="false" is-multiple-value="false"
-               is-required="false">
-            <description>The precursor's experimental mass to charge (m/z).
-            </description>
+        <field header="mass_to_charge" data-type="Double" is-file-field="false" is-multiple-value="false" is-required="false">
+            <description>The precursor's experimental mass to charge (m/z)</description>
             <default-value></default-value>
         </field>
-        <field header="charge" data-type="Double" is-file-field="false"
-               is-multiple-value="false" is-required="false">
+        <field header="charge" data-type="Double" is-file-field="false" is-multiple-value="false" is-required="false">
             <description>The precursor's charge</description>
             <default-value></default-value>
         </field>
-        <field header="retention_time" data-type="String" is-file-field="false"
-               is-multiple-value="false" is-required="false">
+        <field header="retention_time" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
             <description>Small molecule retention time</description>
             <default-value></default-value>
         </field>
-        <field header="taxid" data-type="String" is-file-field="false"
-               is-multiple-value="false" is-required="false">
-            <description>the detector used by the mass spectrometer, use PSI-MS cv</description>
+        <field header="taxid" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
+            <description>The taxonomy id for the species</description>
             <default-value></default-value>
         </field>
-        <field header="species" data-type="Ontology term" is-file-field="false"
-               is-multiple-value="false" is-required="false">
-            <description>the detector used by the mass spectrometer, use PSI-MS cv</description>
+        <field header="species" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
+            <description>The species as a human readable string</description>
+            <default-value></default-value>
+        </field>
+        <field header="database" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
+            <description>Generally references the used spectral library</description>
+            <default-value></default-value>
+        </field>
+        <field header="database_version" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
+            <description>Either the version of the used database if available or otherwise the date of creation</description>
+            <default-value></default-value>
+        </field>
+        <field header="reliability" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
+            <description>Rating 0 - 5 (0 low, 5 high)</description>
+            <default-value></default-value>
+        </field>
+        <field header="uri" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
+            <description>The MetaboLights experiment it was identified in (MTBLS id)</description>
+            <default-value></default-value>
+        </field>
+        <field header="search_engine" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
+            <description>A "|" delimited list of search engine(s) used to identify this protein/metabolite</description>
+            <default-value></default-value>
+        </field>
+        <field header="search_engine_score" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
+            <description>A "|" delimited list of search engine(s) used to identify this protein/metabolite</description>
+            <default-value></default-value>
+        </field>
+        <field header="modifications" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
+            <description>
+                The small molecules modifications. The position of the modification must be given relative to the small molecules beginning.
+                The exact semantics of this position depends on the type of small molecule identified</description>
+            <default-value></default-value>
+        </field>
+        <field header="smallmolecule_abundance_sub" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
+            <description>The small molecule’s intensity in the respective subsample, [1-n]</description>
+            <default-value></default-value>
+        </field>
+        <field header="smallmolecule_abundance_stdev_sub" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
+            <description>The standard deviation of the small molecule’s abundance, [1-n]</description>
+            <default-value></default-value>
+        </field>
+        <field header="smallmolecule_abundance_std_error_sub" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
+            <description>The standard error of the small molecule’s abundance, [1-n]</description>
             <default-value></default-value>
         </field>
     </isatab-configuration>
