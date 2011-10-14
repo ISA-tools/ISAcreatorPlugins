@@ -3,6 +3,8 @@ package org.isatools.plugins.metabolights.assignments.ui;
 import org.isatools.isacreator.common.UIHelper;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
+import org.isatools.plugins.metabolights.assignments.io.FileLoader;
+import org.isatools.plugins.metabolights.assignments.io.FileWriter;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
@@ -10,6 +12,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.FileNotFoundException;
 
 /**
  * Created by the ISA team
@@ -56,6 +59,9 @@ public class DataEntrySheet extends JPanel {
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
                 loadButton.setIcon(loadIcon);
+                FileLoader fl = new FileLoader();
+                
+                fl.loadFile(getFileName(), tableReferenceObject);
             }
 
             @Override
@@ -74,6 +80,17 @@ public class DataEntrySheet extends JPanel {
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
                 saveButton.setIcon(saveIcon);
+                
+                System.out.print("Save code here");
+                
+                FileWriter fw = new FileWriter();
+                
+                try {
+					fw.writeFile(getFileName(), sheet);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
             }
 
             @Override
@@ -94,5 +111,8 @@ public class DataEntrySheet extends JPanel {
         topContainer.add(buttonContainer, BorderLayout.EAST);
 
         add(topContainer, BorderLayout.NORTH);
+    }
+    private String getFileName(){
+    	return "/tmp/metabolights.txt";
     }
 }
