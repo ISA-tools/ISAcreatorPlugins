@@ -59,9 +59,8 @@ public class DataEntrySheet extends JPanel {
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
                 loadButton.setIcon(loadIcon);
-                FileLoader fl = new FileLoader();
+                loadFile();
                 
-                fl.loadFile(getFileName(), tableReferenceObject);
             }
 
             @Override
@@ -80,17 +79,8 @@ public class DataEntrySheet extends JPanel {
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
                 saveButton.setIcon(saveIcon);
-                
-                System.out.print("Save code here");
-                
-                FileWriter fw = new FileWriter();
-                
-                try {
-					fw.writeFile(getFileName(), sheet);
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+                saveFile();
+ 
             }
 
             @Override
@@ -113,6 +103,55 @@ public class DataEntrySheet extends JPanel {
         add(topContainer, BorderLayout.NORTH);
     }
     private String getFileName(){
+    	
     	return "/tmp/metabolights.txt";
+    }
+
+    private void saveFile(){
+        System.out.print("Save code here");
+        
+        FileWriter fw = new FileWriter();
+        
+        try {
+			fw.writeFile(getFileName(), sheet);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    private void loadFile(){
+        
+    	FileLoader fl = new FileLoader();
+        
+        System.out.println("Trying to load a file");
+        tableReferenceObject= fl.loadFile(getFileName(), tableReferenceObject);
+        
+        updateSpreadsheet(new Spreadsheet(parentFrame,tableReferenceObject,""));
+        
+    }
+    
+    private void updateSpreadsheet(Spreadsheet newSpreadsheet){
+
+        System.out.println("Removing existing spreadsheet");
+        remove(sheet);
+        
+        System.out.println("Adding the new sheet");
+        sheet = newSpreadsheet;
+        add(sheet,BorderLayout.CENTER);
+        validate();
+
+// http://www.javamex.com/tutorials/threads/invokelater.shtml
+// http://java.sun.com/products/jfc/tsc/articles/painting/#smart
+//    	SwingUtilities.invokeLater(new Runnable() {
+//            public void run() {
+//                remove(sheet);
+//
+//                add(newSpreadsheet, BorderLayout.SOUTH);
+//
+//                repaint();
+//            }
+//        });
+
+    	
     }
 }
