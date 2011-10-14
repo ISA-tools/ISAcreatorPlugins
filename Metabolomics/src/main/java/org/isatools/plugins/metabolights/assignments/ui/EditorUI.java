@@ -15,13 +15,8 @@ import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
 public class EditorUI extends AnimatableJFrame {
@@ -30,7 +25,6 @@ public class EditorUI extends AnimatableJFrame {
 
     private String currentCellValue;
     private String newCellValue;
-
 
     static {
         ResourceInjector.addModule("org.jdesktop.fuse.swing.SwingModule");
@@ -50,6 +44,8 @@ public class EditorUI extends AnimatableJFrame {
     }
 
     public void createGUI() {
+
+        System.out.println("Metabolomics plugin starting up");
 
         setTitle("Assign metabolites");
         setUndecorated(true);

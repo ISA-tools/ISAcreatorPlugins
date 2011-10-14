@@ -139,6 +139,7 @@ public class DataEntrySheet extends JPanel {
         sheet = newSpreadsheet;
         add(sheet,BorderLayout.CENTER);
         validate();
+    }
 
 // http://www.javamex.com/tutorials/threads/invokelater.shtml
 // http://java.sun.com/products/jfc/tsc/articles/painting/#smart
@@ -152,6 +153,4 @@ public class DataEntrySheet extends JPanel {
 //            }
 //        });
 
-    	
-    }
 }
