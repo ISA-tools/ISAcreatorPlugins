@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.isatools.isacreator.common.UIHelper;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
-import org.isatools.plugins.metabolights.assignments.io.ConfigurationLoader;
 import org.isatools.plugins.metabolights.assignments.io.FileLoader;
 import org.isatools.plugins.metabolights.assignments.io.FileWriter;
 import org.jdesktop.fuse.InjectedResource;
@@ -26,6 +25,8 @@ import java.io.FileNotFoundException;
  */
 public class DataEntrySheet extends JPanel {
 	
+	private static final long serialVersionUID = -7317091603657433515L;
+
 	private static Logger logger = Logger.getLogger(DataEntrySheet.class);
 
     private Spreadsheet sheet;
@@ -106,6 +107,7 @@ public class DataEntrySheet extends JPanel {
 
         add(topContainer, BorderLayout.NORTH);
     }
+    
     private String getFileName(){
     	
     	return "/tmp/metabolights.txt";

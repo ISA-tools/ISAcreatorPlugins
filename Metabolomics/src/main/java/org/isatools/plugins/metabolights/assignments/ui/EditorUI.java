@@ -47,7 +47,7 @@ public class EditorUI extends AnimatableJFrame {
         ResourceInjector.get("metabolights-fileeditor-package.style").inject(this);
     }
 
-    public void createGUI() {
+    public void createGUI(String technologyType) {
 
         logger.info("Metabolomics plugin starting up");
 
@@ -67,17 +67,15 @@ public class EditorUI extends AnimatableJFrame {
 
         ((JComponent) getContentPane()).setBorder(new EtchedBorder(UIHelper.LIGHT_GREEN_COLOR, UIHelper.LIGHT_GREEN_COLOR));
 
-        createCentralPanel();
+        createCentralPanel(technologyType);
 
         createSouthPanel();
 
         pack();
     }
 
-
-
-    private void createCentralPanel() {
-        DataEntrySheet sheet = new DataEntrySheet(EditorUI.this, loadConfiguration());
+    private void createCentralPanel(String technologyType) {
+        DataEntrySheet sheet = new DataEntrySheet(EditorUI.this, loadConfiguration(technologyType));
         sheet.createGUI();
         add(sheet, BorderLayout.CENTER);
     }
@@ -101,16 +99,23 @@ public class EditorUI extends AnimatableJFrame {
 
     public static void main(String[] args) {
         EditorUI ui = new EditorUI();
-        ui.createGUI();
+        ui.createGUI(MetabolomicsResultEditor.MS);
 
         ui.setVisible(true);
     }
 
-    private TableReferenceObject loadConfiguration() {
+    private TableReferenceObject loadConfiguration(String techologyType) {
         ConfigurationLoader loader = new ConfigurationLoader();
 
         try {
-            return loader.loadConfigurationXML();
+        	
+        	if (techologyType.equals(MetabolomicsResultEditor.MS)){
+        		return loader.loadConfigurationXML();
+        	} else {
+        		return loader.loadNMRConfigurationXML();
+        	}
+        		
+            
         } catch (XmlException e) {
             e.printStackTrace();
             return null;
