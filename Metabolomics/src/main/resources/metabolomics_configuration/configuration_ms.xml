@@ -1,5 +1,5 @@
 <isatab-config-file xmlns="http://www.ebi.ac.uk/bii/isatab_configuration#">
-    <isatab-configuration table-name="metaboliteprofiling_mztab">
+    <isatab-configuration table-name="metaboliteprofiling_ms_mztab">
         <measurement term-label="metabolite profiling" term-accession="" source-abbreviation=""/>
         <technology term-label="" term-accession="" source-abbreviation=""/>
         <field header="identifier" data-type="String" is-file-field="false" is-multiple-value="true" is-required="true">
@@ -18,11 +18,11 @@
             <description>NMR/MS: The chemical formula of the identified compound</description>
             <default-value></default-value>
         </field>
-        <field header="chemical_shift" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
+        <field header="chemical_shift" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false" is-hidden="true">
             <description>NMR: Chemical shift</description>
             <default-value></default-value>
         </field>
-        <field header="multiplicity" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
+        <field header="multiplicity" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false" is-hidden="true">
             <description>NMR: Type of multiplets observed of the metabolite (e.g s, d, t, q, dd, ...)</description>
             <default-value></default-value>
         </field>
@@ -84,8 +84,7 @@
         </field>
         <field header="modifications" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
             <description>
-                MS:
-                The small molecules modifications. The position of the modification must be given relative to the small molecules beginning.
+                MS: The small molecules modifications. The position of the modification must be given relative to the small molecules beginning.
                 The exact semantics of this position depends on the type of small molecule identified</description>
             <default-value></default-value>
         </field>

@@ -2,6 +2,8 @@ package org.isatools.plugins.metabolights.assignments.ui;
 
 
 import com.sun.awt.AWTUtilities;
+
+import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.isatools.isacreator.common.UIHelper;
 import org.isatools.isacreator.effects.AnimatableJFrame;
@@ -20,6 +22,8 @@ import java.awt.*;
 import java.io.IOException;
 
 public class EditorUI extends AnimatableJFrame {
+	
+	private static Logger logger = Logger.getLogger(EditorUI.class);
 
     public static final float DESIRED_OPACITY = .94f;
 
@@ -45,7 +49,7 @@ public class EditorUI extends AnimatableJFrame {
 
     public void createGUI() {
 
-        System.out.println("Metabolomics plugin starting up");
+        logger.info("Metabolomics plugin starting up");
 
         setTitle("Assign metabolites");
         setUndecorated(true);

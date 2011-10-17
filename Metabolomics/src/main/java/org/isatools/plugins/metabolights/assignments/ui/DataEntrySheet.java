@@ -1,8 +1,10 @@
 package org.isatools.plugins.metabolights.assignments.ui;
 
+import org.apache.log4j.Logger;
 import org.isatools.isacreator.common.UIHelper;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
+import org.isatools.plugins.metabolights.assignments.io.ConfigurationLoader;
 import org.isatools.plugins.metabolights.assignments.io.FileLoader;
 import org.isatools.plugins.metabolights.assignments.io.FileWriter;
 import org.jdesktop.fuse.InjectedResource;
@@ -23,6 +25,8 @@ import java.io.FileNotFoundException;
  *         Time: 16:24
  */
 public class DataEntrySheet extends JPanel {
+	
+	private static Logger logger = Logger.getLogger(DataEntrySheet.class);
 
     private Spreadsheet sheet;
     private EditorUI parentFrame;
@@ -108,7 +112,7 @@ public class DataEntrySheet extends JPanel {
     }
 
     private void saveFile(){
-        System.out.print("Save code here");
+        logger.info("Saving the file");
         
         FileWriter fw = new FileWriter();
         
@@ -120,22 +124,27 @@ public class DataEntrySheet extends JPanel {
 		}
     }
     private void loadFile(){
-        
-    	FileLoader fl = new FileLoader();
-        
-        System.out.println("Trying to load a file");
-        tableReferenceObject= fl.loadFile(getFileName(), tableReferenceObject);
-        
-        updateSpreadsheet(new Spreadsheet(parentFrame,tableReferenceObject,""));
-        
+    	logger.info("Loading file");
+    	loadFile(tableReferenceObject);
     }
-    
+
+    public void loadFile(TableReferenceObject tableReferenceObject){
+
+    	FileLoader fl = new FileLoader();
+
+        logger.info("Trying to load the metabolite assignment file");
+        tableReferenceObject = fl.loadFile(getFileName(), tableReferenceObject);
+
+        updateSpreadsheet(new Spreadsheet(parentFrame,tableReferenceObject,""));
+
+    }
+
     private void updateSpreadsheet(Spreadsheet newSpreadsheet){
 
-        System.out.println("Removing existing spreadsheet");
+        logger.info("Removing existing spreadsheet");
         remove(sheet);
         
-        System.out.println("Adding the new sheet");
+        logger.info("Adding the new sheet");
         sheet = newSpreadsheet;
         add(sheet,BorderLayout.CENTER);
         validate();
