@@ -32,6 +32,8 @@ public class DataEntrySheet extends JPanel {
     private Spreadsheet sheet;
     private EditorUI parentFrame;
     private TableReferenceObject tableReferenceObject;
+    
+    private String fileName;
 
     @InjectedResource
     private ImageIcon saveIcon, saveIconOver, loadIcon, loadIconOver;
@@ -110,7 +112,16 @@ public class DataEntrySheet extends JPanel {
     
     private String getFileName(){
     	
-    	return "/tmp/metabolights.txt";
+    	
+    	// if we do not have the property already setted
+    	if (fileName == null){
+    		calculateFileName();
+    	}
+    	return fileName;
+    }
+    private void calculateFileName(){
+    	fileName = "/tmp/metabolights.txt";
+    	parentFrame.setCurrentCellValue(fileName);
     }
 
     private void saveFile(){
