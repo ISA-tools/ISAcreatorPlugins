@@ -1,5 +1,6 @@
 package org.isatools.plugins.metabolights.assignments;
 
+import org.apache.log4j.Logger;
 import org.isatools.isacreator.gui.ApplicationManager;
 import org.isatools.isacreator.gui.DataEntryEnvironment;
 import org.isatools.isacreator.gui.ISAcreator;
@@ -15,11 +16,12 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * Time: 09:14
  */
 public class IsaCreatorInfo {
+	
+	private static Logger logger = Logger.getLogger(IsaCreatorInfo.class);
 
     private ISAcreator isacreator;
 
     public IsaCreatorInfo(){
-
     }
 
     public ISAcreator getIsacreator() {
@@ -29,19 +31,13 @@ public class IsaCreatorInfo {
         return isacreator;
     }
 
-    public void setIsacreator(ISAcreator isacreator) {
-        this.isacreator = isacreator;
-    }
-
     private DataEntryEnvironment getISACreatorEnvironment(){
         return getIsacreator().getDataEntryEnvironment();
     }
 
     private DefaultMutableTreeNode getISANode(){
-
         DefaultMutableTreeNode selectedNode = getISACreatorEnvironment().getSelectedNodeInOverviewTree();
         return selectedNode;
-
     }
 
     private Assay getAssay(Object object){
@@ -52,7 +48,7 @@ public class IsaCreatorInfo {
             assay = (Assay) object;
         }
 
-        System.out.println("Current Assay is '" + assay.getIdentifier() + "', technology is " + assay.getTechnologyType() + ", platform is " + assay.getAssayPlatform());
+        logger.info("Current Assay is '" + assay.getIdentifier() + "', technology is " + assay.getTechnologyType() + ", platform is " + assay.getAssayPlatform());
         return assay;
 
     }
@@ -75,7 +71,7 @@ public class IsaCreatorInfo {
 
         Investigation investigation = getISACreatorEnvironment().getInvestigation();
 
-        System.out.println("Investigation id is '"+ investigation.getInvestigationId() + "' title is " + investigation.getInvestigationTitle() + ", configuration used "+ investigation.getLastConfigurationUsed());
+        logger.info("Investigation id is '"+ investigation.getInvestigationId() + "' title is " + investigation.getInvestigationTitle() + ", configuration used "+ investigation.getLastConfigurationUsed());
         return investigation;
 
     }

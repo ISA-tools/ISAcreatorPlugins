@@ -1,26 +1,47 @@
 package org.isatools.plugins.metabolights.assignments;
 
 
+import org.apache.log4j.Logger;
+import org.apache.xmlbeans.XmlException;
 import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.plugins.AbstractPluginSpreadsheetWidget;
 import org.isatools.isacreator.plugins.DefaultWindowListener;
 import org.isatools.isacreator.plugins.registries.SpreadsheetPluginRegistry;
+import org.isatools.plugins.metabolights.assignments.io.ConfigurationLoader;
+import org.isatools.plugins.metabolights.assignments.ui.DataEntrySheet;
 import org.isatools.plugins.metabolights.assignments.ui.EditorUI;
 
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
-
-    public static int WIDTH = 700;
+	
+	private static final long serialVersionUID = 1699770979608557533L;
+	
+	private static Logger logger = Logger.getLogger(MetabolomicsResultEditor.class);
+	
+	public static int WIDTH = 700;
     public static int HEIGHT = 400;
     private IsaCreatorInfo isaCreatorInfo;
 
-    EditorUI editorUI;
+    private EditorUI editorUI;
+    private DataEntrySheet dataEntrySheet;
+    private ConfigurationLoader configurationLoader;
+
+    public ConfigurationLoader getConfigurationLoader() {
+        if (configurationLoader == null)
+            configurationLoader = new ConfigurationLoader();
+        return configurationLoader;
+    }
+
+    public DataEntrySheet getDataEntrySheet() {
+        return dataEntrySheet;
+    }
 
     public MetabolomicsResultEditor() {
         super();
@@ -28,7 +49,7 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
 
     @Override
     public void instantiateComponent() {
-        System.out.print("Instantiating the metabolomics plugin");
+    	logger.info("Instantiating the metabolomics plugin");
         editorUI = new EditorUI();
         editorUI.createGUI();
         editorUI.setLocationRelativeTo(null);
@@ -37,7 +58,7 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
         editorUI.addPropertyChangeListener("confirm",
                 new PropertyChangeListener() {
                     public void propertyChange(PropertyChangeEvent evt) {
-                        System.out.println("Cell editing confirmed");
+                        logger.info("Cell editing confirmed");
                         setCellValue(getCellValue());
                         stopCellEditing();
                     }
@@ -45,7 +66,7 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
         editorUI.addPropertyChangeListener("cancel",
                 new PropertyChangeListener() {
                     public void propertyChange(PropertyChangeEvent evt) {
-                        System.out.println("Cell editing cancelled");
+                        logger.info("Cell editing cancelled");
                         setCellValue(getOriginalValue());
                         cancelCellEditing();
                     }
@@ -54,7 +75,7 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
         editorUI.addWindowListener(new DefaultWindowListener() {
 
             public void windowDeactivated(WindowEvent event) {
-                System.out.println("Cell editing cancelled");
+                logger.info("Cell editing cancelled");
                 setCellValue(editorUI.getNewCellValue());
                 cancelCellEditing();
             }
@@ -69,24 +90,27 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
 
     @Override
     public void showComponent() {
-
-        //Get the current assay
-        Assay assay = getAssay();
-        System.out.println("The current Assay is "+assay.getIdentifier());
-
-        //Get the Technology type from the assay NMR or MS
-        String technology = assay.getTechnologyType();
-        System.out.println("The current Assay Technology type is "+technology);
-
-        if (technology != null && technology.equalsIgnoreCase("NMR")){
-        	//TODO, swap in the NMR version of the spreadsheet
-
-        }
-
-
-        System.out.println("Original value of cell is " + getOriginalValue());
+    	
+        logger.info("Original value of cell is " + getOriginalValue());
         editorUI.setCurrentCellValue(getOriginalValue());
         editorUI.setVisible(true);
+    	
+    	logger.info("Plugin: Checking which configuration file to load");
+
+        try {
+            //Is this NMR or MS? Load the appropriate xml file (differs where some columns are hidden)
+            if (getTechnology().equalsIgnoreCase("NMR")){
+            	logger.info("Plugin: Loading the NMR configuration file");
+                //getDataEntrySheet().loadFile(getConfigurationLoader().loadNMRConfigurationXML());
+            } else {
+            	logger.info("Plugin: Loading the MS configuration file");
+                //getDataEntrySheet().loadFile(getConfigurationLoader().loadConfigurationXML());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();  
+        } 
+   
     }
 
     @Override
@@ -142,7 +166,25 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     }
 
     private Assay getAssay(){
-        return getIsaCreatorInfo().getCurrentAssay();
+
+        Assay assay = getIsaCreatorInfo().getCurrentAssay();
+
+        if (assay == null)
+            return new Assay();
+
+        return assay;
+    }
+
+    private String getTechnology(){
+           //Get the current assay
+        Assay assay = getAssay();
+        logger.info("The current Assay is "+assay.getIdentifier());
+
+        //Get the Technology type from the assay NMR or MS
+        String technology = assay.getTechnologyType();
+        logger.info("The current Assay Technology type is "+technology);
+
+        return technology;
     }
 
 }
