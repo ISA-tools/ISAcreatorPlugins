@@ -29,6 +29,9 @@ public class EditorUI extends AnimatableJFrame {
 
     private String currentCellValue;
     private String newCellValue;
+    
+    // True when running alone without ISACreator
+    private boolean amIAlone = true;
 
     static {
         ResourceInjector.addModule("org.jdesktop.fuse.swing.SwingModule");
@@ -78,6 +81,17 @@ public class EditorUI extends AnimatableJFrame {
         DataEntrySheet sheet = new DataEntrySheet(EditorUI.this, loadConfiguration(technologyType));
         sheet.createGUI();
         add(sheet, BorderLayout.CENTER);
+        
+        // Check if he ISACreator is available
+        if (!amIAlone) {
+        	// If so, try to load the file (if exists)
+        	sheet.loadFile();
+        }
+
+    }
+    
+    public void confirm(){
+    	firePropertyChange("confirm", "1", "2");
     }
 
     /**
@@ -93,10 +107,20 @@ public class EditorUI extends AnimatableJFrame {
         this.newCellValue = currentCellValue;
     }
 
+    public String getCurrentCellValue(){
+    	return this.currentCellValue;
+    }
     public String getNewCellValue() {
         return newCellValue;
     }
 
+    public boolean getAmIAlone(){
+    	return amIAlone;
+    }
+    public void setAmIAlone(boolean amIAlone){
+    	this.amIAlone = amIAlone;
+    }
+    
     public static void main(String[] args) {
         EditorUI ui = new EditorUI();
         ui.createGUI(MetabolomicsResultEditor.MS);

@@ -59,12 +59,15 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
 
     @Override
     public void instantiateComponent() {
+    	logger.info("instantiateComponent called.");
     	instantiateComponent(MS);
     }
     
     public void instantiateComponent(String technologyType) {
     	logger.info("Instantiating the metabolomics plugin");
         editorUI = new EditorUI();
+        
+        editorUI.setAmIAlone(!isIsaCreatorLoaded());
         editorUI.createGUI(technologyType);
         editorUI.setLocationRelativeTo(null);
         editorUI.setAlwaysOnTop(true);
@@ -94,7 +97,6 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
                 cancelCellEditing();
             }
         });
-
     }
 
     @Override
@@ -159,7 +161,7 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     }
 
     public void deregisterCellEditor() {
-        SpreadsheetPluginRegistry.registerPlugin(this);
+        SpreadsheetPluginRegistry.deregisterPlugin(this);
     }
 
     public Set<String> targetColumns() {
@@ -200,6 +202,9 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
         logger.info("The current Assay Technology type is "+technology);
 
         return technology;
+    }
+    private boolean isIsaCreatorLoaded(){
+    	return (getIsaCreatorInfo().getIsacreator()!=null);
     }
 
 }

@@ -13,6 +13,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.FileNotFoundException;
 
 /**
@@ -36,7 +37,7 @@ public class DataEntrySheet extends JPanel {
     private String fileName;
 
     @InjectedResource
-    private ImageIcon saveIcon, saveIconOver, loadIcon, loadIconOver;
+    private ImageIcon saveIcon, saveIconOver, loadIcon, loadIconOver, okIcon;
 
     public DataEntrySheet(EditorUI parentFrame, TableReferenceObject tableReferenceObject) {
         ResourceInjector.get("metabolights-fileeditor-package.style").inject(this);
@@ -87,7 +88,6 @@ public class DataEntrySheet extends JPanel {
             public void mousePressed(MouseEvent mouseEvent) {
                 saveButton.setIcon(saveIcon);
                 saveFile();
- 
             }
 
             @Override
@@ -101,9 +101,20 @@ public class DataEntrySheet extends JPanel {
             }
         });
 
+        final JLabel okButton = new JLabel(okIcon);
+        okButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+                parentFrame.setCurrentCellValue(fileName);
+            	parentFrame.confirm();
+            }
+        });
+        
         buttonContainer.add(saveButton);
         buttonContainer.add(Box.createHorizontalStrut(5));
         buttonContainer.add(loadButton);
+        buttonContainer.add(Box.createHorizontalStrut(5));
+        buttonContainer.add(okButton);
 
         topContainer.add(buttonContainer, BorderLayout.EAST);
 
@@ -119,9 +130,17 @@ public class DataEntrySheet extends JPanel {
     	}
     	return fileName;
     }
-    private void calculateFileName(){
-    	fileName = "/tmp/metabolights.txt";
-    	parentFrame.setCurrentCellValue(fileName);
+    @SuppressWarnings("static-access")
+	private void calculateFileName(){
+    	
+    	// Check if the current cell has any value
+    	if (parentFrame.getCurrentCellValue() == null){
+    		File file = new File(".");
+    		
+    		fileName = file.getAbsolutePath() + file.separator + "metabolights.txt";
+    	}else{
+    		fileName = parentFrame.getCurrentCellValue();
+    	}
     }
 
     private void saveFile(){
@@ -136,7 +155,7 @@ public class DataEntrySheet extends JPanel {
 			e.printStackTrace();
 		}
     }
-    private void loadFile(){
+    public void loadFile(){
     	logger.info("Loading file");
     	loadFile(tableReferenceObject);
     }
@@ -155,7 +174,11 @@ public class DataEntrySheet extends JPanel {
     private void updateSpreadsheet(Spreadsheet newSpreadsheet){
 
         logger.info("Removing existing spreadsheet");
-        remove(sheet);
+        
+        // If we have a previous sheet
+        if (sheet != null){
+        	remove(sheet);
+        }
         
         logger.info("Adding the new sheet");
         sheet = newSpreadsheet;
