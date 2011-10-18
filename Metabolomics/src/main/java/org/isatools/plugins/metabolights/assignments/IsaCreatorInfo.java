@@ -8,6 +8,9 @@ import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.model.Investigation;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,6 +23,7 @@ public class IsaCreatorInfo {
 	private static Logger logger = Logger.getLogger(IsaCreatorInfo.class);
 
     private ISAcreator isacreator;
+    private static final String SAMPLE_PREFIX = "opt_sample_";
 
     public IsaCreatorInfo(){
     }
@@ -73,6 +77,27 @@ public class IsaCreatorInfo {
 
         logger.info("Investigation id is '"+ investigation.getInvestigationId() + "' title is " + investigation.getInvestigationTitle() + ", configuration used "+ investigation.getLastConfigurationUsed());
         return investigation;
+
+    }
+
+    public List<String> getSampleColumns(){
+
+        List<String> assayColumns = new ArrayList<String>();
+
+        if (getIsacreator() != null){
+
+            List<List<String>> assayData = getCurrentAssay().getTableReferenceObject().getData();
+
+            Iterator iterator = assayData.listIterator();
+            while (iterator.hasNext()){
+                List<String> assayRow = (List<String>) iterator.next();
+                String assayName = assayRow.get(0);  //Sample name is the first row
+                assayColumns.add(SAMPLE_PREFIX + assayName);
+            }
+
+        }
+
+        return assayColumns;
 
     }
 

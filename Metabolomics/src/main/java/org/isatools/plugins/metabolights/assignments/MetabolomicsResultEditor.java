@@ -39,20 +39,6 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
         return configurationLoader;
     }
 
-    //TODO, is this still used?
-    public DataEntrySheet getDataEntrySheet(String type) {
-    	try {
-    		if (type == NMR) {
-    			this.dataEntrySheet = new DataEntrySheet(editorUI, getConfigurationLoader().loadNMRConfigurationXML());
-    		} else {
-    			this.dataEntrySheet = new DataEntrySheet(editorUI, getConfigurationLoader().loadConfigurationXML());
-    		}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} 
-        return this.dataEntrySheet;
-    }
-
     public MetabolomicsResultEditor() {
         super();
     }
@@ -159,7 +145,7 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     }
 
     public void deregisterCellEditor() {
-        SpreadsheetPluginRegistry.registerPlugin(this);
+        SpreadsheetPluginRegistry.deregisterPlugin(this);
     }
 
     public Set<String> targetColumns() {
@@ -174,10 +160,6 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
         if (isaCreatorInfo == null)
             isaCreatorInfo = new IsaCreatorInfo();
         return isaCreatorInfo;
-    }
-
-    public void setIsaCreatorInfo(IsaCreatorInfo isaCreatorInfo) {
-        this.isaCreatorInfo = isaCreatorInfo;
     }
 
     private Assay getAssay(){
