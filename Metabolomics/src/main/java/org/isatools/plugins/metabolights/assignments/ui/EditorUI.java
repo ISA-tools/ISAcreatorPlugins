@@ -2,15 +2,17 @@ package org.isatools.plugins.metabolights.assignments.ui;
 
 
 import com.sun.awt.AWTUtilities;
-
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.isatools.isacreator.common.UIHelper;
+import org.isatools.isacreator.configuration.DataTypes;
+import org.isatools.isacreator.configuration.FieldObject;
 import org.isatools.isacreator.effects.AnimatableJFrame;
 import org.isatools.isacreator.effects.FooterPanel;
 import org.isatools.isacreator.effects.HUDTitleBar;
 import org.isatools.isacreator.gui.ISAcreator;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
+import org.isatools.plugins.metabolights.assignments.IsaCreatorInfo;
 import org.isatools.plugins.metabolights.assignments.MetabolomicsResultEditor;
 import org.isatools.plugins.metabolights.assignments.io.ConfigurationLoader;
 import org.jdesktop.fuse.InjectedResource;
@@ -20,6 +22,8 @@ import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.io.IOException;
+import java.util.*;
+import java.util.List;
 
 public class EditorUI extends AnimatableJFrame {
 	
@@ -32,6 +36,14 @@ public class EditorUI extends AnimatableJFrame {
     
     // True when running alone without ISACreator
     private boolean amIAlone = true;
+
+    private IsaCreatorInfo isaCreatorInfo;
+
+    private IsaCreatorInfo getIsaCreatorInfo() {
+        if (isaCreatorInfo == null)
+            isaCreatorInfo = new IsaCreatorInfo();
+        return isaCreatorInfo;
+    }
 
     static {
         ResourceInjector.addModule("org.jdesktop.fuse.swing.SwingModule");
@@ -78,7 +90,21 @@ public class EditorUI extends AnimatableJFrame {
     }
 
     private void createCentralPanel(String technologyType) {
-        DataEntrySheet sheet = new DataEntrySheet(EditorUI.this, loadConfiguration(technologyType));
+
+        TableReferenceObject tableReferenceObject = loadConfiguration(technologyType);
+
+        if (getIsaCreatorInfo().getIsacreator() != null){
+            List<String> assaySampleList =  getIsaCreatorInfo().getSampleColumns();
+            Iterator iter = assaySampleList.iterator();
+            while (iter.hasNext()){
+                String sampleName = (String) iter.next();
+                FieldObject fieldObject = new FieldObject(sampleName, "Sample description", DataTypes.STRING, "", false, false, false);
+                tableReferenceObject.addField(fieldObject);
+            }
+
+        }
+
+        DataEntrySheet sheet = new DataEntrySheet(EditorUI.this, tableReferenceObject);
         sheet.createGUI();
         add(sheet, BorderLayout.CENTER);
         
@@ -138,8 +164,8 @@ public class EditorUI extends AnimatableJFrame {
         	} else {
         		return loader.loadNMRConfigurationXML();
         	}
-        		
-            
+
+
         } catch (XmlException e) {
             e.printStackTrace();
             return null;

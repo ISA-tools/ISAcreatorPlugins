@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.isatools.isacreator.common.UIHelper;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
+import org.isatools.plugins.metabolights.assignments.IsaCreatorInfo;
 import org.isatools.plugins.metabolights.assignments.io.FileLoader;
 import org.isatools.plugins.metabolights.assignments.io.FileWriter;
 import org.jdesktop.fuse.InjectedResource;
@@ -15,6 +16,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by the ISA team
@@ -33,15 +36,22 @@ public class DataEntrySheet extends JPanel {
     private Spreadsheet sheet;
     private EditorUI parentFrame;
     private TableReferenceObject tableReferenceObject;
-    
+
     private String fileName;
+
+    private IsaCreatorInfo isaCreatorInfo;
+
+    private IsaCreatorInfo getIsaCreatorInfo() {
+        if (isaCreatorInfo == null)
+            isaCreatorInfo = new IsaCreatorInfo();
+        return isaCreatorInfo;
+    }
 
     @InjectedResource
     private ImageIcon saveIcon, saveIconOver, loadIcon, loadIconOver, okIcon;
 
     public DataEntrySheet(EditorUI parentFrame, TableReferenceObject tableReferenceObject) {
         ResourceInjector.get("metabolights-fileeditor-package.style").inject(this);
-
         this.parentFrame = parentFrame;
         this.tableReferenceObject = tableReferenceObject;
         setLayout(new BorderLayout());
@@ -49,7 +59,22 @@ public class DataEntrySheet extends JPanel {
     }
 
     public void createGUI() {
+
         sheet = new Spreadsheet(parentFrame, tableReferenceObject, "");
+
+        if (getIsaCreatorInfo().getIsacreator() != null){
+
+            List<String> assaySampleList = getIsaCreatorInfo().getSampleColumns();
+            Iterator iter = assaySampleList.iterator();
+            while (iter.hasNext()){
+                String sampleName = (String) iter.next();
+                   if (!sheet.getSpreadsheetFunctions().checkColumnExists(sampleName));{
+                        logger.info("Adding optional column " +sampleName);
+                        sheet.getSpreadsheetFunctions().addColumn(sampleName);
+                    }
+
+             }
+        }
 
         createTopPanel();
         add(sheet, BorderLayout.CENTER);
