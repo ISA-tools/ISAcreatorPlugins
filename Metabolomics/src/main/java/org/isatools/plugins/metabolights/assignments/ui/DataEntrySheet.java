@@ -162,7 +162,8 @@ public class DataEntrySheet extends JPanel {
     	if (parentFrame.getCurrentCellValue() == null){
     		File file = new File(".");
     		
-    		fileName = file.getAbsolutePath() + file.separator + "metabolights.txt";
+    		String assayName = getIsaCreatorInfo().getCurrentAssay().getIdentifier();
+    		fileName = file.getAbsolutePath() + file.separator + assayName + ".maf";
     	}else{
     		fileName = parentFrame.getCurrentCellValue();
     	}
@@ -187,12 +188,21 @@ public class DataEntrySheet extends JPanel {
 
     public void loadFile(TableReferenceObject tableReferenceObject){
 
-    	FileLoader fl = new FileLoader();
+        
+        String fn = getFileName();
+        File file = new File(fn);
+        
+        // If the file exists...
+        if (file.exists()){
 
-        logger.info("Trying to load the metabolite assignment file");
-        tableReferenceObject = fl.loadFile(getFileName(), tableReferenceObject);
+        	FileLoader fl = new FileLoader();
 
-        updateSpreadsheet(new Spreadsheet(parentFrame,tableReferenceObject,""));
+            logger.info("Trying to load the metabolite assignment file: " + fn);
+
+        	tableReferenceObject = fl.loadFile(getFileName(), tableReferenceObject);
+
+        	updateSpreadsheet(new Spreadsheet(parentFrame,tableReferenceObject,""));
+        }
 
     }
 
