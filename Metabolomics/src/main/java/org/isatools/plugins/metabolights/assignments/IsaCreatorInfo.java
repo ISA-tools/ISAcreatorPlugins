@@ -8,6 +8,8 @@ import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.model.Investigation;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -102,9 +104,18 @@ public class IsaCreatorInfo {
 
     }
 
-    public String getAssayFileLocation() {
+    public String getFileLocation() {
+        File file = new File(".");
 
-        return getCurrentInvestigation().getReference();
+        if (getIsacreator() == null )
+            try {
+                return file.getCanonicalPath();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        file = new File(getCurrentInvestigation().getReference());
+        return file.getParentFile().getPath();
     }
 
 

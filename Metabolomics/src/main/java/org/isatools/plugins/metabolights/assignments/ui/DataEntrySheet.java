@@ -182,7 +182,7 @@ public class DataEntrySheet extends JPanel {
 				path = file.getCanonicalPath();
 			} catch (IOException e) {
 				// Do not use the canonical (this will have a /. at the end)
-				path = file.getAbsolutePath();
+				path = getIsaCreatorInfo().getFileLocation(); //file.getAbsolutePath();
 			}
     		
     		// Compose the final file name
