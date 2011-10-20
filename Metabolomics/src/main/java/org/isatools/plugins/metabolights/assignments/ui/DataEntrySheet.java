@@ -189,7 +189,7 @@ public class DataEntrySheet extends JPanel {
 			fileName = path + file.separator + assayName;
     		
     		
-    	}else{
+    	} else {
     		fileName = parentFrame.getCurrentCellValue();
     	}
     }

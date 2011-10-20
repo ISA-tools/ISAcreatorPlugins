@@ -102,6 +102,11 @@ public class IsaCreatorInfo {
 
     }
 
+    public String getAssayFileLocation() {
+
+        return getCurrentInvestigation().getReference();
+    }
+
 
 
 }

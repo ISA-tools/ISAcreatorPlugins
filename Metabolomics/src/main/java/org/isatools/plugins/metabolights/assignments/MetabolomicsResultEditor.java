@@ -174,6 +174,8 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
         return assay;
     }
 
+
+
     private String getTechnology(){
            //Get the current assay
         Assay assay = getAssay();
