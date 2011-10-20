@@ -16,6 +16,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -166,8 +167,28 @@ public class DataEntrySheet extends JPanel {
     	if (parentFrame.getCurrentCellValue() == null){
     		File file = new File(".");
     		
+    		// Get the assay name
     		String assayName = getIsaCreatorInfo().getCurrentAssay().getIdentifier();
-    		fileName = file.getAbsolutePath() + file.separator + assayName + ".maf";
+    		
+    		// Remove the extension
+    		assayName = assayName.substring(0, assayName.length()-4);
+    		
+    		// Add a asigmentfile sufix
+    		assayName = assayName + "_maf.csv";
+    		
+    		// Get the path
+    		String path ="";
+    		try {
+				path = file.getCanonicalPath();
+			} catch (IOException e) {
+				// Do not use the canonical (this will have a /. at the end)
+				path = file.getAbsolutePath();
+			}
+    		
+    		// Compose the final file name
+			fileName = path + file.separator + assayName;
+    		
+    		
     	}else{
     		fileName = parentFrame.getCurrentCellValue();
     	}
