@@ -59,24 +59,29 @@ public class DataEntrySheet extends JPanel {
         setBackground(UIHelper.BG_COLOR);
     }
 
-    public void createGUI() {
 
-        sheet = new Spreadsheet(parentFrame, tableReferenceObject, "");
-
-        if (getIsaCreatorInfo().getIsacreator() != null){
+    /*
+    Add all missing sample columns to the spreadsheet
+     */
+    public void addAllSampleColumns(){
+         if (getIsaCreatorInfo().getIsacreator() != null){
 
             List<String> assaySampleList = getIsaCreatorInfo().getSampleColumns();
             Iterator iter = assaySampleList.iterator();
             while (iter.hasNext()){
                 String sampleName = (String) iter.next();
-                   if (!sheet.getSpreadsheetFunctions().checkColumnExists(sampleName));{
+                   if (!sheet.getSpreadsheetFunctions().checkColumnExists(sampleName) && sampleName.length() > 0);{
                         logger.info("Adding optional column " +sampleName);
                         sheet.getSpreadsheetFunctions().addColumn(sampleName);
                     }
-
              }
         }
+    }
 
+    public void createGUI() {
+
+        sheet = new Spreadsheet(parentFrame, tableReferenceObject, "");
+        addAllSampleColumns();         // Add the sample columns to the spreadsheet
         //createTopPanel();
         add(sheet, BorderLayout.CENTER);
         createBottomPanel();
@@ -182,9 +187,8 @@ public class DataEntrySheet extends JPanel {
     }
     
     private String getFileName(){
-    	
-    	
-    	// if we do not have the property already setted
+
+    	// if we do not have the property already set
     	if (fileName == null){
     		calculateFileName();
     	}
@@ -212,14 +216,14 @@ public class DataEntrySheet extends JPanel {
 				path = file.getCanonicalPath();
 			} catch (IOException e) {
 				// Do not use the canonical (this will have a /. at the end)
-				path = file.getAbsolutePath();
+				path = getIsaCreatorInfo().getFileLocation(); //file.getAbsolutePath();
 			}
     		
     		// Compose the final file name
 			fileName = path + file.separator + assayName;
     		
     		
-    	}else{
+    	} else {
     		fileName = parentFrame.getCurrentCellValue();
     	}
     }
@@ -272,6 +276,7 @@ public class DataEntrySheet extends JPanel {
         
         logger.info("Adding the new sheet");
         sheet = newSpreadsheet;
+        addAllSampleColumns(); //Add all missing sample columns to the spreadsheet
         add(sheet,BorderLayout.CENTER);
         validate();
     }

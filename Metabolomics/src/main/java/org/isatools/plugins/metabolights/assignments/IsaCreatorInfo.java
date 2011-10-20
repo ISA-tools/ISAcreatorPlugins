@@ -8,6 +8,8 @@ import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.model.Investigation;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -84,7 +86,7 @@ public class IsaCreatorInfo {
 
         List<String> assayColumns = new ArrayList<String>();
 
-        if (getIsacreator() != null){
+        if (getIsacreator() != null && getCurrentAssay() != null){
 
             List<List<String>> assayData = getCurrentAssay().getTableReferenceObject().getData();
 
@@ -92,13 +94,28 @@ public class IsaCreatorInfo {
             while (iterator.hasNext()){
                 List<String> assayRow = (List<String>) iterator.next();
                 String assayName = assayRow.get(0);  //Sample name is the first row
-                assayColumns.add(SAMPLE_PREFIX + assayName);
+                if (assayName != null)
+                    assayColumns.add(SAMPLE_PREFIX + assayName);
             }
 
         }
 
         return assayColumns;
 
+    }
+
+    public String getFileLocation() {
+        File file = new File(".");
+
+        if (getIsacreator() == null )
+            try {
+                return file.getCanonicalPath();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        file = new File(getCurrentInvestigation().getReference());
+        return file.getParentFile().getPath();
     }
 
 
