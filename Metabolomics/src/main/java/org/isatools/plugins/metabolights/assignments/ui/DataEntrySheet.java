@@ -49,7 +49,7 @@ public class DataEntrySheet extends JPanel {
     }
 
     @InjectedResource
-    private ImageIcon saveIcon, saveIconOver, loadIcon, loadIconOver, okIcon;
+    private ImageIcon saveIcon, saveIconOver, loadIcon, loadIconOver, okIcon, okIconOver;
 
     public DataEntrySheet(EditorUI parentFrame, TableReferenceObject tableReferenceObject) {
         ResourceInjector.get("metabolights-fileeditor-package.style").inject(this);
@@ -77,10 +77,54 @@ public class DataEntrySheet extends JPanel {
              }
         }
 
-        createTopPanel();
+        //createTopPanel();
         add(sheet, BorderLayout.CENTER);
+        createBottomPanel();
     }
+    public void createBottomPanel(){
+    	JPanel bottomPannel = new JPanel(new BorderLayout());
+    	bottomPannel.setBackground(UIHelper.BG_COLOR);
+    	
+    	Box buttonContainer = Box.createHorizontalBox();
+    	buttonContainer.setBackground(UIHelper.BG_COLOR);
+    	
+    	JLabel file = new JLabel();
+    	file.setBackground(UIHelper.BG_COLOR);
+    	
+    	// Not available in the first load (without ISACreator) 
+    	if (!parentFrame.getAmIAlone()){
+    		file.setText(getFileName());
+    	}
+    	
+    	bottomPannel.add(file);
+    	
+    	final JLabel okButton = new JLabel(okIcon);
+        okButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+                saveFile();
+            	parentFrame.setCurrentCellValue(fileName);
+            	parentFrame.confirm();
+            }
+            @Override
+            public void mouseExited(MouseEvent mouseEvent) {
+                okButton.setIcon(okIcon);
+            }
 
+            @Override
+            public void mouseEntered(MouseEvent mouseEvent) {
+                okButton.setIcon(okIconOver);
+            }
+        });
+        
+        buttonContainer.add(okButton);
+
+        bottomPannel.add(buttonContainer, BorderLayout.EAST);
+
+        add(bottomPannel, BorderLayout.SOUTH);
+
+    	
+    }
     public void createTopPanel() {
         JPanel topContainer = new JPanel(new BorderLayout());
         topContainer.setBackground(UIHelper.BG_COLOR);
@@ -127,21 +171,11 @@ public class DataEntrySheet extends JPanel {
             }
         });
 
-        final JLabel okButton = new JLabel(okIcon);
-        okButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent mouseEvent) {
-                parentFrame.setCurrentCellValue(fileName);
-            	parentFrame.confirm();
-            }
-        });
         
         buttonContainer.add(saveButton);
         buttonContainer.add(Box.createHorizontalStrut(5));
         buttonContainer.add(loadButton);
-        buttonContainer.add(Box.createHorizontalStrut(5));
-        buttonContainer.add(okButton);
-
+        
         topContainer.add(buttonContainer, BorderLayout.EAST);
 
         add(topContainer, BorderLayout.NORTH);

@@ -117,7 +117,9 @@ public class EditorUI extends AnimatableJFrame {
     }
     
     public void confirm(){
+    	setVisible(false);
     	firePropertyChange("confirm", "1", "2");
+    	
     }
 
     /**
