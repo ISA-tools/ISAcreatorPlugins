@@ -84,7 +84,7 @@ public class IsaCreatorInfo {
 
         List<String> assayColumns = new ArrayList<String>();
 
-        if (getIsacreator() != null){
+        if (getIsacreator() != null && getCurrentAssay() != null){
 
             List<List<String>> assayData = getCurrentAssay().getTableReferenceObject().getData();
 
@@ -92,7 +92,8 @@ public class IsaCreatorInfo {
             while (iterator.hasNext()){
                 List<String> assayRow = (List<String>) iterator.next();
                 String assayName = assayRow.get(0);  //Sample name is the first row
-                assayColumns.add(SAMPLE_PREFIX + assayName);
+                if (assayName != null)
+                    assayColumns.add(SAMPLE_PREFIX + assayName);
             }
 
         }

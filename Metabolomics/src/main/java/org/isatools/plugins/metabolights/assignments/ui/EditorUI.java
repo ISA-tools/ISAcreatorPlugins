@@ -95,11 +95,13 @@ public class EditorUI extends AnimatableJFrame {
 
         if (getIsaCreatorInfo().getIsacreator() != null){
             List<String> assaySampleList =  getIsaCreatorInfo().getSampleColumns();
-            Iterator iter = assaySampleList.iterator();
-            while (iter.hasNext()){
-                String sampleName = (String) iter.next();
-                FieldObject fieldObject = new FieldObject(sampleName, "Sample description", DataTypes.STRING, "", false, false, false);
-                tableReferenceObject.addField(fieldObject);
+            Iterator iterator = assaySampleList.iterator();
+            while (iterator.hasNext()){
+                String sampleName = (String) iterator.next();
+                if (sampleName != null && sampleName.length() > 0){ //Add the sample name, but there are lots of empty rows so need to test first
+                    FieldObject fieldObject = new FieldObject(sampleName, "Sample description", DataTypes.STRING, "", false, false, false);
+                    tableReferenceObject.addField(fieldObject);
+                }
             }
 
         }
