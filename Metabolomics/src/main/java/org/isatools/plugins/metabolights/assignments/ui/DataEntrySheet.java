@@ -17,8 +17,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Created by the ISA team
@@ -59,31 +57,10 @@ public class DataEntrySheet extends JPanel {
         setBackground(UIHelper.BG_COLOR);
     }
 
-
-    /*
-    Add all missing sample columns to the spreadsheet
-     */
-    public void addAllSampleColumns(){
-         if (getIsaCreatorInfo().getIsacreator() != null){
-
-            List<String> assaySampleList = getIsaCreatorInfo().getSampleColumns();
-            Iterator iter = assaySampleList.iterator();
-            while (iter.hasNext()){
-                String sampleName = (String) iter.next();
-                   if (!sheet.getSpreadsheetFunctions().checkColumnExists(sampleName) && sampleName.length() > 0);{
-                        logger.info("Adding optional column " +sampleName);
-                        sheet.getSpreadsheetFunctions().addColumn(sampleName);
-                    }
-             }
-        }
-    }
-
     public void createGUI() {
-
-        sheet = new Spreadsheet(parentFrame, tableReferenceObject, "");
-        addAllSampleColumns();         // Add the sample columns to the spreadsheet
+        sheet = new Spreadsheet(parentFrame, getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject), "");  // Add the sample columns to the definition
         createTopPanel();
-        add(sheet, BorderLayout.CENTER);
+        add(getIsaCreatorInfo().addSpreadsheetSampleColumns(sheet), BorderLayout.CENTER);  // Add the sample columns to the spreadsheet
     }
 
     public void createTopPanel() {
@@ -208,7 +185,7 @@ public class DataEntrySheet extends JPanel {
     }
     public void loadFile(){
     	logger.info("Loading file");
-    	loadFile(tableReferenceObject);
+    	loadFile(getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject));   //Make sure all sample columns are present in the defintion
     }
 
     public void loadFile(TableReferenceObject tableReferenceObject){
@@ -225,8 +202,8 @@ public class DataEntrySheet extends JPanel {
             logger.info("Trying to load the metabolite assignment file: " + fn);
 
         	tableReferenceObject = fl.loadFile(getFileName(), tableReferenceObject);
-
-        	updateSpreadsheet(new Spreadsheet(parentFrame,tableReferenceObject,""));
+            Spreadsheet loadedSheet = new Spreadsheet(parentFrame,tableReferenceObject,"");   //To map the columns that we load from the file
+        	updateSpreadsheet(getIsaCreatorInfo().addSpreadsheetSampleColumns(loadedSheet));  // Load the existing spreadsheet and add any new sample columns
         }
 
     }
@@ -242,8 +219,7 @@ public class DataEntrySheet extends JPanel {
         
         logger.info("Adding the new sheet");
         sheet = newSpreadsheet;
-        addAllSampleColumns(); //Add all missing sample columns to the spreadsheet
-        add(sheet,BorderLayout.CENTER);
+        add(getIsaCreatorInfo().addSpreadsheetSampleColumns(sheet),BorderLayout.CENTER);  //Add all missing sample columns to the spreadsheet
         validate();
     }
 

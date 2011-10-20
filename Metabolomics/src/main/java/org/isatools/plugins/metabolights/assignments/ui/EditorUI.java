@@ -5,8 +5,6 @@ import com.sun.awt.AWTUtilities;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.isatools.isacreator.common.UIHelper;
-import org.isatools.isacreator.configuration.DataTypes;
-import org.isatools.isacreator.configuration.FieldObject;
 import org.isatools.isacreator.effects.AnimatableJFrame;
 import org.isatools.isacreator.effects.FooterPanel;
 import org.isatools.isacreator.effects.HUDTitleBar;
@@ -22,8 +20,6 @@ import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.io.IOException;
-import java.util.*;
-import java.util.List;
 
 public class EditorUI extends AnimatableJFrame {
 	
@@ -92,21 +88,8 @@ public class EditorUI extends AnimatableJFrame {
     private void createCentralPanel(String technologyType) {
 
         TableReferenceObject tableReferenceObject = loadConfiguration(technologyType);
-
-        if (getIsaCreatorInfo().getIsacreator() != null){
-            List<String> assaySampleList =  getIsaCreatorInfo().getSampleColumns();
-            Iterator iterator = assaySampleList.iterator();
-            while (iterator.hasNext()){
-                String sampleName = (String) iterator.next();
-                if (sampleName != null && sampleName.length() > 0){ //Add the sample name, but there are lots of empty rows so need to test first
-                    FieldObject fieldObject = new FieldObject(sampleName, "Sample description", DataTypes.STRING, "", false, false, false);
-                    tableReferenceObject.addField(fieldObject);
-                }
-            }
-
-        }
-
-        DataEntrySheet sheet = new DataEntrySheet(EditorUI.this, tableReferenceObject);
+        DataEntrySheet sheet = new DataEntrySheet(EditorUI.this,
+                getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject));  //Add sample columns to the table definition
         sheet.createGUI();
         add(sheet, BorderLayout.CENTER);
         

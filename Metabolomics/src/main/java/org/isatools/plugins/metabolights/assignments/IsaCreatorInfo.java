@@ -1,11 +1,15 @@
 package org.isatools.plugins.metabolights.assignments;
 
 import org.apache.log4j.Logger;
+import org.isatools.isacreator.configuration.DataTypes;
+import org.isatools.isacreator.configuration.FieldObject;
 import org.isatools.isacreator.gui.ApplicationManager;
 import org.isatools.isacreator.gui.DataEntryEnvironment;
 import org.isatools.isacreator.gui.ISAcreator;
 import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.model.Investigation;
+import org.isatools.isacreator.spreadsheet.Spreadsheet;
+import org.isatools.isacreator.spreadsheet.TableReferenceObject;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.File;
@@ -118,6 +122,47 @@ public class IsaCreatorInfo {
         return file.getParentFile().getPath();
     }
 
+    /*
+    Add all missing sample columns to the spreadsheet *DEFINITION*
+     */
+    public TableReferenceObject addTableRefSampleColumns(TableReferenceObject tableReferenceObject){
+
+        if (getIsacreator() != null){
+            List<String> assaySampleList =  getSampleColumns();
+            Iterator iterator = assaySampleList.iterator();
+            while (iterator.hasNext()){
+                String sampleName = (String) iterator.next();
+                if (sampleName != null && sampleName.length() > 0){ //Add the sample name, but there are lots of empty rows so need to test first
+                    logger.info("Adding optional column to the spreadsheet definition: " +sampleName);
+                    FieldObject fieldObject = new FieldObject(sampleName, "Sample description", DataTypes.STRING, "", false, false, false);
+                    tableReferenceObject.addField(fieldObject);
+                }
+            }
+        }
+
+        return tableReferenceObject;
+
+    }
+
+    /*
+    Add all missing sample columns to the spreadsheet, the DEFINITION must be defined first
+     */
+    public Spreadsheet addSpreadsheetSampleColumns(Spreadsheet newSheet){
+
+         if (getIsacreator() != null){
+             List<String> assaySampleList = getSampleColumns();
+             Iterator iter = assaySampleList.iterator();
+             while (iter.hasNext()){
+                String sampleName = (String) iter.next();
+                   if (!newSheet.getSpreadsheetFunctions().checkColumnExists(sampleName) && sampleName.length() > 0);{
+                        logger.info("Adding optional column to the spreadsheet:" +sampleName);
+                        newSheet.getSpreadsheetFunctions().addColumn(sampleName);
+                    }
+             }
+        }
+
+        return newSheet;
+    }
 
 
 }
