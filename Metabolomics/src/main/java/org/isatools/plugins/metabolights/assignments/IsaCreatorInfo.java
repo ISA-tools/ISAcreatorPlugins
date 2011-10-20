@@ -114,8 +114,19 @@ public class IsaCreatorInfo {
                 e.printStackTrace();
             }
 
-        file = new File(getCurrentInvestigation().getReference());
-        return file.getParentFile().getPath();
+            // Get the reference
+            String ref = getCurrentInvestigation().getReference();
+            
+            // If it has been saved
+            if (ref != null){
+            	// Get the get the parent folder...
+            	file = new File(getCurrentInvestigation().getReference());
+                return file.getParentFile().getPath();
+            }
+            
+            // Otherwise return null
+            return null;
+        
     }
 
 
