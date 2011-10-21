@@ -3,6 +3,7 @@ package org.isatools.plugins.metabolights.assignments;
 
 import org.apache.log4j.Logger;
 import org.isatools.isacreator.gui.DataEntryEnvironment;
+import org.isatools.isacreator.gui.ISAcreator;
 import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.plugins.AbstractPluginSpreadsheetWidget;
 import org.isatools.isacreator.plugins.DefaultWindowListener;
@@ -10,8 +11,11 @@ import org.isatools.isacreator.plugins.registries.SpreadsheetPluginRegistry;
 import org.isatools.plugins.metabolights.assignments.io.ConfigurationLoader;
 import org.isatools.plugins.metabolights.assignments.ui.DataEntrySheet;
 import org.isatools.plugins.metabolights.assignments.ui.EditorUI;
+import org.jdesktop.fuse.InjectedResource;
+import org.jdesktop.fuse.ResourceInjector;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -34,6 +38,9 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     private EditorUI editorUI;
     private DataEntrySheet dataEntrySheet;
     private ConfigurationLoader configurationLoader;
+    
+    @InjectedResource
+    private ImageIcon logo;
 
     public ConfigurationLoader getConfigurationLoader() {
         if (configurationLoader == null)
@@ -43,6 +50,7 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
 
     public MetabolomicsResultEditor() {
         super();
+        ResourceInjector.get("metabolights-fileeditor-package.style").inject(this);
     }
 
     @Override
@@ -101,12 +109,30 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     	// Check if the component can't be shown
     	if (!canComponentBeShown()){
 
-    		JOptionPane op = new JOptionPane("",JOptionPane.INFORMATION_MESSAGE,JOptionPane.OK_OPTION);
-    	    
-    		//UIHelper.applyOptionPaneBackground(op, UIHelper.BG_COLOR);
-    	    //  getIsaCreatorInfo().getIsacreator().getFocusOwner().add(op);
-            DataEntryEnvironment dataEntryEnvironment = getIsaCreatorInfo().getIsacreator().getDataEntryEnvironment();
-    		op.showMessageDialog(dataEntryEnvironment, "You must save your study once before your can assign metabolites");
+    		
+    		final ISAcreator currentInstance = getIsaCreatorInfo().getIsacreator();
+            JOptionPane pane = new JOptionPane("You must save your study once before your can assign metabolites", JOptionPane.WARNING_MESSAGE);
+            pane.setIcon(logo);
+            //pane.createDialog("my new dialog");
+            pane.addPropertyChangeListener(new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent event) {
+                    if (event.getPropertyName()
+                            .equals(JOptionPane.VALUE_PROPERTY)) {
+                        currentInstance.hideSheet();
+                    }
+                }
+            });
+            
+            currentInstance.showJDialogAsSheet(pane.createDialog("MetaboLights Plugin"));
+    		
+    		
+    		
+//    		JOptionPane op = new JOptionPane("",JOptionPane.INFORMATION_MESSAGE,JOptionPane.OK_OPTION);
+//    	    
+//    		//UIHelper.applyOptionPaneBackground(op, UIHelper.BG_COLOR);
+//    	    //  getIsaCreatorInfo().getIsacreator().getFocusOwner().add(op);
+//            DataEntryEnvironment dataEntryEnvironment = getIsaCreatorInfo().getIsacreator().getDataEntryEnvironment();
+//    		op.showMessageDialog(dataEntryEnvironment, "You must save your study once before your can assign metabolites");
     		    		
     		return;
     	}
