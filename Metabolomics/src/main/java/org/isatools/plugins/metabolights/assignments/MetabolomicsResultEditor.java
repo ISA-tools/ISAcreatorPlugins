@@ -2,26 +2,22 @@ package org.isatools.plugins.metabolights.assignments;
 
 
 import org.apache.log4j.Logger;
-import org.isatools.helpbrowser.effects.AnimatableJFrame;
-import org.isatools.isacreator.common.UIHelper;
 import org.isatools.isacreator.gui.DataEntryEnvironment;
 import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.plugins.AbstractPluginSpreadsheetWidget;
 import org.isatools.isacreator.plugins.DefaultWindowListener;
 import org.isatools.isacreator.plugins.registries.SpreadsheetPluginRegistry;
-import org.isatools.isacreator.spreadsheet.Spreadsheet;
 import org.isatools.plugins.metabolights.assignments.io.ConfigurationLoader;
 import org.isatools.plugins.metabolights.assignments.ui.DataEntrySheet;
 import org.isatools.plugins.metabolights.assignments.ui.EditorUI;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.swing.JOptionPane;
 
 public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
 	
@@ -109,7 +105,8 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     	    
     		//UIHelper.applyOptionPaneBackground(op, UIHelper.BG_COLOR);
     	    //  getIsaCreatorInfo().getIsacreator().getFocusOwner().add(op);
-    		op.showMessageDialog(getIsaCreatorInfo().getIsacreator().getDataEntryEnvironment(), "Please, save your data before accessing the Metabolites Assigment File");
+            DataEntryEnvironment dataEntryEnvironment = getIsaCreatorInfo().getIsacreator().getDataEntryEnvironment();
+    		op.showMessageDialog(dataEntryEnvironment, "You must save your study once before your can assign metabolites");
     		    		
     		return;
     	}

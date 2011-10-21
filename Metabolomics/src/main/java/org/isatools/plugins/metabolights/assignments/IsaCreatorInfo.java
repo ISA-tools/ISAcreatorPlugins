@@ -91,14 +91,20 @@ public class IsaCreatorInfo {
 
         if (getIsacreator() != null && getCurrentAssay() != null){
 
-            List<List<String>> assayData = getCurrentAssay().getTableReferenceObject().getData();
+            TableReferenceObject localTableReferenceObject = getCurrentAssay().getTableReferenceObject();
 
-            Iterator iterator = assayData.listIterator();
-            while (iterator.hasNext()){
-                List<String> assayRow = (List<String>) iterator.next();
-                String assayName = assayRow.get(0);  //Sample name is the first row
-                if (assayName != null)
-                    assayColumns.add(assayName);
+            if (localTableReferenceObject != null){   //Make sure we don't have an empty sheet
+                List<List<String>> assayData = localTableReferenceObject.getData();
+
+                Iterator iterator = assayData.listIterator();
+                while (iterator.hasNext()){
+                    List<String> assayRow = (List<String>) iterator.next();
+                    String assayName = assayRow.get(0);  //Sample name is the first row
+                    if (assayName != null)
+                        assayColumns.add(assayName);
+                }
+            } else {
+                logger.info("The assay is empty, can not find sample columns");
             }
 
         }
