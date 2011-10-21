@@ -177,7 +177,8 @@ public class DataEntrySheet extends JPanel {
     	
     	// Check if the current cell has any value
     	if (parentFrame.getCurrentCellValue() == null){
-    		File file = new File(".");
+    		
+    		String path = getIsaCreatorInfo().getFileLocation();
     		
     		// Get the assay name
     		String assayName = getIsaCreatorInfo().getCurrentAssay().getIdentifier();
@@ -188,17 +189,8 @@ public class DataEntrySheet extends JPanel {
     		// Add a asigmentfile sufix
     		assayName = assayName + "_maf.csv";
     		
-    		// Get the path
-    		String path ="";
-    		try {
-				path = file.getCanonicalPath();
-			} catch (IOException e) {
-				// Do not use the canonical (this will have a /. at the end)
-				path = getIsaCreatorInfo().getFileLocation(); //file.getAbsolutePath();
-			}
-    		
     		// Compose the final file name
-			fileName = path + file.separator + assayName;
+			fileName = path + (new File(".")).separator + assayName;
     		
     		
     	} else {

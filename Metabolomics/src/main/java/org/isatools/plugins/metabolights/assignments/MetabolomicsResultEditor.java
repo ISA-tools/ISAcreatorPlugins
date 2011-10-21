@@ -2,10 +2,14 @@ package org.isatools.plugins.metabolights.assignments;
 
 
 import org.apache.log4j.Logger;
+import org.isatools.helpbrowser.effects.AnimatableJFrame;
+import org.isatools.isacreator.common.UIHelper;
+import org.isatools.isacreator.gui.DataEntryEnvironment;
 import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.plugins.AbstractPluginSpreadsheetWidget;
 import org.isatools.isacreator.plugins.DefaultWindowListener;
 import org.isatools.isacreator.plugins.registries.SpreadsheetPluginRegistry;
+import org.isatools.isacreator.spreadsheet.Spreadsheet;
 import org.isatools.plugins.metabolights.assignments.io.ConfigurationLoader;
 import org.isatools.plugins.metabolights.assignments.ui.DataEntrySheet;
 import org.isatools.plugins.metabolights.assignments.ui.EditorUI;
@@ -16,6 +20,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.swing.JOptionPane;
 
 public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
 	
@@ -95,6 +101,19 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
        	
     	logger.info("Plugin: Checking which configuration file to load");
 
+    	
+    	// Check if the component can't be shown
+    	if (!canComponentBeShown()){
+
+    		JOptionPane op = new JOptionPane("",JOptionPane.INFORMATION_MESSAGE,JOptionPane.OK_OPTION);
+    	    
+    		//UIHelper.applyOptionPaneBackground(op, UIHelper.BG_COLOR);
+    	    //  getIsaCreatorInfo().getIsacreator().getFocusOwner().add(op);
+    		op.showMessageDialog(getIsaCreatorInfo().getIsacreator().getDataEntryEnvironment(), "Please, save your data before accessing the Metabolites Assigment File");
+    		    		
+    		return;
+    	}
+    	
         try {
             //Is this NMR or MS? Load the appropriate xml file (differs where some columns are hidden)
         	//TODO, waste of time when the same technology type is loaded as the columns are identical
@@ -189,6 +208,17 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     }
     private boolean isIsaCreatorLoaded(){
     	return (getIsaCreatorInfo().getIsacreator()!=null);
+    }
+    private boolean canComponentBeShown(){
+    	// If IsaCreator is not available...
+    	if (!isIsaCreatorLoaded()){
+    		return false;
+    	// If the data has not been saved yet,...
+    	}else if (getIsaCreatorInfo().getFileLocation() == null){
+    		return false;
+    	}else{
+    		return true;
+    	}
     }
 
 }
