@@ -16,7 +16,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 /**
  * Created by the ISA team
@@ -212,7 +211,8 @@ public class DataEntrySheet extends JPanel {
     }
     public void loadFile(){
     	logger.info("Loading file");
-    	loadFile(getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject));   //Make sure all sample columns are present in the defintion
+    	//loadFile(getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject));   //Make sure all sample columns are present in the defintion
+        loadFile(tableReferenceObject);
     }
 
     public void loadFile(TableReferenceObject tableReferenceObject){
@@ -229,8 +229,10 @@ public class DataEntrySheet extends JPanel {
             logger.info("Trying to load the metabolite assignment file: " + fn);
 
         	tableReferenceObject = fl.loadFile(getFileName(), tableReferenceObject);
-            Spreadsheet loadedSheet = new Spreadsheet(parentFrame,tableReferenceObject,"");   //To map the columns that we load from the file
-        	updateSpreadsheet(getIsaCreatorInfo().addSpreadsheetSampleColumns(loadedSheet));  // Load the existing spreadsheet and add any new sample columns
+            Spreadsheet loadedSheet = new Spreadsheet(parentFrame,
+                    getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject),"");   //To map the columns that we load from the file
+        	updateSpreadsheet(
+                    getIsaCreatorInfo().addSpreadsheetSampleColumns(loadedSheet));  // Load the existing spreadsheet and add any new sample columns
         }
 
     }
