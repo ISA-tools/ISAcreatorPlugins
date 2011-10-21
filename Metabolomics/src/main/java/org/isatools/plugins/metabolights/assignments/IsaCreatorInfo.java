@@ -144,7 +144,7 @@ public class IsaCreatorInfo {
     public TableReferenceObject addTableRefSampleColumns(TableReferenceObject tableReferenceObject){
 
         if (getIsacreator() != null){
-            List<String> assaySampleList =  getSampleColumns();
+            List<String> assaySampleList = getSampleColumns();
             Iterator iterator = assaySampleList.iterator();
             while (iterator.hasNext()){
                 String sampleName = (String) iterator.next();
