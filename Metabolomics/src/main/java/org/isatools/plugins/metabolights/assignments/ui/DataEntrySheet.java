@@ -59,7 +59,7 @@ public class DataEntrySheet extends JPanel {
 
     public void createGUI() {
         sheet = new Spreadsheet(parentFrame, getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject), "");  // Add the sample columns to the definition
-        createTopPanel();
+        //createTopPanel();
         add(getIsaCreatorInfo().addSpreadsheetSampleColumns(sheet), BorderLayout.CENTER);  // Add the sample columns to the spreadsheet
         createBottomPanel();
     }

@@ -29,7 +29,6 @@ public class IsaCreatorInfo {
 	private static Logger logger = Logger.getLogger(IsaCreatorInfo.class);
 
     private ISAcreator isacreator;
-    private static final String SAMPLE_PREFIX = "opt_sample_";
 
     public IsaCreatorInfo(){
     }
@@ -99,7 +98,7 @@ public class IsaCreatorInfo {
                 List<String> assayRow = (List<String>) iterator.next();
                 String assayName = assayRow.get(0);  //Sample name is the first row
                 if (assayName != null)
-                    assayColumns.add(SAMPLE_PREFIX + assayName);
+                    assayColumns.add(assayName);
             }
 
         }
@@ -133,9 +132,12 @@ public class IsaCreatorInfo {
             while (iterator.hasNext()){
                 String sampleName = (String) iterator.next();
                 if (sampleName != null && sampleName.length() > 0){ //Add the sample name, but there are lots of empty rows so need to test first
-                    logger.info("Adding optional column to the spreadsheet definition: " +sampleName);
                     FieldObject fieldObject = new FieldObject(sampleName, "Sample description", DataTypes.STRING, "", false, false, false);
-                    tableReferenceObject.addField(fieldObject);
+
+                    if (!fieldObject.equals(tableReferenceObject.getFieldByName(sampleName))){
+                        logger.info("Adding optional column to the spreadsheet definition: " +sampleName);
+                        tableReferenceObject.addField(fieldObject);
+                    }
                 }
             }
         }
@@ -154,10 +156,12 @@ public class IsaCreatorInfo {
              Iterator iter = assaySampleList.iterator();
              while (iter.hasNext()){
                 String sampleName = (String) iter.next();
-                   if (!newSheet.getSpreadsheetFunctions().checkColumnExists(sampleName) && sampleName.length() > 0);{
+                   if (!newSheet.getSpreadsheetFunctions().checkColumnExists(sampleName) && sampleName.length() > 0){
                         logger.info("Adding optional column to the spreadsheet:" +sampleName);
                         newSheet.getSpreadsheetFunctions().addColumn(sampleName);
-                    }
+                   } else {
+                       logger.info("Sample column already exists in the spreadsheet:" +sampleName);
+                   }
              }
         }
 
