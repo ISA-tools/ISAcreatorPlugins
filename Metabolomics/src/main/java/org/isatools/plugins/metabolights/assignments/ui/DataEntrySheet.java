@@ -279,16 +279,5 @@ public class DataEntrySheet extends JPanel {
         validate();
     }
 
-// http://www.javamex.com/tutorials/threads/invokelater.shtml
-// http://java.sun.com/products/jfc/tsc/articles/painting/#smart
-//    	SwingUtilities.invokeLater(new Runnable() {
-//            public void run() {
-//                remove(sheet);
-//
-//                add(newSpreadsheet, BorderLayout.SOUTH);
-//
-//                repaint();
-//            }
-//        });
 
 }

@@ -1,6 +1,8 @@
 package org.isatools.plugins.metabolights.assignments;
 
+import org.apache.commons.collections15.set.ListOrderedSet;
 import org.apache.log4j.Logger;
+import org.isatools.isacreator.apiutils.SpreadsheetUtils;
 import org.isatools.isacreator.configuration.DataTypes;
 import org.isatools.isacreator.configuration.FieldObject;
 import org.isatools.isacreator.gui.ApplicationManager;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -87,31 +90,42 @@ public class IsaCreatorInfo {
 
     public List<String> getSampleColumns(){
 
-        List<String> assayColumns = new ArrayList<String>();
+        List<String> sampleData = new ArrayList<String>();
 
         if (getIsacreator() != null && getCurrentAssay() != null){
 
-            TableReferenceObject localTableReferenceObject = getCurrentAssay().getTableReferenceObject();
+           Set<String> sampleRows = getCurrentColumnValues(1); //Column 1 is the sample column on the assay
 
-            if (localTableReferenceObject != null){   //Make sure we don't have an empty sheet
-                List<List<String>> assayData = localTableReferenceObject.getData();
-
-                Iterator iterator = assayData.listIterator();
-                while (iterator.hasNext()){
-                    List<String> assayRow = (List<String>) iterator.next();
-                    String assayName = assayRow.get(0);  //Sample name is the first row
-                    if (assayName != null)
-                        assayColumns.add(assayName);
-                }
-            } else {
-                logger.debug("The assay is empty, can not find sample columns");
-            }
+           if (sampleRows != null){  //Make sure we have some data
+               Iterator iterator = sampleRows.iterator();
+               while (iterator.hasNext()){
+                   String assayName = (String) iterator.next();
+                   if (assayName != null)
+                        sampleData.add(assayName);
+               }
+           }
 
         }
 
-        return assayColumns;
+        return sampleData;
 
     }
+
+    /*
+    This method will return the current data in the Assay column you request
+     */
+    public Set<String> getCurrentColumnValues(Integer columnNumber){
+
+        Set<String> currentSet = new ListOrderedSet<String>();
+
+        if (getIsacreator() != null && getCurrentAssay() != null && columnNumber != null)
+           currentSet = SpreadsheetUtils.getDataInColumn(getCurrentAssay().getSpreadsheetUI().getTable(), columnNumber);
+
+       return currentSet;
+
+    }
+
+
 
     public String getFileLocation() {
         File file = new File(".");
@@ -150,16 +164,13 @@ public class IsaCreatorInfo {
                 String sampleName = (String) iterator.next();
                 if (sampleName != null && sampleName.length() > 0){ //Add the sample name, but there are lots of empty rows so need to test first
                     FieldObject fieldObject = new FieldObject(sampleName, "Sample description", DataTypes.STRING, "", false, false, false);   //New column to add to the definition
-                    //FieldObject existingColumn = null;
 
-                    if (tableReferenceObject != null) {
-                            //existingColumn = tableReferenceObject.getFieldByName(sampleName);    //Try to find the column in the existing sheet definition
-
+                    if (tableReferenceObject != null)
                         if (tableReferenceObject.getFieldByName(sampleName) == null){
                             logger.debug("Adding optional column to the spreadsheet definition: " +sampleName);
                             tableReferenceObject.addField(fieldObject);
                         }
-                    }
+
                 }
             }
         }
@@ -179,10 +190,10 @@ public class IsaCreatorInfo {
              while (iter.hasNext()){
                 String sampleName = (String) iter.next();
                    if (!newSheet.getSpreadsheetFunctions().checkColumnExists(sampleName) && sampleName.length() > 0){
-                        logger.debug("Adding optional column to the spreadsheet:" +sampleName);
+                        logger.debug("Adding optional column to the spreadsheet:" + sampleName);
                         newSheet.getSpreadsheetFunctions().addColumn(sampleName);
                    } else {
-                       logger.debug("Sample column already exists in the spreadsheet:" +sampleName);
+                       logger.debug("Sample column already exists in the spreadsheet:" + sampleName);
                    }
              }
         }
