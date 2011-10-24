@@ -2,7 +2,6 @@ package org.isatools.plugins.metabolights.assignments;
 
 
 import org.apache.log4j.Logger;
-import org.isatools.isacreator.gui.DataEntryEnvironment;
 import org.isatools.isacreator.gui.ISAcreator;
 import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.plugins.AbstractPluginSpreadsheetWidget;
@@ -15,7 +14,6 @@ import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -62,9 +60,11 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     public void instantiateComponent(String technologyType) {
     	logger.info("Instantiating the metabolomics plugin");
         editorUI = new EditorUI();
-        
         editorUI.setAmIAlone(!isIsaCreatorLoaded());
-        editorUI.createGUI(technologyType);
+
+        if (isIsaCreatorLoaded())
+            editorUI.createGUI(technologyType);
+
         editorUI.setLocationRelativeTo(null);
         editorUI.setAlwaysOnTop(true);
 

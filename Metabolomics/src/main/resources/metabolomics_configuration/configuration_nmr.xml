@@ -8,7 +8,7 @@
             </description>
             <default-value></default-value>
         </field>
-        <field header="unit_id" data-type="String" is-file-field="false" is-multiple-value="false" is-required="true">
+        <field header="unit_id" data-type="String" is-file-field="false" is-multiple-value="false" is-required="true" is-hidden="true">
             <description>
                 NMR/MS: The concatenation of the sample id plus assay id to uniquely identify that sample and run on the machine (or mass concatenated with retention index for unknowns)
             </description>
@@ -58,17 +58,10 @@
             <description>NMR/MS: Either the version of the used database if available or otherwise the date of creation</description>
             <default-value></default-value>
         </field>
-        <field header="reliability" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
-            <description>
-                NMR/MS: Rating
-                   0: non-significant identification
-                   1: poor reliability
-                   2: less poor reliability
-                   3: medium reliability
-                   4: good reliability
-                   5: very good reliability
-            </description>
+        <field header="reliability" data-type="List" is-file-field="false" is-multiple-value="false" is-required="false">
+            <description>NMR/MS: Rating</description>
             <default-value></default-value>
+            <list-values>0:non-significant identification,1:poor reliability,2:less poor reliability,3:medium reliability,4:good reliability,5:very good reliability</list-values>
         </field>
         <field header="uri" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
             <description>NMR/MS: The MetaboLights experiment it was identified in (MTBLS id)</description>

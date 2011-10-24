@@ -149,11 +149,16 @@ public class IsaCreatorInfo {
             while (iterator.hasNext()){
                 String sampleName = (String) iterator.next();
                 if (sampleName != null && sampleName.length() > 0){ //Add the sample name, but there are lots of empty rows so need to test first
-                    FieldObject fieldObject = new FieldObject(sampleName, "Sample description", DataTypes.STRING, "", false, false, false);
+                    FieldObject fieldObject = new FieldObject(sampleName, "Sample description", DataTypes.STRING, "", false, false, false);   //New column to add to the definition
+                    //FieldObject existingColumn = null;
 
-                    if (!fieldObject.equals(tableReferenceObject.getFieldByName(sampleName))){
-                        logger.info("Adding optional column to the spreadsheet definition: " +sampleName);
-                        tableReferenceObject.addField(fieldObject);
+                    if (tableReferenceObject != null) {
+                            //existingColumn = tableReferenceObject.getFieldByName(sampleName);    //Try to find the column in the existing sheet definition
+
+                        if (tableReferenceObject.getFieldByName(sampleName) == null){
+                            logger.info("Adding optional column to the spreadsheet definition: " +sampleName);
+                            tableReferenceObject.addField(fieldObject);
+                        }
                     }
                 }
             }
