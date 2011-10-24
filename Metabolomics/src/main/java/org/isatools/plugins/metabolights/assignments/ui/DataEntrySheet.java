@@ -1,6 +1,7 @@
 package org.isatools.plugins.metabolights.assignments.ui;
 
 import org.apache.log4j.Logger;
+import org.isatools.isacreator.apiutils.SpreadsheetUtils;
 import org.isatools.isacreator.common.UIHelper;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
@@ -11,6 +12,10 @@ import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableModel;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -36,7 +41,8 @@ public class DataEntrySheet extends JPanel {
     private TableReferenceObject tableReferenceObject;
 
     private String fileName;
-
+    private JLabel info;
+    
     private IsaCreatorInfo isaCreatorInfo;
 
     private IsaCreatorInfo getIsaCreatorInfo() {
@@ -58,11 +64,34 @@ public class DataEntrySheet extends JPanel {
 
     public void createGUI() {
         sheet = new Spreadsheet(parentFrame, getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject), "");  // Add the sample columns to the definition
-        //createTopPanel();
+        createTopPanel();
         add(getIsaCreatorInfo().addSpreadsheetSampleColumns(sheet), BorderLayout.CENTER);  // Add the sample columns to the spreadsheet
         createBottomPanel();
+        
+        // Add a listener to the changes of the table
+        //addChangesListener();
     }
 
+    //Trying to listen to the changes of the Table. This method is called from createGUI and update updateSpreadsheet (now commented).
+    private void addChangesListener(){
+    	
+    	sheet.getTableModel().addTableModelListener(
+    	new TableModelListener() {
+
+    	    public void tableChanged(TableModelEvent e) {
+    	        int row = e.getFirstRow();
+    	        int column = e.getColumn();
+    	        TableModel model = (TableModel)e.getSource();
+    	        //String columnName = model.getColumnName(column);
+    	        Object data = model.getValueAt(row, column);
+
+    	        // Do something with the data...
+    	        info.setText("Changed: row " + row + ", column " + column + ", value: " + data);
+    	    }
+    	}
+    	);
+    }
+    
     public void createBottomPanel(){
     	JPanel bottomPannel = new JPanel(new BorderLayout());
     	bottomPannel.setBackground(UIHelper.BG_COLOR);
@@ -84,7 +113,11 @@ public class DataEntrySheet extends JPanel {
         okButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
-                saveFile();
+                
+            	// Try to force to save the current cell if it is in "edition mode".
+            	SpreadsheetUtils.stopCellEditingInTable(sheet.getTable());
+            	
+            	saveFile();
             	parentFrame.setCurrentCellValue(fileName);
             	parentFrame.confirm();
             }
@@ -114,49 +147,52 @@ public class DataEntrySheet extends JPanel {
         Box buttonContainer = Box.createHorizontalBox();
         buttonContainer.setBackground(UIHelper.BG_COLOR);
 
-        final JLabel loadButton = new JLabel(loadIcon);
-        loadButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent mouseEvent) {
-                loadButton.setIcon(loadIcon);
-                loadFile();
-                
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent) {
-                loadButton.setIcon(loadIcon);
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent) {
-                loadButton.setIcon(loadIconOver);
-            }
-        });
-
-        final JLabel saveButton = new JLabel(saveIcon);
-        saveButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent mouseEvent) {
-                saveButton.setIcon(saveIcon);
-                saveFile();
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent) {
-                saveButton.setIcon(saveIcon);
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent) {
-                saveButton.setIcon(saveIconOver);
-            }
-        });
-
-        
-        buttonContainer.add(saveButton);
-        buttonContainer.add(Box.createHorizontalStrut(5));
-        buttonContainer.add(loadButton);
+        info = new JLabel();
+        buttonContainer.add(info);
+        info.setText("This is the info label");	
+//        final JLabel loadButton = new JLabel(loadIcon);
+//        loadButton.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mousePressed(MouseEvent mouseEvent) {
+//                loadButton.setIcon(loadIcon);
+//                loadFile();
+//                
+//            }
+//
+//            @Override
+//            public void mouseExited(MouseEvent mouseEvent) {
+//                loadButton.setIcon(loadIcon);
+//            }
+//
+//            @Override
+//            public void mouseEntered(MouseEvent mouseEvent) {
+//                loadButton.setIcon(loadIconOver);
+//            }
+//        });
+//
+//        final JLabel saveButton = new JLabel(saveIcon);
+//        saveButton.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mousePressed(MouseEvent mouseEvent) {
+//                saveButton.setIcon(saveIcon);
+//                saveFile();
+//            }
+//
+//            @Override
+//            public void mouseExited(MouseEvent mouseEvent) {
+//                saveButton.setIcon(saveIcon);
+//            }
+//
+//            @Override
+//            public void mouseEntered(MouseEvent mouseEvent) {
+//                saveButton.setIcon(saveIconOver);
+//            }
+//        });
+//
+//        
+//        buttonContainer.add(saveButton);
+//        buttonContainer.add(Box.createHorizontalStrut(5));
+//        buttonContainer.add(loadButton);
         
         topContainer.add(buttonContainer, BorderLayout.EAST);
 
@@ -250,6 +286,7 @@ public class DataEntrySheet extends JPanel {
         
         logger.info("Adding the new sheet");
         sheet = newSpreadsheet;
+        //addChangesListener();
         add(getIsaCreatorInfo().addSpreadsheetSampleColumns(sheet),BorderLayout.CENTER);  //Add all missing sample columns to the spreadsheet
         validate();
     }
