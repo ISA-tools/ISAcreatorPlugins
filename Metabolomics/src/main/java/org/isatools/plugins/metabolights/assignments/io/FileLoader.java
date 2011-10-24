@@ -23,7 +23,9 @@ public class FileLoader {
         } catch (IOException e) {
             return null;
         } catch (MalformedInvestigationException e) {
-            return null;
+            //If there are columns in the spreadsheet that are no longer present in the sheet definition, return the existing tableReferenceObject
+            //return null;
+            return referenceObject;
         }
     }
 }

@@ -108,32 +108,7 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     	
     	// Check if the component can't be shown
     	if (!canComponentBeShown()){
-
-    		
-    		final ISAcreator currentInstance = getIsaCreatorInfo().getIsacreator();
-            JOptionPane pane = new JOptionPane("You must save your study once before your can assign metabolites", JOptionPane.WARNING_MESSAGE);
-            pane.setIcon(logo);
-            //pane.createDialog("my new dialog");
-            pane.addPropertyChangeListener(new PropertyChangeListener() {
-                public void propertyChange(PropertyChangeEvent event) {
-                    if (event.getPropertyName()
-                            .equals(JOptionPane.VALUE_PROPERTY)) {
-                        currentInstance.hideSheet();
-                    }
-                }
-            });
-            
-            currentInstance.showJDialogAsSheet(pane.createDialog("MetaboLights Plugin"));
-    		
-    		
-    		
-//    		JOptionPane op = new JOptionPane("",JOptionPane.INFORMATION_MESSAGE,JOptionPane.OK_OPTION);
-//    	    
-//    		//UIHelper.applyOptionPaneBackground(op, UIHelper.BG_COLOR);
-//    	    //  getIsaCreatorInfo().getIsacreator().getFocusOwner().add(op);
-//            DataEntryEnvironment dataEntryEnvironment = getIsaCreatorInfo().getIsacreator().getDataEntryEnvironment();
-//    		op.showMessageDialog(dataEntryEnvironment, "You must save your study once before your can assign metabolites");
-    		    		
+            displayMessage("You must save your study once before your can assign metabolites");
     		return;
     	}
     	
@@ -229,19 +204,38 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
 
         return technology;
     }
+
     private boolean isIsaCreatorLoaded(){
-    	return (getIsaCreatorInfo().getIsacreator()!=null);
+    	return (getIsaCreatorInfo().getIsacreator() != null);
     }
+
     private boolean canComponentBeShown(){
     	// If IsaCreator is not available...
     	if (!isIsaCreatorLoaded()){
     		return false;
     	// If the data has not been saved yet,...
-    	}else if (getIsaCreatorInfo().getFileLocation() == null){
+    	} else if (getIsaCreatorInfo().getFileLocation() == null){
     		return false;
-    	}else{
+    	} else {
     		return true;
     	}
     }
+
+    public void displayMessage(String message) {
+        final ISAcreator currentInstance = getIsaCreatorInfo().getIsacreator();
+            JOptionPane pane = new JOptionPane(message, JOptionPane.WARNING_MESSAGE);
+            pane.setIcon(logo);
+            pane.addPropertyChangeListener(new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent event) {
+                    if (event.getPropertyName().equals(JOptionPane.VALUE_PROPERTY)) {
+                        currentInstance.hideSheet();
+                    }
+                }
+            });
+
+            currentInstance.showJDialogAsSheet(pane.createDialog("MetaboLights Plugin"));
+    }
+
+
 
 }
