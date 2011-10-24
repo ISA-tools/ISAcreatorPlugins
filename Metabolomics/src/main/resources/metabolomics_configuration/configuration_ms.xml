@@ -8,9 +8,10 @@
             </description>
             <default-value></default-value>
         </field>
-        <field header="unit_id" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false" is-hidden="true">
+        <field header="unit_id" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
             <description>
-                NMR/MS: The concatenation of the sample id plus assay id to uniquely identify that sample and run on the machine (or mass concatenated with retention index for unknowns)
+                NMR/MS: The concatenation of the sample id plus assay id to uniquely identify that sample and run on the machine
+                (or mass concatenated with retention index for unknowns)
             </description>
             <default-value></default-value>
         </field>

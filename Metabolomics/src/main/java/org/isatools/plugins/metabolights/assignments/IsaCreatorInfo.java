@@ -104,7 +104,7 @@ public class IsaCreatorInfo {
                         assayColumns.add(assayName);
                 }
             } else {
-                logger.info("The assay is empty, can not find sample columns");
+                logger.debug("The assay is empty, can not find sample columns");
             }
 
         }
@@ -156,7 +156,7 @@ public class IsaCreatorInfo {
                             //existingColumn = tableReferenceObject.getFieldByName(sampleName);    //Try to find the column in the existing sheet definition
 
                         if (tableReferenceObject.getFieldByName(sampleName) == null){
-                            logger.info("Adding optional column to the spreadsheet definition: " +sampleName);
+                            logger.debug("Adding optional column to the spreadsheet definition: " +sampleName);
                             tableReferenceObject.addField(fieldObject);
                         }
                     }
@@ -179,10 +179,10 @@ public class IsaCreatorInfo {
              while (iter.hasNext()){
                 String sampleName = (String) iter.next();
                    if (!newSheet.getSpreadsheetFunctions().checkColumnExists(sampleName) && sampleName.length() > 0){
-                        logger.info("Adding optional column to the spreadsheet:" +sampleName);
+                        logger.debug("Adding optional column to the spreadsheet:" +sampleName);
                         newSheet.getSpreadsheetFunctions().addColumn(sampleName);
                    } else {
-                       logger.info("Sample column already exists in the spreadsheet:" +sampleName);
+                       logger.debug("Sample column already exists in the spreadsheet:" +sampleName);
                    }
              }
         }

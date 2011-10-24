@@ -247,30 +247,18 @@ public class DataEntrySheet extends JPanel {
     }
     public void loadFile(){
     	logger.info("Loading file");
-    	//loadFile(getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject));   //Make sure all sample columns are present in the defintion
-        loadFile(this.tableReferenceObject);
-    }
 
-    public void loadFile(TableReferenceObject tableReferenceObject){
-
-        
         String fn = getFileName();
         File file = new File(fn);
-
-        TableReferenceObject localTableReferenceObject;
         
         // If the file exists...
         if (file.exists()){
-
-        	FileLoader fl = new FileLoader();
-
             logger.info("Trying to load the metabolite assignment file: " + fn);
 
-        	localTableReferenceObject = fl.loadFile(getFileName(), this.tableReferenceObject);
-            Spreadsheet loadedSheet = new Spreadsheet(parentFrame,
-                    getIsaCreatorInfo().addTableRefSampleColumns(localTableReferenceObject),"");   //To map the columns that we load from the file
-        	updateSpreadsheet(
-                    getIsaCreatorInfo().addSpreadsheetSampleColumns(loadedSheet));  // Load the existing spreadsheet and add any new sample columns
+            FileLoader fl = new FileLoader();
+        	tableReferenceObject = fl.loadFile(getFileName(), tableReferenceObject);
+            Spreadsheet loadedSheet = new Spreadsheet(parentFrame, getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject),"");   //To map the columns that we load from the file
+        	updateSpreadsheet(getIsaCreatorInfo().addSpreadsheetSampleColumns(loadedSheet));  // Load the existing spreadsheet and add any new sample columns
         }
 
     }
