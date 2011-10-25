@@ -86,6 +86,9 @@ public class IsaCreatorInfo {
 
     }
 
+    /*
+    Returns a list of sample name from the assay spreadsheet in ISAcreator (GUI)
+     */
     public List<String> getSampleColumns(){
 
         List<String> sampleData = new ArrayList<String>();
