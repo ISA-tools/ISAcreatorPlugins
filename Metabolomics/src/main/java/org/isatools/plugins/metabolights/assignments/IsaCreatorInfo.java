@@ -13,6 +13,8 @@ import org.isatools.isacreator.model.Investigation;
 import org.isatools.isacreator.model.Study;
 import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
+import org.isatools.isacreator.spreadsheet.SpreadsheetCellRange;
+import org.isatools.isacreator.spreadsheet.SpreadsheetFunctions;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
 import org.isatools.plugins.metabolights.assignments.ui.DataEntrySheet;
 
@@ -211,12 +213,13 @@ public class IsaCreatorInfo {
      *  taxid --> "Term Source REF" + "Term Accession Number"
      *  species --> "Characteristics[organism]"	
      */
-    public void fillSampleData(DataEntrySheet newSheet){
+    public void importSampleData(DataEntrySheet deSheet){
+    	
     	
     	// Check if we have to populate the sampledata
-    	if (haveToFillSampleData(newSheet)){
+    	if (haveToFillSampleData(deSheet)){
     		
-    		String termSourceREF, termAccessionNUmber, organism;
+    		String termSourceREF="", termAccessionNumber="", organism = "", taxid="";
     		
     		// Get the study sample data
     		Assay studySample = getCurrentStudySample();
@@ -224,15 +227,29 @@ public class IsaCreatorInfo {
             OntologyTerm ontologyTerm = getOntologyTerm(studySample);
 
             if (ontologyTerm != null){
-                termSourceREF = ontologyTerm.getOntologySource();
-                termAccessionNUmber = ontologyTerm.getOntologySourceAccession();
+            	termSourceREF = ontologyTerm.getOntologySourceInformation().getSourceName();
+                termAccessionNumber = ontologyTerm.getOntologySourceAccession();
                 organism = ontologyTerm.getOntologyTermName();
+                taxid=termSourceREF + ":" + termAccessionNumber;
+                
             }
-
     		
-    		// Get the termSourceREF
-    		System.out.println(studySample.getSpreadsheetUI().getTable().getColValAtRow("Characteristics[organism]", 1));
-
+    		// Write sample data
+    	  	// Get the current assay
+        	Assay assay = getCurrentAssay();  		
+        	// TODO: I subtract 2 because when used in the range object it work fine. Why?  
+			int taxidCol = deSheet.getTableReferenceObject().getFieldColumnNoByName("taxid")-2;
+			int speciesCol = deSheet.getTableReferenceObject().getFieldColumnNoByName("species")-2;
+			
+			System.out.println("Taxid column: " + taxidCol);
+			System.out.println("Species column: " + speciesCol);
+			
+			int rows = deSheet.getSheet().getTable().getRowCount();
+			
+			// Fill the whole columns....(TODO: why columnnumber-2?).
+			if (!taxid.equals("")) deSheet.getSheet().getSpreadsheetFunctions().fill(new SpreadsheetCellRange(new int[]{0,rows}, new int[]{taxidCol}), taxid);
+			if (!organism.equals("")) deSheet.getSheet().getSpreadsheetFunctions().fill(new SpreadsheetCellRange(new int[]{0,rows}, new int[]{speciesCol}), organism);
+						    		
     		
     	}
     	
@@ -255,10 +272,11 @@ public class IsaCreatorInfo {
         return ontologyTerm;
     }
 
-    private boolean haveToFillSampleData(DataEntrySheet newSheet){
+    private boolean haveToFillSampleData(DataEntrySheet deSheet){
     	
     	// TODO: Check if there is already sample data in the spreadsheet (target)
     	boolean dataInTarget = false;
+    	    	
     	
     	// TODO: Check if there is data in the study sample assay (source)
     	boolean dataInSource = true;

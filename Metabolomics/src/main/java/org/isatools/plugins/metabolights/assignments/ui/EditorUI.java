@@ -108,7 +108,7 @@ public class EditorUI extends AnimatableJFrame {
         	sheet.loadFile();
         	
         	// Fill sample data....
-        	getIsaCreatorInfo().fillSampleData(sheet);
+        	getIsaCreatorInfo().importSampleData(sheet);
         }
 
     }

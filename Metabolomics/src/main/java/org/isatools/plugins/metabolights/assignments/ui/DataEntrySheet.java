@@ -62,7 +62,15 @@ public class DataEntrySheet extends JPanel {
         setBackground(UIHelper.BG_COLOR);
     }
 
-    public void createGUI() {
+    public Spreadsheet getSheet(){
+    	return sheet;
+    }
+    
+    public TableReferenceObject getTableReferenceObject() {
+		return tableReferenceObject;
+	}
+
+	public void createGUI() {
         sheet = new Spreadsheet(parentFrame, getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject), "");  // Add the sample columns to the definition
         createTopPanel();
         add(getIsaCreatorInfo().addSpreadsheetSampleColumns(sheet), BorderLayout.CENTER);  // Add the sample columns to the spreadsheet
