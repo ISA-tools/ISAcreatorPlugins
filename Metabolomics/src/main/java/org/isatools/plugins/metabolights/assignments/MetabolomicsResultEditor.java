@@ -114,7 +114,6 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     	
         try {
             //Is this NMR or MS? Load the appropriate xml file (differs where some columns are hidden)
-        	//TODO, waste of time when the same technology type is loaded as the columns are identical
             if (getTechnology().equalsIgnoreCase(NMR)){
             	logger.info("Plugin: Loading the NMR configuration file");
             	instantiateComponent(NMR);

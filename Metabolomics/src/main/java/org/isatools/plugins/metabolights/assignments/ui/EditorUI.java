@@ -163,9 +163,11 @@ public class EditorUI extends AnimatableJFrame {
 
         } catch (XmlException e) {
             e.printStackTrace();
+            logger.error(e.getMessage().toString());
             return null;
         } catch (IOException e) {
             e.printStackTrace();
+            logger.error(e.getMessage().toString());
             return null;
         }
     }

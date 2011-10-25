@@ -56,11 +56,10 @@ public class IsaCreatorInfo {
 
         Assay assay = new Assay();
 
-        if (object instanceof Assay) {
+        if (object instanceof Assay)
             assay = (Assay) object;
-        }
 
-        logger.info("Current Assay is '" + assay.getIdentifier() + "', technology is " + assay.getTechnologyType() + ", platform is " + assay.getAssayPlatform());
+        logger.debug("Current Assay is '" + assay.getIdentifier() + "', technology is " + assay.getTechnologyType() + ", platform is " + assay.getAssayPlatform());
         return assay;
 
     }
@@ -82,8 +81,7 @@ public class IsaCreatorInfo {
     public Investigation getCurrentInvestigation(){
 
         Investigation investigation = getISACreatorEnvironment().getInvestigation();
-
-        logger.info("Investigation id is '"+ investigation.getInvestigationId() + "' title is " + investigation.getInvestigationTitle() + ", configuration used "+ investigation.getLastConfigurationUsed());
+        logger.debug("Investigation id is '"+ investigation.getInvestigationId() + "' title is " + investigation.getInvestigationTitle() + ", configuration used "+ investigation.getLastConfigurationUsed());
         return investigation;
 
     }

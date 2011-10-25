@@ -18,6 +18,7 @@
  */
 package org.isatools.plugins.metabolights.assignments;
 
+import org.apache.log4j.Logger;
 import org.isatools.isacreator.plugins.host.service.PluginSpreadsheetWidget;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -26,15 +27,14 @@ import java.util.Hashtable;
 
 public class Activator implements BundleActivator {
 
-
     private BundleContext context = null;
-
+    private static Logger logger = Logger.getLogger(Activator.class);
 
     public void start(BundleContext context) {
         this.context = context;
 
         Hashtable dict = new Hashtable();
-        System.out.println("Activating the ISAcreator metabolite bundle....");
+        logger.info("Activating the ISAcreator metabolite bundle....");
         context.registerService(
                 PluginSpreadsheetWidget.class.getName(), new MetabolomicsResultEditor(), dict);
     }
