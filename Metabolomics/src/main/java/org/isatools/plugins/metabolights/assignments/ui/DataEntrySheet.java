@@ -241,10 +241,11 @@ public class DataEntrySheet extends JPanel {
         try {
 			fw.writeFile(getFileName(), sheet);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+            logger.error(e.getMessage().toString());
 			e.printStackTrace();
 		}
     }
+
     public void loadFile(){
     	logger.info("Loading file");
 
