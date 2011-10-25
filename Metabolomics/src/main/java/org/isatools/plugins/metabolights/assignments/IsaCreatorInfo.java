@@ -10,8 +10,11 @@ import org.isatools.isacreator.gui.DataEntryEnvironment;
 import org.isatools.isacreator.gui.ISAcreator;
 import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.model.Investigation;
+import org.isatools.isacreator.model.Study;
+import org.isatools.isacreator.model.StudyDesign;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
+import org.isatools.plugins.metabolights.assignments.ui.DataEntrySheet;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.File;
@@ -63,7 +66,6 @@ public class IsaCreatorInfo {
         return assay;
 
     }
-
 
     /*
     Returns the current Assay, from the ISAcreator object.  This is the assay you are working on
@@ -201,7 +203,119 @@ public class IsaCreatorInfo {
 
         return newSheet;
     }
+    
+    
+    /**
+     * Fill sample columns of our configuration (taxid & species) based on Study Sample data
+     * taxid should be a taxon identifier based on an ontology
+     * species, the human readable equivalent. 
+     * IN the Study sample we have: "Characteristics[organism]"	"Term Source REF"	"Term Accession Number"
+     * So:
+     *  taxid --> "Term Source REF" + "Term Accession Number"
+     *  species --> "Characteristics[organism]"	
+     */
+    public void fillSampleData(DataEntrySheet newSheet){
+    	
+    	// Check if we have to populate the sampledata
+    	if (haveToFillSampleData(newSheet)){
+    		
+    		String termSourceREF, termAccessionNUmber, organism;
+    		
+    		// Get the study sample data
+    		Assay studySample = getCurrentStudySample();
+    		
+    		// Get the termSourceREF
+    		System.out.println(studySample.getSpreadsheetUI().getTable().getColValAtRow("Characteristics[organism]", 1));
+    		
+    		
+    		
+    	}
+    	
+    }
+    private boolean haveToFillSampleData(DataEntrySheet newSheet){
+    	
+    	// TODO: Check if there is already sample data in the spreadsheet (target)
+    	boolean dataInTarget = false;
+    	
+    	// TODO: Check if there is data in the study sample assay (source)
+    	boolean dataInSource = true;
+    	
+    	
+    	return (dataInSource && !dataInTarget);
+    }
+    
+    
+    /**
+     *  Gets as study object properly casted.
+     * @param object
+     * @return
+     */
+    private Study getStudy(Object object){
 
+        Study study = new Study();
+
+        if (object instanceof Study) {
+            study = (Study) object;
+        }
+
+        logger.info("Current Study is '" + study.getStudySampleFileIdentifier());
+        return study;
+
+    }
+
+    /**
+     * Return current study
+     */
+    public Study getCurrentStudy(){
+
+    	Object userObject = getISAStudyNode().getUserObject();
+        return getStudy(userObject);
+
+    }
+    /**
+     * Returns the study node
+     */
+    private DefaultMutableTreeNode getISAStudyNode(){
+        DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) getISACreatorEnvironment().getSelectedNodeInOverviewTree().getParent().getParent();
+        return selectedNode;
+    }
+    
+    /**
+     * Returns an asssay with the study sample.
+     * @param object
+     * @return
+     */
+    private Assay getStudySample(Object object){
+
+        Assay studySample = new Assay();
+
+        if (object instanceof Assay) {
+            studySample = (Assay) object;
+        }
+
+        logger.info("Current Study sample (an assay)  identifier is: " + studySample.getIdentifier());
+        return studySample;
+
+    }
+
+    /**
+     * Return current study sample
+     */
+    public Assay getCurrentStudySample(){
+
+    	Object userObject = getISAStudySampleNode().getUserObject();
+        return getStudySample(userObject);
+
+    }
+    /**
+     * Returns the study sample node
+     */
+    private DefaultMutableTreeNode getISAStudySampleNode(){
+        DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) getISACreatorEnvironment().getSelectedNodeInOverviewTree().getParent();
+        return selectedNode;
+    }
+
+    
 
 }
 

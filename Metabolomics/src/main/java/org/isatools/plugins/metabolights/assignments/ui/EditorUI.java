@@ -103,8 +103,12 @@ public class EditorUI extends AnimatableJFrame {
         
         // Check if he ISACreator is available
         if (!amIAlone) {
+        	
         	// If so, try to load the file (if exists)
         	sheet.loadFile();
+        	
+        	// Fill sample data....
+        	getIsaCreatorInfo().fillSampleData(sheet);
         }
 
     }
