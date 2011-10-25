@@ -26,6 +26,7 @@ public class EditorUI extends AnimatableJFrame {
 	private static Logger logger = Logger.getLogger(EditorUI.class);
 
     public static final float DESIRED_OPACITY = .94f;
+    public static final String PLUGIN_VERSION = "0.1";
 
     private String currentCellValue;
     private String newCellValue;
@@ -39,6 +40,13 @@ public class EditorUI extends AnimatableJFrame {
         if (isaCreatorInfo == null)
             isaCreatorInfo = new IsaCreatorInfo();
         return isaCreatorInfo;
+    }
+
+    /*
+    A public method to return the version of this plugin, can be use by the ISAcreator to provide an "update plugin function"
+     */
+    public static String getPluginVersion() {
+        return PLUGIN_VERSION;
     }
 
     static {

@@ -247,28 +247,18 @@ public class DataEntrySheet extends JPanel {
     }
     public void loadFile(){
     	logger.info("Loading file");
-    	//loadFile(getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject));   //Make sure all sample columns are present in the defintion
-        loadFile(tableReferenceObject);
-    }
 
-    public void loadFile(TableReferenceObject tableReferenceObject){
-
-        
         String fn = getFileName();
         File file = new File(fn);
         
         // If the file exists...
         if (file.exists()){
-
-        	FileLoader fl = new FileLoader();
-
             logger.info("Trying to load the metabolite assignment file: " + fn);
 
+            FileLoader fl = new FileLoader();
         	tableReferenceObject = fl.loadFile(getFileName(), tableReferenceObject);
-            Spreadsheet loadedSheet = new Spreadsheet(parentFrame,
-                    getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject),"");   //To map the columns that we load from the file
-        	updateSpreadsheet(
-                    getIsaCreatorInfo().addSpreadsheetSampleColumns(loadedSheet));  // Load the existing spreadsheet and add any new sample columns
+            Spreadsheet loadedSheet = new Spreadsheet(parentFrame, getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject),"");   //To map the columns that we load from the file
+        	updateSpreadsheet(getIsaCreatorInfo().addSpreadsheetSampleColumns(loadedSheet));  // Load the existing spreadsheet and add any new sample columns
         }
 
     }
@@ -293,16 +283,5 @@ public class DataEntrySheet extends JPanel {
         info.setText("The sample file identifier is: " + getIsaCreatorInfo().getCurrentStudySample().getIdentifier());
     }
 
-// http://www.javamex.com/tutorials/threads/invokelater.shtml
-// http://java.sun.com/products/jfc/tsc/articles/painting/#smart
-//    	SwingUtilities.invokeLater(new Runnable() {
-//            public void run() {
-//                remove(sheet);
-//
-//                add(newSpreadsheet, BorderLayout.SOUTH);
-//
-//                repaint();
-//            }
-//        });
 
 }
