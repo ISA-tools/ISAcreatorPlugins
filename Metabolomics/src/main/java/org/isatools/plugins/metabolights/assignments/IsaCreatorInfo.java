@@ -204,64 +204,14 @@ public class IsaCreatorInfo {
     }
     
     
-    /**
-     * Fill sample columns of our configuration (taxid & species) based on Study Sample data
-     * taxid should be a taxon identifier based on an ontology
-     * species, the human readable equivalent. 
-     * IN the Study sample we have: "Characteristics[organism]"	"Term Source REF"	"Term Accession Number"
-     * So:
-     *  taxid --> "Term Source REF" + "Term Accession Number"
-     *  species --> "Characteristics[organism]"	
-     */
-    public void importSampleData(DataEntrySheet deSheet){
-    	
-    	
-    	// Check if we have to populate the sampledata
-    	if (haveToFillSampleData(deSheet)){
-    		
-    		String termSourceREF="", termAccessionNumber="", organism = "", taxid="";
-    		
-    		// Get the study sample data
-    		Assay studySample = getCurrentStudySample();
-
-            OntologyTerm ontologyTerm = getOntologyTerm(studySample);
-
-            if (ontologyTerm != null){
-            	termSourceREF = ontologyTerm.getOntologySourceInformation().getSourceName();
-                termAccessionNumber = ontologyTerm.getOntologySourceAccession();
-                organism = ontologyTerm.getOntologyTermName();
-                taxid=termSourceREF + ":" + termAccessionNumber;
-                
-            }
-    		
-    		// Write sample data
-    	  	// Get the current assay
-        	Assay assay = getCurrentAssay();  		
-        	// TODO: I subtract 2 because when used in the range object it work fine. Why?  
-			int taxidCol = deSheet.getTableReferenceObject().getFieldColumnNoByName("taxid")-2;
-			int speciesCol = deSheet.getTableReferenceObject().getFieldColumnNoByName("species")-2;
-			
-			System.out.println("Taxid column: " + taxidCol);
-			System.out.println("Species column: " + speciesCol);
-			
-			int rows = deSheet.getSheet().getTable().getRowCount();
-			
-			// Fill the whole columns....(TODO: why columnnumber-2?).
-			if (!taxid.equals("")) deSheet.getSheet().getSpreadsheetFunctions().fill(new SpreadsheetCellRange(new int[]{0,rows}, new int[]{taxidCol}), taxid);
-			if (!organism.equals("")) deSheet.getSheet().getSpreadsheetFunctions().fill(new SpreadsheetCellRange(new int[]{0,rows}, new int[]{speciesCol}), organism);
-						    		
-    		
-    	}
-    	
-    }
-
+        
     private Map<String, OntologyTerm> getOntologyInformation(Assay assay) {
 
         Map<String, OntologyTerm> definedOntologies = assay.getTableReferenceObject().getDefinedOntologies();
         return definedOntologies;
     }
 
-    private OntologyTerm getOntologyTerm(Assay assay){
+    public OntologyTerm getOntologyTerm(Assay assay){
         OntologyTerm ontologyTerm = new OntologyTerm();
 
         Map<String, OntologyTerm> ontologyTermMap = getOntologyInformation(assay);
@@ -271,20 +221,7 @@ public class IsaCreatorInfo {
 
         return ontologyTerm;
     }
-
-    private boolean haveToFillSampleData(DataEntrySheet deSheet){
-    	
-    	// TODO: Check if there is already sample data in the spreadsheet (target)
-    	boolean dataInTarget = false;
-    	    	
-    	
-    	// TODO: Check if there is data in the study sample assay (source)
-    	boolean dataInSource = true;
-    	
-    	
-    	return (dataInSource && !dataInTarget);
-    }
-    
+   
     
     /**
      *  Gets as study object properly casted.

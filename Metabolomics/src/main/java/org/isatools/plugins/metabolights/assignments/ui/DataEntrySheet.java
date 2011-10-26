@@ -3,7 +3,11 @@ package org.isatools.plugins.metabolights.assignments.ui;
 import org.apache.log4j.Logger;
 import org.isatools.isacreator.apiutils.SpreadsheetUtils;
 import org.isatools.isacreator.common.UIHelper;
+import org.isatools.isacreator.model.Assay;
+import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
+import org.isatools.isacreator.spreadsheet.SpreadsheetCell;
+import org.isatools.isacreator.spreadsheet.SpreadsheetCellRange;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
 import org.isatools.plugins.metabolights.assignments.IsaCreatorInfo;
 import org.isatools.plugins.metabolights.assignments.io.FileLoader;
@@ -43,7 +47,13 @@ public class DataEntrySheet extends JPanel {
     private String fileName;
     private JLabel info;
     
-    private IsaCreatorInfo isaCreatorInfo;
+    public static String TAXID = "taxid";
+    public static String SPECIES = "species";
+    public static String SPECIEFIELD = "Characteristics[organism]";
+    private boolean forceSpecieImport = false;
+    
+
+	private IsaCreatorInfo isaCreatorInfo;
 
     private IsaCreatorInfo getIsaCreatorInfo() {
         if (isaCreatorInfo == null)
@@ -52,7 +62,7 @@ public class DataEntrySheet extends JPanel {
     }
 
     @InjectedResource
-    private ImageIcon saveIcon, saveIconOver, loadIcon, loadIconOver, okIcon, okIconOver;
+    private ImageIcon saveIcon, saveIconOver, loadIcon, loadIconOver, okIcon, okIconOver, importSpecieIcon, importSpecieIconOver;
 
     public DataEntrySheet(EditorUI parentFrame, TableReferenceObject tableReferenceObject) {
         ResourceInjector.get("metabolights-fileeditor-package.style").inject(this);
@@ -202,8 +212,32 @@ public class DataEntrySheet extends JPanel {
 //        buttonContainer.add(Box.createHorizontalStrut(5));
 //        buttonContainer.add(loadButton);
         
-        topContainer.add(buttonContainer, BorderLayout.EAST);
+      final JLabel importSpecieButton = new JLabel(importSpecieIcon);
+      importSpecieButton.addMouseListener(new MouseAdapter() {
+          @Override
+          public void mousePressed(MouseEvent mouseEvent) {
+              importSpecieButton.setIcon(importSpecieIcon);
+              forceSpecieImport = true;
+              importSampleData();
+              forceSpecieImport = false;
+          }
 
+          @Override
+          public void mouseExited(MouseEvent mouseEvent) {
+              importSpecieButton.setIcon(importSpecieIcon);
+          }
+
+          @Override
+          public void mouseEntered(MouseEvent mouseEvent) {
+              importSpecieButton.setIcon(importSpecieIconOver);
+          }
+      });
+      	
+      	buttonContainer.add(Box.createHorizontalStrut(5));
+      	buttonContainer.add (importSpecieButton);
+        
+      	
+      	topContainer.add(buttonContainer, BorderLayout.EAST);
         add(topContainer, BorderLayout.NORTH);
     }
     
@@ -290,6 +324,87 @@ public class DataEntrySheet extends JPanel {
         // To test
         //info.setText("The sample file identifier is: " + getIsaCreatorInfo().getCurrentStudy().getStudySampleFileIdentifier());
         info.setText("The sample file identifier is: " + getIsaCreatorInfo().getCurrentStudySample().getIdentifier());
+    }
+
+   	public boolean isColumnEmpty(String columnName){
+   		int column = sheet.getSpreadsheetFunctions().getModelIndexForColumn(columnName);
+   		
+   		return isColumnEmpty(column);
+   	}
+    private boolean isColumnEmpty(int column){
+    	
+    	SpreadsheetCell value = (SpreadsheetCell) sheet.getTable().getValueAt(0, column);
+    	return (value.isEmpty());
+    }
+    /**
+     * Fill sample columns of our configuration (taxid & species) based on Study Sample data
+     * taxid should be a taxon identifier based on an ontology
+     * species, the human readable equivalent. 
+     * IN the Study sample we have: "Characteristics[organism]"	"Term Source REF"	"Term Accession Number"
+     * So:
+     *  taxid --> "Term Source REF" + "Term Accession Number"
+     *  species --> "Characteristics[organism]"	
+     */
+    public void importSampleData(){
+    	
+		// Get the study sample data
+		Assay studySample = isaCreatorInfo.getCurrentStudySample();
+    	
+    	// Check if we have to populate the sampledata
+    	if (haveToFillSampleData( studySample)){
+    		
+    		String termSourceREF="", termAccessionNumber="", organism = "", taxid="";
+    		
+
+            OntologyTerm ontologyTerm = isaCreatorInfo.getOntologyTerm(studySample);
+
+            if (ontologyTerm != null){
+            	termSourceREF = ontologyTerm.getOntologySourceInformation().getSourceName();
+                termAccessionNumber = ontologyTerm.getOntologySourceAccession();
+                organism = ontologyTerm.getOntologyTermName();
+                taxid=termSourceREF + ":" + termAccessionNumber;
+                
+            }
+    		
+    		// Write sample data
+    	  	// Get the current assay
+        	Assay assay = isaCreatorInfo.getCurrentAssay();  		
+			int taxidCol = getSheet().getSpreadsheetFunctions().getModelIndexForColumn("taxid");
+			int speciesCol = getSheet().getSpreadsheetFunctions().getModelIndexForColumn("species");
+
+			System.out.println("Taxid column: " + taxidCol);
+			System.out.println("Species column: " + speciesCol);
+			
+			int rows = getSheet().getTable().getRowCount();
+			
+			// Fill the whole columns....(TODO: why columnumber-2?).
+			if (!taxid.equals("")) getSheet().getSpreadsheetFunctions().fill(new SpreadsheetCellRange(new int[]{0,rows}, new int[]{taxidCol}), taxid);
+			if (!organism.equals("")) getSheet().getSpreadsheetFunctions().fill(new SpreadsheetCellRange(new int[]{0,rows}, new int[]{speciesCol}), organism);
+						    		
+    		
+    	}
+    	
+    }
+
+    public boolean haveToFillSampleData(Assay studySample){
+    	
+    	// Check if there is already sample data in the spreadsheet (target)
+    	boolean dataInTarget = !isColumnEmpty(TAXID);
+    	
+    	// If import is forced, let change dataInTarget to false
+    	if (forceSpecieImport) dataInTarget = false;
+    	
+    	// Check if there is data in the study sample assay (source)
+    	boolean dataInSource = isThereSampleData(studySample);
+    	
+    	
+    	return (dataInSource && !dataInTarget);
+    }
+    private boolean isThereSampleData(Assay studySample){
+    	
+    	String value = studySample.getSpreadsheetUI().getTable().getColValAtRow(SPECIEFIELD, 0);
+    	
+    	return !(value == null || value.equals(""));
     }
 
 
