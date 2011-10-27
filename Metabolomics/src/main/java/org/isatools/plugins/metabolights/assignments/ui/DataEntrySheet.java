@@ -3,8 +3,10 @@ package org.isatools.plugins.metabolights.assignments.ui;
 import org.apache.log4j.Logger;
 import org.isatools.isacreator.apiutils.SpreadsheetUtils;
 import org.isatools.isacreator.common.UIHelper;
+import org.isatools.isacreator.gui.AssaySpreadsheet;
 import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
+import org.isatools.isacreator.ontologyselectiontool.OntologySourceManager;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCell;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCellRange;
@@ -217,6 +219,8 @@ public class DataEntrySheet extends JPanel {
           @Override
           public void mousePressed(MouseEvent mouseEvent) {
               importSpecieButton.setIcon(importSpecieIcon);
+              
+              //testSync();
               forceSpecieImport = true;
               importSampleData();
               forceSpecieImport = false;
@@ -240,8 +244,8 @@ public class DataEntrySheet extends JPanel {
       	topContainer.add(buttonContainer, BorderLayout.EAST);
         add(topContainer, BorderLayout.NORTH);
     }
-    
-    private String getFileName(){
+   	
+     private String getFileName(){
 
     	// if we do not have the property already set
     	if (fileName == null){
@@ -351,41 +355,38 @@ public class DataEntrySheet extends JPanel {
 		Assay studySample = isaCreatorInfo.getCurrentStudySample();
     	
     	// Check if we have to populate the sampledata
-    	if (haveToFillSampleData( studySample)){
-    		
+    	if (haveToFillSampleData(studySample)){
+
     		String termSourceREF="", termAccessionNumber="", organism = "", taxid="";
     		
+    		String value = studySample.getSpreadsheetUI().getTable().getColValAtRow(SPECIEFIELD, 0); 
 
-            OntologyTerm ontologyTerm = isaCreatorInfo.getOntologyTerm(studySample);
+    		logger.info("Importing sample data to metabolights plugin: " + value);
+    		
+            OntologyTerm ontologyTerm = isaCreatorInfo.getOntologyTerm(value);
 
             if (ontologyTerm != null){
+            	
             	termSourceREF = ontologyTerm.getOntologySourceInformation().getSourceName();
                 termAccessionNumber = ontologyTerm.getOntologySourceAccession();
                 organism = ontologyTerm.getOntologyTermName();
                 taxid=termSourceREF + ":" + termAccessionNumber;
-                
-            }
-    		
-    		// Write sample data
-    	  	// Get the current assay
-        	Assay assay = isaCreatorInfo.getCurrentAssay();  		
-			int taxidCol = getSheet().getSpreadsheetFunctions().getModelIndexForColumn("taxid");
-			int speciesCol = getSheet().getSpreadsheetFunctions().getModelIndexForColumn("species");
+  
+        		// Write sample data
+        	  	// Get the current assay
+            	Assay assay = isaCreatorInfo.getCurrentAssay();
+    			int taxidCol = getSheet().getSpreadsheetFunctions().getModelIndexForColumn("taxid");
+    			int speciesCol = getSheet().getSpreadsheetFunctions().getModelIndexForColumn("species");
 
-			System.out.println("Taxid column: " + taxidCol);
-			System.out.println("Species column: " + speciesCol);
-			
-			int rows = getSheet().getTable().getRowCount();
-			
-			// Fill the whole columns....(TODO: why columnumber-2?).
-			if (!taxid.equals("")) getSheet().getSpreadsheetFunctions().fill(new SpreadsheetCellRange(new int[]{0,rows}, new int[]{taxidCol}), taxid);
-			if (!organism.equals("")) getSheet().getSpreadsheetFunctions().fill(new SpreadsheetCellRange(new int[]{0,rows}, new int[]{speciesCol}), organism);
-						    		
-    		
+    			int rows = getSheet().getTable().getRowCount();
+    			
+    			// Fill the whole columns....(TODO: why columnumber-2?).
+    			if (!taxid.equals("")) getSheet().getSpreadsheetFunctions().fill(new SpreadsheetCellRange(new int[]{0,rows}, new int[]{taxidCol}), taxid);
+    			if (!organism.equals("")) getSheet().getSpreadsheetFunctions().fill(new SpreadsheetCellRange(new int[]{0,rows}, new int[]{speciesCol}), organism);
+            }
     	}
     	
     }
-
     public boolean haveToFillSampleData(Assay studySample){
     	
     	// Check if there is already sample data in the spreadsheet (target)
