@@ -169,7 +169,7 @@ public class DataEntrySheet extends JPanel {
 
         info = new JLabel();
         buttonContainer.add(info);
-        info.setText("This is the info label");	
+        //info.setText("This is the info label");	
 //        final JLabel loadButton = new JLabel(loadIcon);
 //        loadButton.addMouseListener(new MouseAdapter() {
 //            @Override
@@ -359,7 +359,11 @@ public class DataEntrySheet extends JPanel {
 
     		String termSourceREF="", termAccessionNumber="", organism = "", taxid="";
     		
-    		String value = studySample.getSpreadsheetUI().getTable().getColValAtRow(SPECIEFIELD, 0); 
+    		int column = studySample.getSpreadsheetUI().getTable().getSpreadsheetFunctions().getModelIndexForColumn(SPECIEFIELD);
+    	   	   		
+    		SpreadsheetCell cell = (SpreadsheetCell)studySample.getSpreadsheetUI().getTable().getTable().getValueAt(0, column); 
+    		
+    		String value = cell.toString();
 
     		logger.info("Importing sample data to metabolights plugin: " + value);
     		
@@ -403,7 +407,11 @@ public class DataEntrySheet extends JPanel {
     }
     private boolean isThereSampleData(Assay studySample){
     	
-    	String value = studySample.getSpreadsheetUI().getTable().getColValAtRow(SPECIEFIELD, 0);
+		int column = studySample.getSpreadsheetUI().getTable().getSpreadsheetFunctions().getModelIndexForColumn(SPECIEFIELD);
+	   		
+		SpreadsheetCell cell = (SpreadsheetCell)studySample.getSpreadsheetUI().getTable().getTable().getValueAt(0, column); 
+		
+		String value = cell.toString();
     	
     	return !(value == null || value.equals(""));
     }
