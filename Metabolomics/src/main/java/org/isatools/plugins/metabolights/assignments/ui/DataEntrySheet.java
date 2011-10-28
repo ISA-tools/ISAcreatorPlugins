@@ -10,19 +10,26 @@ import org.isatools.isacreator.ontologyselectiontool.OntologySourceManager;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCell;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCellRange;
+import org.isatools.isacreator.spreadsheet.StringEditor;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
 import org.isatools.plugins.metabolights.assignments.IsaCreatorInfo;
+import org.isatools.plugins.metabolights.assignments.TableCellListener;
 import org.isatools.plugins.metabolights.assignments.io.FileLoader;
 import org.isatools.plugins.metabolights.assignments.io.FileWriter;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
 import javax.swing.*;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -89,11 +96,11 @@ public class DataEntrySheet extends JPanel {
         createBottomPanel();
         
         // Add a listener to the changes of the table
-        //addChangesListener();
+        addChangesListener3();
     }
 
     //Trying to listen to the changes of the Table. This method is called from createGUI and update updateSpreadsheet (now commented).
-    private void addChangesListener(){
+    private void addChangesListener1(){
     	
     	sheet.getTableModel().addTableModelListener(
     	new TableModelListener() {
@@ -110,6 +117,70 @@ public class DataEntrySheet extends JPanel {
     	    }
     	}
     	);
+    	
+    	sheet.getTableModel().fireTableCellUpdated(1, 1);
+
+    }
+    private void addChangesListener2(){
+    	
+    	TableColumnModel model = sheet.getTable().getColumnModel();
+    	TableColumn col = model.getColumn(1);
+    	
+    	CellEditor ce =  col.getCellEditor();
+    	
+    	ce.addCellEditorListener(new myListener(sheet));
+    	
+    	
+    }
+    private class myListener implements CellEditorListener{
+		Spreadsheet sheet;
+		int row;
+		public myListener(Spreadsheet sheet){
+			this.sheet = sheet; 
+		}
+		public void editingStopped(ChangeEvent e) {
+			
+			int newRow = sheet.getTableModel().getTable().getEditingRow();
+			
+			if (newRow != row) {
+				
+				row = newRow;
+				info.setText("NEW ROW: Editing column 1, row " + row);
+				
+			}else{
+				info.setText("Editing column 1, row " + row);
+			}
+			
+			
+			//StringEditor ce = (StringEditor)e.getSource();
+			
+			
+		}
+		public void editingCanceled(ChangeEvent arg0) {
+			// TODO Auto-generated method stub
+			info.setText("Edition in a cell in column 1 has been cancelled.");
+		}
+	}
+    
+    public void addChangesListener3(){
+    	Action action = new AbstractAction()
+    	{
+    		public void actionPerformed(ActionEvent e)
+    	    {
+    	        TableCellListener tcl = (TableCellListener)e.getSource();
+//    	        System.out.println("Row   : " + tcl.getRow());
+//    	        System.out.println("Column: " + tcl.getColumn());
+//    	        System.out.println("Old   : " + tcl.getOldValue());
+//    	        System.out.println("New   : " + tcl.getNewValue());
+    	        if (tcl.getColumn() == 1){
+    	        	tcl.getTable().setValueAt(tcl.getNewValue(), tcl.getRow(), 2);
+    	        }
+    	    
+    	    }
+    	};
+
+    	TableCellListener tcl = new TableCellListener(sheet.getTable(), action);
+    	//sheet.getTable().setBackground(Color.RED);
     }
     
     public void createBottomPanel(){
@@ -220,7 +291,7 @@ public class DataEntrySheet extends JPanel {
           public void mousePressed(MouseEvent mouseEvent) {
               importSpecieButton.setIcon(importSpecieIcon);
               
-              //testSync();
+              //addChangesListener3();
               forceSpecieImport = true;
               importSampleData();
               forceSpecieImport = false;
@@ -321,7 +392,7 @@ public class DataEntrySheet extends JPanel {
         
         logger.info("Adding the new sheet");
         sheet = newSpreadsheet;
-        //addChangesListener();
+        addChangesListener3();
         add(getIsaCreatorInfo().addSpreadsheetSampleColumns(sheet),BorderLayout.CENTER);  //Add all missing sample columns to the spreadsheet
         validate();
         
