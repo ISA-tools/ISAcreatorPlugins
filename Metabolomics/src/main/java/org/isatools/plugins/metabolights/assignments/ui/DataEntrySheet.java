@@ -99,69 +99,6 @@ public class DataEntrySheet extends JPanel {
         addChangesListener3();
     }
 
-    //Trying to listen to the changes of the Table. This method is called from createGUI and update updateSpreadsheet (now commented).
-    private void addChangesListener1(){
-    	
-    	sheet.getTableModel().addTableModelListener(
-    	new TableModelListener() {
-
-    	    public void tableChanged(TableModelEvent e) {
-    	        int row = e.getFirstRow();
-    	        int column = e.getColumn();
-    	        TableModel model = (TableModel)e.getSource();
-    	        //String columnName = model.getColumnName(column);
-    	        Object data = model.getValueAt(row, column);
-
-    	        // Do something with the data...
-    	        info.setText("Changed: row " + row + ", column " + column + ", value: " + data);
-    	    }
-    	}
-    	);
-    	
-    	sheet.getTableModel().fireTableCellUpdated(1, 1);
-
-    }
-    private void addChangesListener2(){
-    	
-    	TableColumnModel model = sheet.getTable().getColumnModel();
-    	TableColumn col = model.getColumn(1);
-    	
-    	CellEditor ce =  col.getCellEditor();
-    	
-    	ce.addCellEditorListener(new myListener(sheet));
-    	
-    	
-    }
-    private class myListener implements CellEditorListener{
-		Spreadsheet sheet;
-		int row;
-		public myListener(Spreadsheet sheet){
-			this.sheet = sheet; 
-		}
-		public void editingStopped(ChangeEvent e) {
-			
-			int newRow = sheet.getTableModel().getTable().getEditingRow();
-			
-			if (newRow != row) {
-				
-				row = newRow;
-				info.setText("NEW ROW: Editing column 1, row " + row);
-				
-			}else{
-				info.setText("Editing column 1, row " + row);
-			}
-			
-			
-			//StringEditor ce = (StringEditor)e.getSource();
-			
-			
-		}
-		public void editingCanceled(ChangeEvent arg0) {
-			// TODO Auto-generated method stub
-			info.setText("Edition in a cell in column 1 has been cancelled.");
-		}
-	}
-    
     public void addChangesListener3(){
     	Action action = new AbstractAction()
     	{
