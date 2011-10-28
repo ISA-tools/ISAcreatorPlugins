@@ -5,7 +5,11 @@ import org.isatools.isacreator.apiutils.SpreadsheetUtils;
 import org.isatools.isacreator.common.UIHelper;
 import org.isatools.isacreator.gui.AssaySpreadsheet;
 import org.isatools.isacreator.model.Assay;
+import org.isatools.isacreator.ontologymanager.OLSClient;
+import org.isatools.isacreator.ontologymanager.OntologySourceRefObject;
 import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
+import org.isatools.isacreator.configuration.Ontology;
+import org.isatools.isacreator.configuration.RecommendedOntology;
 import org.isatools.isacreator.ontologyselectiontool.OntologySourceManager;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCell;
@@ -34,6 +38,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.List;
 
 /**
  * Created by the ISA team
@@ -110,7 +118,8 @@ public class DataEntrySheet extends JPanel {
 //    	        System.out.println("Old   : " + tcl.getOldValue());
 //    	        System.out.println("New   : " + tcl.getNewValue());
     	        if (tcl.getColumn() == 1){
-    	        	tcl.getTable().setValueAt(tcl.getNewValue(), tcl.getRow(), 2);
+    	        	
+    	        	appendExtraInfoFromIdentifier(tcl.getNewValue().toString(), tcl.getRow());
     	        }
     	    
     	    }
@@ -118,6 +127,20 @@ public class DataEntrySheet extends JPanel {
 
     	TableCellListener tcl = new TableCellListener(sheet.getTable(), action);
     	//sheet.getTable().setBackground(Color.RED);
+    }
+    private void appendExtraInfoFromIdentifier(String identifier, int row){
+    	OLSClient olsc = new OLSClient();
+    	
+    	Ontology onto = new Ontology("CHEBI",null,"CHEBI","Chemical Entities of Biological Interest");
+    	RecommendedOntology ro = new RecommendedOntology(onto);
+    	Map<OntologySourceRefObject, List<OntologyTerm>> results = olsc.getTermsByPartialNameFromSource(identifier, Arrays.asList(new RecommendedOntology[] {ro}));
+    	
+    	
+    	if (results.size()!=0){
+    		OntologyTerm ot = results.values().iterator().next().get(0);
+    		sheet.getTable().setValueAt(ot.getOntologySource()+":"+ ot.getOntologySourceAccession(), row, 2);
+    	}
+    	//System.out.println(results.values().iterator().next().get(0).getOntologyTermName());
     }
     
     public void createBottomPanel(){
