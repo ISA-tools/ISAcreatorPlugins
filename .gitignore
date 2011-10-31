@@ -3,3 +3,8 @@
 /.settings
 /.project
 /.svn
+Metabolomics/target/metabolomics-0.1-SNAPSHOT.jar
+
+Metabolomics/target/classes/org/isatools/plugins/metabolights/assignments/ui/EditorUI.class
+
+.gitignore

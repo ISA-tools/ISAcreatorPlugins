@@ -3,27 +3,45 @@ package org.isatools.plugins.metabolights.assignments.ui;
 import org.apache.log4j.Logger;
 import org.isatools.isacreator.apiutils.SpreadsheetUtils;
 import org.isatools.isacreator.common.UIHelper;
+import org.isatools.isacreator.gui.AssaySpreadsheet;
 import org.isatools.isacreator.model.Assay;
+import org.isatools.isacreator.ontologymanager.OLSClient;
+import org.isatools.isacreator.ontologymanager.OntologySourceRefObject;
 import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
+import org.isatools.isacreator.configuration.Ontology;
+import org.isatools.isacreator.configuration.RecommendedOntology;
+import org.isatools.isacreator.ontologyselectiontool.OntologySourceManager;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCell;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCellRange;
+import org.isatools.isacreator.spreadsheet.StringEditor;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
 import org.isatools.plugins.metabolights.assignments.IsaCreatorInfo;
+import org.isatools.plugins.metabolights.assignments.TableCellListener;
 import org.isatools.plugins.metabolights.assignments.io.FileLoader;
 import org.isatools.plugins.metabolights.assignments.io.FileWriter;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
 import javax.swing.*;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
+
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.List;
 
 /**
  * Created by the ISA team
@@ -82,32 +100,47 @@ public class DataEntrySheet extends JPanel {
 	public void createGUI() {
         sheet = new Spreadsheet(parentFrame, getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject), "");  // Add the sample columns to the definition
         createTopPanel();
-        add(getIsaCreatorInfo().addSpreadsheetSampleColumns(sheet), BorderLayout.CENTER);  // Add the sheet with all sample columns to the spreadsheet
+        add(getIsaCreatorInfo().addSpreadsheetSampleColumns(sheet), BorderLayout.CENTER);  // Add the sample columns to the spreadsheet
         createBottomPanel();
         
         // Add a listener to the changes of the table
-      //  addChangesListener();
+        addChangesListener3();
     }
 
-    //Trying to listen to the changes of the Table. This method is called from createGUI and update updateSpreadsheet (now commented).
-    private void addChangesListener(){
+    public void addChangesListener3(){
+    	Action action = new AbstractAction()
+    	{
+    		public void actionPerformed(ActionEvent e)
+    	    {
+    	        TableCellListener tcl = (TableCellListener)e.getSource();
+//    	        System.out.println("Row   : " + tcl.getRow());
+//    	        System.out.println("Column: " + tcl.getColumn());
+//    	        System.out.println("Old   : " + tcl.getOldValue());
+//    	        System.out.println("New   : " + tcl.getNewValue());
+    	        if (tcl.getColumn() == 1){
+    	        	
+    	        	appendExtraInfoFromIdentifier(tcl.getNewValue().toString(), tcl.getRow());
+    	        }
+    	    
+    	    }
+    	};
 
-
-    	sheet.getTableModel().addTableModelListener(
-            new TableModelListener() {
-
-                public void tableChanged(TableModelEvent e) {
-                    int row = e.getFirstRow();
-                    int column = e.getColumn();
-                    TableModel model = (TableModel)e.getSource();
-                    //String columnName = model.getColumnName(column);
-                    Object data = model.getValueAt(row, column);
-
-                    // Do something with the data...
-                    info.setText("Changed: row " + row + ", column " + column + ", value: " + data);
-                }
-            }
-    	);
+    	TableCellListener tcl = new TableCellListener(sheet.getTable(), action);
+    	//sheet.getTable().setBackground(Color.RED);
+    }
+    private void appendExtraInfoFromIdentifier(String identifier, int row){
+    	OLSClient olsc = new OLSClient();
+    	
+    	Ontology onto = new Ontology("CHEBI",null,"CHEBI","Chemical Entities of Biological Interest");
+    	RecommendedOntology ro = new RecommendedOntology(onto);
+    	Map<OntologySourceRefObject, List<OntologyTerm>> results = olsc.getTermsByPartialNameFromSource(identifier, Arrays.asList(new RecommendedOntology[] {ro}));
+    	
+    	
+    	if (results.size()!=0){
+    		OntologyTerm ot = results.values().iterator().next().get(0);
+    		sheet.getTable().setValueAt(ot.getOntologySource()+":"+ ot.getOntologySourceAccession(), row, 2);
+    	}
+    	//System.out.println(results.values().iterator().next().get(0).getOntologyTermName());
     }
     
     public void createBottomPanel(){
@@ -167,7 +200,7 @@ public class DataEntrySheet extends JPanel {
 
         info = new JLabel();
         buttonContainer.add(info);
-        info.setText("This is the info label");	
+        //info.setText("This is the info label");	
 //        final JLabel loadButton = new JLabel(loadIcon);
 //        loadButton.addMouseListener(new MouseAdapter() {
 //            @Override
@@ -218,7 +251,7 @@ public class DataEntrySheet extends JPanel {
           public void mousePressed(MouseEvent mouseEvent) {
               importSpecieButton.setIcon(importSpecieIcon);
               
-              //testSync();
+              //addChangesListener3();
               forceSpecieImport = true;
               importSampleData();
               forceSpecieImport = false;
@@ -319,7 +352,7 @@ public class DataEntrySheet extends JPanel {
         
         logger.info("Adding the new sheet");
         sheet = newSpreadsheet;
-        //addChangesListener();
+        addChangesListener3();
         add(getIsaCreatorInfo().addSpreadsheetSampleColumns(sheet),BorderLayout.CENTER);  //Add all missing sample columns to the spreadsheet
         validate();
         
@@ -357,7 +390,11 @@ public class DataEntrySheet extends JPanel {
 
     		String termSourceREF="", termAccessionNumber="", organism = "", taxid="";
     		
-    		String value = studySample.getSpreadsheetUI().getTable().getColValAtRow(SPECIEFIELD, 0); 
+    		int column = studySample.getSpreadsheetUI().getTable().getSpreadsheetFunctions().getModelIndexForColumn(SPECIEFIELD);
+    	   	   		
+    		SpreadsheetCell cell = (SpreadsheetCell)studySample.getSpreadsheetUI().getTable().getTable().getValueAt(0, column); 
+    		
+    		String value = cell.toString();
 
     		logger.info("Importing sample data to metabolights plugin: " + value);
     		
@@ -401,7 +438,11 @@ public class DataEntrySheet extends JPanel {
     }
     private boolean isThereSampleData(Assay studySample){
     	
-    	String value = studySample.getSpreadsheetUI().getTable().getColValAtRow(SPECIEFIELD, 0);
+		int column = studySample.getSpreadsheetUI().getTable().getSpreadsheetFunctions().getModelIndexForColumn(SPECIEFIELD);
+	   		
+		SpreadsheetCell cell = (SpreadsheetCell)studySample.getSpreadsheetUI().getTable().getTable().getValueAt(0, column); 
+		
+		String value = cell.toString();
     	
     	return !(value == null || value.equals(""));
     }
