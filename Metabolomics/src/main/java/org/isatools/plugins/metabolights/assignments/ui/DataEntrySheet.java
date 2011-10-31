@@ -21,6 +21,7 @@ import org.isatools.plugins.metabolights.ols.OntologyLookup;
 import org.isatools.plugins.metabolights.ols.TermTypes;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
+import uk.ac.ebi.miriam.lib.MiriamLink;
 
 import javax.swing.*;
 import java.awt.*;
@@ -129,12 +130,63 @@ public class DataEntrySheet extends JPanel {
     	//sheet.getTable().setBackground(Color.RED);
     }
 
+
+    private  void populateNameFromId(String identifiers, int row, String columnName){
+        String ontology = null;
+        String identifiersOrg = null;  // http://www.ebi.ac.uk/miriam/main/mdb?section=browse
+
+        if (!identifiers.contains(","))
+            identifiers = identifiers + ","; //Make this one entry into a comma separated list
+
+        //Which ontology should we use?
+        if (identifiers.toUpperCase().contains(TermTypes.CHEBI)){
+            ontology = TermTypes.CHEBI;
+        }
+
+        if (identifiers.toUpperCase().contains(TermTypes.PUBMED)){
+            ontology = TermTypes.PUBMED;
+            identifiersOrg = "urn:miriam:pubmed";
+        }
+
+        if (identifiers.toUpperCase().contains(TermTypes.KEGG)){
+            ontology = TermTypes.KEGG;
+            identifiersOrg = "urn:miriam:kegg.drug";
+        }
+
+        //TODO, for all entries, loop until a name has been found
+        List<String> identifierList = Arrays.asList(identifiers.split(","));    //Get all the individual identifiers
+        for(String identifier: identifierList){
+            populateNameFromId(identifier, row, ontology, columnName, identifiersOrg);
+        }
+
+    }
+
+    private void findInIndentifiersOrg(String identifier, String identifiersOrg){
+
+         if (identifiersOrg != null){
+            // Creation of the link to the Web Services
+            MiriamLink link = new MiriamLink();
+
+            // Sets the address to access the Web Services
+            link.setAddress("http://www.ebi.ac.uk/miriamws/main/MiriamWebServices");
+
+            Boolean entryFound = link.checkRegExp(identifier, identifiersOrg);
+
+            if (!entryFound){
+                //TOOD,  bold or color the identifier that is not found???
+
+            }
+
+         }
+    }
+
     /*
     This method sets the column name based on the ontology name, in the correct row/column
      */
-    private void populateNameFromId(String identifier, int row, String ontology, String columnName){
+    private boolean populateNameFromId(String identifier, int row, String ontology, String columnName, String identifiersOrg){
 
         Integer columnNumber = null;
+        Boolean termFound = false;
 
         if (identifier != null && identifier.length() > 0) {
 
@@ -148,16 +200,24 @@ public class DataEntrySheet extends JPanel {
 
                     if (spreadsheetCell == null || spreadsheetCell.isEmpty())  //Does the cell already have some values?
                         sheet.getTable().setValueAt(ontologyTermName, row, columnNumber);
+
+                    termFound = true;
                 }
             }
+
+            if(identifiersOrg != null)  //Check to see if the identifier given is a stable id in identifiers.org
+                findInIndentifiersOrg(identifier, identifiersOrg);//TODO
+
         }
+
+        return termFound;
     }
 
     private void appendExtraInfoFromIdentifier(String identifier, int row){
 
 
-        //Add the name/description from the ChEBI id
-        populateNameFromId(identifier, row, TermTypes.CHEBI, TermTypes.DESCRIPTION);
+        //Add the name/description from the identifier
+        populateNameFromId(identifier, row, TermTypes.DESCRIPTION);
 
 
     	OLSClient olsc = new OLSClient();

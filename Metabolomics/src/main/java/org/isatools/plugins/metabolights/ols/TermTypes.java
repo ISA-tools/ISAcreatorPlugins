@@ -19,7 +19,9 @@ public class TermTypes {
     public static final String IDENTIFIER  = "identifier";
     public static final String DESCRIPTION = "description";
 
-    //Supported ontologies
+    //Supported ontologies or validation services
     public static final String CHEBI = "CHEBI";
+    public static final String PUBMED = "PUBMED";
+    public static final String KEGG = "KEGG";
 
 }
