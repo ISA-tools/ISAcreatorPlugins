@@ -3,45 +3,35 @@ package org.isatools.plugins.metabolights.assignments.ui;
 import org.apache.log4j.Logger;
 import org.isatools.isacreator.apiutils.SpreadsheetUtils;
 import org.isatools.isacreator.common.UIHelper;
-import org.isatools.isacreator.gui.AssaySpreadsheet;
+import org.isatools.isacreator.configuration.Ontology;
+import org.isatools.isacreator.configuration.RecommendedOntology;
 import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.ontologymanager.OLSClient;
 import org.isatools.isacreator.ontologymanager.OntologySourceRefObject;
 import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
-import org.isatools.isacreator.configuration.Ontology;
-import org.isatools.isacreator.configuration.RecommendedOntology;
-import org.isatools.isacreator.ontologyselectiontool.OntologySourceManager;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCell;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCellRange;
-import org.isatools.isacreator.spreadsheet.StringEditor;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
 import org.isatools.plugins.metabolights.assignments.IsaCreatorInfo;
 import org.isatools.plugins.metabolights.assignments.TableCellListener;
 import org.isatools.plugins.metabolights.assignments.io.FileLoader;
 import org.isatools.plugins.metabolights.assignments.io.FileWriter;
+import org.isatools.plugins.metabolights.ols.OntologyLookup;
+import org.isatools.plugins.metabolights.ols.TermTypes;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
 import javax.swing.*;
-import javax.swing.event.CellEditorListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by the ISA team
@@ -60,6 +50,7 @@ public class DataEntrySheet extends JPanel {
     private Spreadsheet sheet;
     private EditorUI parentFrame;
     private TableReferenceObject tableReferenceObject;
+    private OntologyLookup ontologyLookup;
 
     private String fileName;
     private JLabel info;
@@ -76,6 +67,13 @@ public class DataEntrySheet extends JPanel {
         if (isaCreatorInfo == null)
             isaCreatorInfo = new IsaCreatorInfo();
         return isaCreatorInfo;
+    }
+
+    public OntologyLookup getOntologyLookup() {
+        if (ontologyLookup == null)
+            ontologyLookup = new OntologyLookup();  //EBI OLS
+
+        return ontologyLookup;
     }
 
     @InjectedResource
@@ -117,8 +115,10 @@ public class DataEntrySheet extends JPanel {
 //    	        System.out.println("Column: " + tcl.getColumn());
 //    	        System.out.println("Old   : " + tcl.getOldValue());
 //    	        System.out.println("New   : " + tcl.getNewValue());
-    	        if (tcl.getColumn() == 1){
-    	        	
+
+                Integer columnNumber = 1; //sheet.getSpreadsheetFunctions().getModelIndexForColumn(TermTypes.IDENTIFIER);  // Is this the identifier column?
+
+    	        if (tcl.getColumn() == columnNumber) {
     	        	appendExtraInfoFromIdentifier(tcl.getNewValue().toString(), tcl.getRow());
     	        }
     	    
@@ -128,14 +128,44 @@ public class DataEntrySheet extends JPanel {
     	TableCellListener tcl = new TableCellListener(sheet.getTable(), action);
     	//sheet.getTable().setBackground(Color.RED);
     }
+
+    /*
+    This method sets the column name based on the ontology name, in the correct row/column
+     */
+    private void populateNameFromId(String identifier, int row, String ontology, String columnName){
+
+        Integer columnNumber = null;
+
+        if (identifier != null && identifier.length() > 0) {
+
+            String ontologyTermName = getOntologyLookup().getNameByIdAndOntology(identifier, ontology);
+
+            if (ontologyTermName != null && ontologyTermName.length() > 0){  //Do we have a name?
+                columnNumber = sheet.getSpreadsheetFunctions().getModelIndexForColumn(columnName); //Get the column number for the column name passed in
+
+                if (columnNumber != null && columnNumber > 0){  //Do we have the column in the model
+                    SpreadsheetCell spreadsheetCell = (SpreadsheetCell) sheet.getTable().getValueAt(row, columnNumber);
+
+                    if (spreadsheetCell == null || spreadsheetCell.isEmpty())  //Does the cell already have some values?
+                        sheet.getTable().setValueAt(ontologyTermName, row, columnNumber);
+                }
+            }
+        }
+    }
+
     private void appendExtraInfoFromIdentifier(String identifier, int row){
+
+
+        //Add the name/description from the ChEBI id
+        populateNameFromId(identifier, row, TermTypes.CHEBI, TermTypes.DESCRIPTION);
+
+
     	OLSClient olsc = new OLSClient();
     	
     	Ontology onto = new Ontology("CHEBI",null,"CHEBI","Chemical Entities of Biological Interest");
     	RecommendedOntology ro = new RecommendedOntology(onto);
     	Map<OntologySourceRefObject, List<OntologyTerm>> results = olsc.getTermsByPartialNameFromSource(identifier, Arrays.asList(new RecommendedOntology[] {ro}));
-    	
-    	
+
     	if (results.size()!=0){
     		OntologyTerm ot = results.values().iterator().next().get(0);
     		sheet.getTable().setValueAt(ot.getOntologySource()+":"+ ot.getOntologySourceAccession(), row, 2);
@@ -366,11 +396,13 @@ public class DataEntrySheet extends JPanel {
    		
    		return isColumnEmpty(column);
    	}
+
     private boolean isColumnEmpty(int column){
     	
     	SpreadsheetCell value = (SpreadsheetCell) sheet.getTable().getValueAt(0, column);
     	return (value.isEmpty());
     }
+
     /**
      * Fill sample columns of our configuration (taxid & species) based on Study Sample data
      * taxid should be a taxon identifier based on an ontology
@@ -422,6 +454,7 @@ public class DataEntrySheet extends JPanel {
     	}
     	
     }
+
     public boolean haveToFillSampleData(Assay studySample){
     	
     	// Check if there is already sample data in the spreadsheet (target)
@@ -436,6 +469,7 @@ public class DataEntrySheet extends JPanel {
     	
     	return (dataInSource && !dataInTarget);
     }
+
     private boolean isThereSampleData(Assay studySample){
     	
 		int column = studySample.getSpreadsheetUI().getTable().getSpreadsheetFunctions().getModelIndexForColumn(SPECIEFIELD);

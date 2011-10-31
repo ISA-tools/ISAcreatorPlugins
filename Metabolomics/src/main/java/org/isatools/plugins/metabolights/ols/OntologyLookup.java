@@ -20,6 +20,7 @@ public class OntologyLookup {
 
     private static Logger logger = Logger.getLogger(OntologyLookup.class);
 
+    /*
     public static void main(String[] args) {
 
        String ontol = "CHEBI";
@@ -29,8 +30,9 @@ public class OntologyLookup {
        List<String> specificTerms = getByNameAndOntologyAndType(termName, TermTypes.FORMULA, ontol, false);
 
     }
+    */
 
-    public static Map<String, String> getAllTermsByNameAndOntology(String termName, String ontologyName, boolean includeSynonyms){
+    public Map<String, String> getAllTermsByNameAndOntology(String termName, String ontologyName, boolean includeSynonyms){
         Map map = new HashMap();
         try {
             QueryService locator = new QueryServiceLocator();
@@ -43,7 +45,7 @@ public class OntologyLookup {
         return map;
     }
 
-    public static String getNameByIdAndOntology(String accession, String ontologyName){
+    public String getNameByIdAndOntology(String accession, String ontologyName){
         String name = null;
         try {
             QueryService locator = new QueryServiceLocator();
@@ -58,7 +60,7 @@ public class OntologyLookup {
     }
 
 
-    public static List<String> getByNameAndOntologyAndType(String termName, String termType, String ontologyName, boolean includeSynonyms){
+    public List<String> getByNameAndOntologyAndType(String termName, String termType, String ontologyName, boolean includeSynonyms){
 
         List<String> termsFound = new ArrayList<String>();
 
