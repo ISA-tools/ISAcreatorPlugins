@@ -29,7 +29,7 @@ public class FileLoader {
         } catch (MalformedInvestigationException e) {
             //If there are columns in the spreadsheet that are no longer present in the sheet definition, return the existing tableReferenceObject
             //the is-hidden="true" attribute in the configuration files will remove a column from the file
-            logger.error(e.getMessage().toString());
+            //logger.error(e.getMessage().toString());
             return referenceObject;
         }
     }

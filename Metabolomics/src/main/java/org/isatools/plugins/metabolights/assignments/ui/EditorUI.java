@@ -135,6 +135,7 @@ public class EditorUI extends AnimatableJFrame {
     public String getCurrentCellValue(){
     	return this.currentCellValue;
     }
+
     public String getNewCellValue() {
         return newCellValue;
     }
@@ -142,6 +143,7 @@ public class EditorUI extends AnimatableJFrame {
     public boolean getAmIAlone(){
     	return amIAlone;
     }
+
     public void setAmIAlone(boolean amIAlone){
     	this.amIAlone = amIAlone;
     }

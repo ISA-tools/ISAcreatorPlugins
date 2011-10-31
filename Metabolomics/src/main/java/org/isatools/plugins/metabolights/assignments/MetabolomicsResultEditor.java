@@ -8,7 +8,6 @@ import org.isatools.isacreator.plugins.AbstractPluginSpreadsheetWidget;
 import org.isatools.isacreator.plugins.DefaultWindowListener;
 import org.isatools.isacreator.plugins.registries.SpreadsheetPluginRegistry;
 import org.isatools.plugins.metabolights.assignments.io.ConfigurationLoader;
-import org.isatools.plugins.metabolights.assignments.ui.DataEntrySheet;
 import org.isatools.plugins.metabolights.assignments.ui.EditorUI;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
@@ -34,7 +33,6 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     private IsaCreatorInfo isaCreatorInfo;
 
     private EditorUI editorUI;
-    private DataEntrySheet dataEntrySheet;
     private ConfigurationLoader configurationLoader;
     
     @InjectedResource
@@ -189,8 +187,6 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
 
         return assay;
     }
-
-
 
     private String getTechnology(){
            //Get the current assay

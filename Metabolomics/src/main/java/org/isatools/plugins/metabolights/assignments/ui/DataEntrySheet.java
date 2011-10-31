@@ -3,10 +3,8 @@ package org.isatools.plugins.metabolights.assignments.ui;
 import org.apache.log4j.Logger;
 import org.isatools.isacreator.apiutils.SpreadsheetUtils;
 import org.isatools.isacreator.common.UIHelper;
-import org.isatools.isacreator.gui.AssaySpreadsheet;
 import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
-import org.isatools.isacreator.ontologyselectiontool.OntologySourceManager;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCell;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCellRange;
@@ -21,7 +19,6 @@ import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
-
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -85,30 +82,31 @@ public class DataEntrySheet extends JPanel {
 	public void createGUI() {
         sheet = new Spreadsheet(parentFrame, getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject), "");  // Add the sample columns to the definition
         createTopPanel();
-        add(getIsaCreatorInfo().addSpreadsheetSampleColumns(sheet), BorderLayout.CENTER);  // Add the sample columns to the spreadsheet
+        add(getIsaCreatorInfo().addSpreadsheetSampleColumns(sheet), BorderLayout.CENTER);  // Add the sheet with all sample columns to the spreadsheet
         createBottomPanel();
         
         // Add a listener to the changes of the table
-        //addChangesListener();
+      //  addChangesListener();
     }
 
     //Trying to listen to the changes of the Table. This method is called from createGUI and update updateSpreadsheet (now commented).
     private void addChangesListener(){
-    	
+
+
     	sheet.getTableModel().addTableModelListener(
-    	new TableModelListener() {
+            new TableModelListener() {
 
-    	    public void tableChanged(TableModelEvent e) {
-    	        int row = e.getFirstRow();
-    	        int column = e.getColumn();
-    	        TableModel model = (TableModel)e.getSource();
-    	        //String columnName = model.getColumnName(column);
-    	        Object data = model.getValueAt(row, column);
+                public void tableChanged(TableModelEvent e) {
+                    int row = e.getFirstRow();
+                    int column = e.getColumn();
+                    TableModel model = (TableModel)e.getSource();
+                    //String columnName = model.getColumnName(column);
+                    Object data = model.getValueAt(row, column);
 
-    	        // Do something with the data...
-    	        info.setText("Changed: row " + row + ", column " + column + ", value: " + data);
-    	    }
-    	}
+                    // Do something with the data...
+                    info.setText("Changed: row " + row + ", column " + column + ", value: " + data);
+                }
+            }
     	);
     }
     
