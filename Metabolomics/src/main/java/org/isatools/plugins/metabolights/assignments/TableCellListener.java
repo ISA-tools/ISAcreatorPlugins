@@ -112,10 +112,11 @@ public class TableCellListener implements PropertyChangeListener, Runnable
 
 		if ("tableCellEditor".equals(e.getPropertyName()))
 		{
-			if (table.isEditing())
+			if (table.isEditing()){
 				processEditingStarted();
-			else
+            } else {
 				processEditingStopped();
+            }
 		}
 	}
 
@@ -152,7 +153,7 @@ public class TableCellListener implements PropertyChangeListener, Runnable
 
 		//  The data has changed, invoke the supplied Action
 
-		if ( newValue.equals(oldValue))
+		if (! newValue.equals(oldValue))
 		{
 			//  Make a copy of the data in case another cell starts editing
 			//  while processing this change

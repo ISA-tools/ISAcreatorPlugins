@@ -531,12 +531,15 @@ public class DataEntrySheet extends JPanel {
     }
 
     private boolean isThereSampleData(Assay studySample){
+
+        String value = null;
     	
 		int column = studySample.getSpreadsheetUI().getTable().getSpreadsheetFunctions().getModelIndexForColumn(SPECIEFIELD);
-	   		
-		SpreadsheetCell cell = (SpreadsheetCell)studySample.getSpreadsheetUI().getTable().getTable().getValueAt(0, column); 
-		
-		String value = cell.toString();
+
+		SpreadsheetCell cell = (SpreadsheetCell)studySample.getSpreadsheetUI().getTable().getTable().getValueAt(0, column);
+
+        if (cell != null)
+		    value = cell.toString();
     	
     	return !(value == null || value.equals(""));
     }
