@@ -10,6 +10,8 @@ import org.isatools.isacreator.spreadsheet.SpreadsheetCell;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCellRange;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
 import org.isatools.plugins.metabolights.assignments.IsaCreatorInfo;
+import org.isatools.plugins.metabolights.assignments.actions.IDGetterFromNameAction;
+import org.isatools.plugins.metabolights.assignments.actions.SelectionRunner;
 import org.isatools.plugins.metabolights.assignments.io.FileLoader;
 import org.isatools.plugins.metabolights.assignments.io.FileWriter;
 import org.jdesktop.fuse.InjectedResource;
@@ -46,6 +48,7 @@ public class DataEntrySheet extends JPanel {
 
     private String fileName;
     private JLabel info;
+    private boolean autocomplete= true;
     
     public static String TAXID = "taxid";
     public static String SPECIES = "species";
@@ -62,7 +65,9 @@ public class DataEntrySheet extends JPanel {
     }
 
     @InjectedResource
-    private ImageIcon saveIcon, saveIconOver, loadIcon, loadIconOver, okIcon, okIconOver, importSpecieIcon, importSpecieIconOver;
+    private ImageIcon saveIcon, saveIconOver, loadIcon, loadIconOver, 
+    					okIcon,	okIconOver, importSpecieIcon, importSpecieIconOver,
+    					getIdIcon, getIdIconOver, selectedIcon, unSelectedIcon;
 
     public DataEntrySheet(EditorUI parentFrame, TableReferenceObject tableReferenceObject) {
         ResourceInjector.get("metabolights-fileeditor-package.style").inject(this);
@@ -212,8 +217,56 @@ public class DataEntrySheet extends JPanel {
 //        buttonContainer.add(Box.createHorizontalStrut(5));
 //        buttonContainer.add(loadButton);
         
-      final JLabel importSpecieButton = new JLabel(importSpecieIcon);
-      importSpecieButton.addMouseListener(new MouseAdapter() {
+        final JCheckBox autocompleteCheck = new JCheckBox();
+        autocompleteCheck.setText("Autocomplete?");
+        autocompleteCheck.setToolTipText("Activate autocomplete if you want to have related cells autocompleted after a cell id edited.");
+        autocompleteCheck.setIcon(unSelectedIcon);
+        autocompleteCheck.setSelectedIcon(selectedIcon);
+        autocompleteCheck.setSelected(autocomplete);
+        autocompleteCheck.addMouseListener(new MouseAdapter(){
+        	@Override
+        	public void mousePressed(MouseEvent mouseEvent){
+        		autocomplete = autocompleteCheck.isSelected();
+        	}
+        });
+        
+        // Add the check box to the container
+        buttonContainer.add(Box.createHorizontalStrut(5));
+    	buttonContainer.add (autocompleteCheck);
+
+        
+        
+        final JLabel getIdButton = new JLabel(getIdIcon);
+        getIdButton.setToolTipText("Fills the [identifier] based on the [description] column for the selected cells.");
+        getIdButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+                getIdButton.setIcon(getIdIcon);
+                
+                Action getIds = new SelectionRunner(sheet.getTable(), new IDGetterFromNameAction());
+                
+                getIds.actionPerformed(null);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent mouseEvent) {
+                getIdButton.setIcon(getIdIcon);
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent mouseEvent) {
+                getIdButton.setIcon(getIdIconOver);
+            }
+        });
+        
+        // Add the button to the container...
+        buttonContainer.add(Box.createHorizontalStrut(5));
+    	buttonContainer.add (getIdButton);
+
+        
+        final JLabel importSpecieButton = new JLabel(importSpecieIcon);
+        importSpecieButton.setToolTipText("Fill the columns [taxid] and [species] based on the data entered in the study sample.");
+        importSpecieButton.addMouseListener(new MouseAdapter() {
           @Override
           public void mousePressed(MouseEvent mouseEvent) {
               importSpecieButton.setIcon(importSpecieIcon);
@@ -232,7 +285,7 @@ public class DataEntrySheet extends JPanel {
               importSpecieButton.setIcon(importSpecieIconOver);
           }
       });
-      	
+      
       	buttonContainer.add(Box.createHorizontalStrut(5));
       	buttonContainer.add (importSpecieButton);
         
