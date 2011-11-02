@@ -116,6 +116,9 @@ public class DataEntrySheet extends JPanel {
     	{
     		public void actionPerformed(ActionEvent e)
     	    {
+    			
+    			if (!autocomplete) return;
+    			
     	        TableCellListener tcl = (TableCellListener)e.getSource();
 //    	        System.out.println("Row   : " + tcl.getRow());
 //    	        System.out.println("Column: " + tcl.getColumn());
@@ -225,17 +228,6 @@ public class DataEntrySheet extends JPanel {
         populateNameFromId(identifier, row, TermTypes.DESCRIPTION);
 
 
-    	OLSClient olsc = new OLSClient();
-    	
-    	Ontology onto = new Ontology("CHEBI",null,"CHEBI","Chemical Entities of Biological Interest");
-    	RecommendedOntology ro = new RecommendedOntology(onto);
-    	Map<OntologySourceRefObject, List<OntologyTerm>> results = olsc.getTermsByPartialNameFromSource(identifier, Arrays.asList(new RecommendedOntology[] {ro}));
-
-    	if (results.size()!=0){
-    		OntologyTerm ot = results.values().iterator().next().get(0);
-    		sheet.getTable().setValueAt(ot.getOntologySource()+":"+ ot.getOntologySourceAccession(), row, 2);
-    	}
-    	//System.out.println(results.values().iterator().next().get(0).getOntologyTermName());
     }
     
     public void createBottomPanel(){
