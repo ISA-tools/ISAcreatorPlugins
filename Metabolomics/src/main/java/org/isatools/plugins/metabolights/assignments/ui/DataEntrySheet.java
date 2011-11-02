@@ -28,6 +28,9 @@ import uk.ac.ebi.miriam.lib.MiriamLink;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -333,16 +336,20 @@ public class DataEntrySheet extends JPanel {
 //        buttonContainer.add(loadButton);
         
         final JCheckBox autocompleteCheck = new JCheckBox();
-        autocompleteCheck.setText("Autocomplete?");
+        autocompleteCheck.setText("Autocomplete:");
         autocompleteCheck.setToolTipText("Activate autocomplete if you want to have related cells autocompleted after a cell id edited.");
         autocompleteCheck.setIcon(unSelectedIcon);
         autocompleteCheck.setSelectedIcon(selectedIcon);
         autocompleteCheck.setSelected(autocomplete);
-        autocompleteCheck.addMouseListener(new MouseAdapter(){
-        	@Override
-        	public void mousePressed(MouseEvent mouseEvent){
+        autocompleteCheck.setHorizontalTextPosition(SwingConstants.LEFT);
+        
+        
+        // Add a listener to the state changed
+        autocompleteCheck.addItemListener(new ItemListener(){
+			public void itemStateChanged(ItemEvent arg0) {
+				// Change the autocomplete variable.
         		autocomplete = autocompleteCheck.isSelected();
-        	}
+			}
         });
         
         // Add the check box to the container
