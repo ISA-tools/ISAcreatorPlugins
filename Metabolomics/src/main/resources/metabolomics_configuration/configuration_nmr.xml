@@ -4,7 +4,7 @@
         <technology term-label="" term-accession="" source-abbreviation=""/>
         <field header="identifier" data-type="String" is-file-field="false" is-multiple-value="true" is-required="true" is-hidden="false">
             <description>
-                A list of "|" separated possible identifiers for these small molecules. e.g. "KEGG:C000017|CHEBI:12345"
+                A list of comma separated possible identifiers for these small molecules. e.g. "KEGG:C000017,CHEBI:12345"
             </description>
             <default-value></default-value>
         </field>
@@ -15,7 +15,7 @@
             </description>
             <default-value></default-value>
         </field>
-        <field header="chemical_formula" data-type="String" is-file-field="false" is-multiple-value="false" is-required="true">
+        <field header="chemical_formula" data-type="String" is-file-field="false" is-multiple-value="false" is-required="true" is-hidden="false">
             <description>NMR/MS: The chemical formula of the identified compound</description>
             <default-value></default-value>
         </field>

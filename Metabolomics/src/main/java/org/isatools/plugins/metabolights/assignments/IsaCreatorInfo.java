@@ -12,9 +12,9 @@ import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.model.Investigation;
 import org.isatools.isacreator.model.Study;
 import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
+import org.isatools.isacreator.ontologyselectiontool.OntologySourceManager;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCellRange;
-import org.isatools.isacreator.spreadsheet.SpreadsheetFunctions;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
 import org.isatools.plugins.metabolights.assignments.ui.DataEntrySheet;
 
@@ -203,23 +203,9 @@ public class IsaCreatorInfo {
         return newSheet;
     }
     
-    
+    public OntologyTerm getOntologyTerm(String uniqueid){
         
-    private Map<String, OntologyTerm> getOntologyInformation(Assay assay) {
-
-        Map<String, OntologyTerm> definedOntologies = assay.getTableReferenceObject().getDefinedOntologies();
-        return definedOntologies;
-    }
-
-    public OntologyTerm getOntologyTerm(Assay assay){
-        OntologyTerm ontologyTerm = new OntologyTerm();
-
-        Map<String, OntologyTerm> ontologyTermMap = getOntologyInformation(assay);
-
-        if (ontologyTermMap != null)
-            ontologyTerm = ontologyTermMap.entrySet().iterator().next().getValue();
-
-        return ontologyTerm;
+        return OntologySourceManager.getUserOntologyHistory().get(uniqueid);
     }
    
     
