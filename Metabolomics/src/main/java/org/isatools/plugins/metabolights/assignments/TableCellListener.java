@@ -153,7 +153,7 @@ public class TableCellListener implements PropertyChangeListener, Runnable
 
 		//  The data has changed, invoke the supplied Action
 
-		if (! newValue.equals(oldValue))
+		if (newValue.equals(oldValue))  //TODO, should be opposite??
 		{
 			//  Make a copy of the data in case another cell starts editing
 			//  while processing this change

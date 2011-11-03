@@ -3,10 +3,7 @@ package org.isatools.plugins.metabolights.assignments.ui;
 import org.apache.log4j.Logger;
 import org.isatools.isacreator.apiutils.SpreadsheetUtils;
 import org.isatools.isacreator.common.UIHelper;
-import org.isatools.isacreator.configuration.Ontology;
-import org.isatools.isacreator.configuration.RecommendedOntology;
 import org.isatools.isacreator.model.Assay;
-import org.isatools.isacreator.ontologymanager.OLSClient;
 import org.isatools.isacreator.ontologymanager.OntologySourceRefObject;
 import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
@@ -117,11 +114,17 @@ public class DataEntrySheet extends JPanel {
 //    	        System.out.println("Old   : " + tcl.getOldValue());
 //    	        System.out.println("New   : " + tcl.getNewValue());
 
-                Integer columnNumber = 1; //sheet.getSpreadsheetFunctions().getModelIndexForColumn(TermTypes.IDENTIFIER);  // Is this the identifier column?
+                Integer column = tcl.getColumn();
 
-    	        if (tcl.getColumn() == columnNumber) {
-    	        	appendExtraInfoFromIdentifier(tcl.getNewValue().toString(), tcl.getRow());
+    	        if (column == 1) { // Is this the identifier column?        //Column 1   sheet.getSpreadsheetFunctions().getModelIndexForColumn(TermTypes.IDENTIFIER)
+                    //Add the name/description from the identifier
+                    getNamebyId(tcl.getNewValue().toString(), tcl.getRow(), TermTypes.DESCRIPTION);
+    	        } else if (column == 6) { // Is this the name column?        //Column 6  sheet.getSpreadsheetFunctions().getModelIndexForColumn(TermTypes.DESCRIPTION)
+                    //Add the name/description from the identifier
+                     populateIdFromName(tcl.getNewValue().toString(), tcl.getRow(), TermTypes.CHEBI, TermTypes.IDENTIFIER);
     	        }
+
+
     	    
     	    }
     	};
@@ -131,9 +134,8 @@ public class DataEntrySheet extends JPanel {
     }
 
 
-    private  void populateNameFromId(String identifiers, int row, String columnName){
+    private void getNamebyId(String identifiers, int row, String columnName){
         String ontology = null;
-        String identifiersOrg = null;  // http://www.ebi.ac.uk/miriam/main/mdb?section=browse
 
         if (!identifiers.contains(","))
             identifiers = identifiers + ","; //Make this one entry into a comma separated list
@@ -145,18 +147,16 @@ public class DataEntrySheet extends JPanel {
 
         if (identifiers.toUpperCase().contains(TermTypes.PUBMED)){
             ontology = TermTypes.PUBMED;
-            identifiersOrg = "urn:miriam:pubmed";
         }
 
         if (identifiers.toUpperCase().contains(TermTypes.KEGG)){
             ontology = TermTypes.KEGG;
-            identifiersOrg = "urn:miriam:kegg.drug";
         }
 
         //TODO, for all entries, loop until a name has been found
         List<String> identifierList = Arrays.asList(identifiers.split(","));    //Get all the individual identifiers
         for(String identifier: identifierList){
-            populateNameFromId(identifier, row, ontology, columnName, identifiersOrg);
+            populateNameFromId(identifier, row, ontology, columnName);
         }
 
     }
@@ -183,7 +183,7 @@ public class DataEntrySheet extends JPanel {
     /*
     This method sets the column name based on the ontology name, in the correct row/column
      */
-    private boolean populateNameFromId(String identifier, int row, String ontology, String columnName, String identifiersOrg){
+    private boolean populateNameFromId(String identifier, int row, String ontology, String columnName){
 
         Integer columnNumber = null;
         Boolean termFound = false;
@@ -205,32 +205,25 @@ public class DataEntrySheet extends JPanel {
                 }
             }
 
-            if(identifiersOrg != null)  //Check to see if the identifier given is a stable id in identifiers.org
-                findInIndentifiersOrg(identifier, identifiersOrg);//TODO
-
         }
 
         return termFound;
     }
 
-    private void appendExtraInfoFromIdentifier(String identifier, int row){
-
-
-        //Add the name/description from the identifier
-        populateNameFromId(identifier, row, TermTypes.DESCRIPTION);
-
-
-    	OLSClient olsc = new OLSClient();
-    	
-    	Ontology onto = new Ontology("CHEBI",null,"CHEBI","Chemical Entities of Biological Interest");
-    	RecommendedOntology ro = new RecommendedOntology(onto);
-    	Map<OntologySourceRefObject, List<OntologyTerm>> results = olsc.getTermsByPartialNameFromSource(identifier, Arrays.asList(new RecommendedOntology[] {ro}));
+    private void populateIdFromName(String identifier,  int row, String ontology, String columnName){
+        //Find if from the name
+        Map<OntologySourceRefObject, List<OntologyTerm>> results = getOntologyLookup().getIdByName(identifier, ontology);
+        Integer columnNumber = null;
 
     	if (results.size()!=0){
     		OntologyTerm ot = results.values().iterator().next().get(0);
-    		sheet.getTable().setValueAt(ot.getOntologySource()+":"+ ot.getOntologySourceAccession(), row, 2);
+
+            columnNumber = sheet.getSpreadsheetFunctions().getModelIndexForColumn(columnName); //Get the column number for the column name passed in
+            SpreadsheetCell spreadsheetCell = (SpreadsheetCell) sheet.getTable().getValueAt(row, columnNumber);
+
+            if (spreadsheetCell == null || spreadsheetCell.isEmpty())  //Does the cell already have some values?
+    		    sheet.getTable().setValueAt(ot.getOntologySource()+":"+ ot.getOntologySourceAccession(), row, columnNumber);
     	}
-    	//System.out.println(results.values().iterator().next().get(0).getOntologyTermName());
     }
     
     public void createBottomPanel(){

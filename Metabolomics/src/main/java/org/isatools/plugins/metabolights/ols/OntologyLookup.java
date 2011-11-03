@@ -1,14 +1,16 @@
 package org.isatools.plugins.metabolights.ols;
 
 import org.apache.log4j.Logger;
+import org.isatools.isacreator.configuration.Ontology;
+import org.isatools.isacreator.configuration.RecommendedOntology;
+import org.isatools.isacreator.ontologymanager.OLSClient;
+import org.isatools.isacreator.ontologymanager.OntologySourceRefObject;
+import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
 import uk.ac.ebi.ook.web.services.Query;
 import uk.ac.ebi.ook.web.services.QueryService;
 import uk.ac.ebi.ook.web.services.QueryServiceLocator;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,6 +33,17 @@ public class OntologyLookup {
 
     }
     */
+
+    private OLSClient olsc;
+
+    public OLSClient getOlsc() {
+
+        if (olsc == null)
+             olsc = new OLSClient();
+
+        return olsc;
+    }
+
 
     public Map<String, String> getAllTermsByNameAndOntology(String termName, String ontologyName, boolean includeSynonyms){
         Map map = new HashMap();
@@ -59,27 +72,18 @@ public class OntologyLookup {
         return name;
     }
 
+    public Map<OntologySourceRefObject, List<OntologyTerm>> getIdByName(String identifier, String ontology) {
 
-    public List<String> getByNameAndOntologyAndType(String termName, String termType, String ontologyName, boolean includeSynonyms){
+    	Ontology onto = null;
+        Map<OntologySourceRefObject, List<OntologyTerm>> results = null;
 
-        List<String> termsFound = new ArrayList<String>();
+        if (ontology.equals(TermTypes.CHEBI))
+            onto = new Ontology("CHEBI",null,"CHEBI","Chemical Entities of Biological Interest");
 
-        try {
+    	RecommendedOntology ro = new RecommendedOntology(onto);
+    	results = olsc.getTermsByPartialNameFromSource(identifier, Arrays.asList(new RecommendedOntology[]{ro}));
 
-            QueryService locator = new QueryServiceLocator();
-            Query qs = locator.getOntologyQuery();
-
-
-            System.out.println("test");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return termsFound;
-
+        return results;
     }
-
-
 
 }
