@@ -11,16 +11,15 @@ import org.isatools.isacreator.spreadsheet.SpreadsheetCell;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCellRange;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
 import org.isatools.plugins.metabolights.assignments.IsaCreatorInfo;
+import org.isatools.plugins.metabolights.assignments.TableCellListener;
 import org.isatools.plugins.metabolights.assignments.actions.IDGetterFromNameAction;
 import org.isatools.plugins.metabolights.assignments.actions.SelectionRunner;
-import org.isatools.plugins.metabolights.assignments.TableCellListener;
 import org.isatools.plugins.metabolights.assignments.io.FileLoader;
 import org.isatools.plugins.metabolights.assignments.io.FileWriter;
 import org.isatools.plugins.metabolights.ols.OntologyLookup;
 import org.isatools.plugins.metabolights.ols.TermTypes;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
-import uk.ac.ebi.miriam.lib.MiriamLink;
 
 import javax.swing.*;
 import java.awt.*;
@@ -119,17 +118,7 @@ public class DataEntrySheet extends JPanel {
 //    	        System.out.println("Old   : " + tcl.getOldValue());
 //    	        System.out.println("New   : " + tcl.getNewValue());
 
-                Integer column = tcl.getColumn();
-
-    	        if (column == 1) { // Is this the identifier column?        //Column 1   sheet.getSpreadsheetFunctions().getModelIndexForColumn(TermTypes.IDENTIFIER)
-                    //Add the name/description from the identifier
-                    getNamebyId(tcl.getNewValue().toString(), tcl.getRow(), TermTypes.DESCRIPTION);
-    	        } else if (column == 6) { // Is this the name column?        //Column 6  sheet.getSpreadsheetFunctions().getModelIndexForColumn(TermTypes.DESCRIPTION)
-                    //Add the name/description from the identifier
-                     populateIdFromName(tcl.getNewValue().toString(), tcl.getRow(), TermTypes.CHEBI, TermTypes.IDENTIFIER);
-    	        }
-
-
+                validateColumns(tcl);
     	    
     	    }
     	};
@@ -138,6 +127,19 @@ public class DataEntrySheet extends JPanel {
     	//sheet.getTable().setBackground(Color.RED);
     }
 
+    private void validateColumns(TableCellListener tcl) {
+
+        Integer column = tcl.getColumn();
+        //Integer sheetColumn = sheet.getSpreadsheetFunctions().getModelIndexForColumn(TermTypes.IDENTIFIER);
+
+        if (column == sheet.getSpreadsheetFunctions().getModelIndexForColumn(TermTypes.IDENTIFIER)) { // Is this the identifier column?        //Column 1
+            //Add the name/description from the identifier
+            getNamebyId(tcl.getNewValue().toString(), tcl.getRow(), TermTypes.DESCRIPTION);
+        } else if (column == sheet.getSpreadsheetFunctions().getModelIndexForColumn(TermTypes.DESCRIPTION)) { // Is this the name column?        //Column 5
+            //Add the name/description from the identifier
+            populateIdFromName(tcl.getNewValue().toString(), tcl.getRow(), TermTypes.CHEBI, TermTypes.IDENTIFIER);
+        }
+    }
 
     private void getNamebyId(String identifiers, int row, String columnName){
         String ontology = null;
@@ -164,25 +166,6 @@ public class DataEntrySheet extends JPanel {
             populateNameFromId(identifier, row, ontology, columnName);
         }
 
-    }
-
-    private void findInIndentifiersOrg(String identifier, String identifiersOrg){
-
-         if (identifiersOrg != null){
-            // Creation of the link to the Web Services
-            MiriamLink link = new MiriamLink();
-
-            // Sets the address to access the Web Services
-            link.setAddress("http://www.ebi.ac.uk/miriamws/main/MiriamWebServices");
-
-            Boolean entryFound = link.checkRegExp(identifier, identifiersOrg);
-
-            if (!entryFound){
-                //TOOD,  bold or color the identifier that is not found???
-
-            }
-
-         }
     }
 
     /*

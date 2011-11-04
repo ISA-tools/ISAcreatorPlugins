@@ -22,28 +22,13 @@ public class OntologyLookup {
 
     private static Logger logger = Logger.getLogger(OntologyLookup.class);
 
-    /*
-    public static void main(String[] args) {
-
-       String ontol = "CHEBI";
-       String termName = getNameByIdAndOntology("CHEBI:15377", ontol);
-       Map<String, String> allTerms = getAllTermsByNameAndOntology("water",ontol, false);
-
-       List<String> specificTerms = getByNameAndOntologyAndType(termName, TermTypes.FORMULA, ontol, false);
-
-    }
-    */
-
     private OLSClient olsc;
 
     public OLSClient getOlsc() {
-
         if (olsc == null)
              olsc = new OLSClient();
-
         return olsc;
     }
-
 
     public Map<String, String> getAllTermsByNameAndOntology(String termName, String ontologyName, boolean includeSynonyms){
         Map map = new HashMap();
@@ -81,7 +66,7 @@ public class OntologyLookup {
             onto = new Ontology("CHEBI",null,"CHEBI","Chemical Entities of Biological Interest");
 
     	RecommendedOntology ro = new RecommendedOntology(onto);
-    	results = olsc.getTermsByPartialNameFromSource(identifier, Arrays.asList(new RecommendedOntology[]{ro}));
+    	results = getOlsc().getTermsByPartialNameFromSource(identifier, Arrays.asList(ro));
 
         return results;
     }

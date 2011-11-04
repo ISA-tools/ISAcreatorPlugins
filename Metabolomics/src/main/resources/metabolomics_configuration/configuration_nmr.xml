@@ -2,7 +2,7 @@
     <isatab-configuration table-name="metaboliteprofiling_nmr_mztab">
         <measurement term-label="metabolite profiling" term-accession="" source-abbreviation=""/>
         <technology term-label="" term-accession="" source-abbreviation=""/>
-        <field header="identifier" data-type="String" is-file-field="false" is-multiple-value="true" is-required="true" is-hidden="false">
+        <field header="identifier" data-type="String" is-file-field="false" is-multiple-value="false" is-required="true" is-hidden="false">
             <description>
                 A list of comma separated possible identifiers for these small molecules. e.g. "KEGG:C000017,CHEBI:12345"
             </description>
