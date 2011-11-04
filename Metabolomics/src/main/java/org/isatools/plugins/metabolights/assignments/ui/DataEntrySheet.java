@@ -112,6 +112,9 @@ public class DataEntrySheet extends JPanel {
     	{
     		public void actionPerformed(ActionEvent e)
     	    {
+    			
+    			if (!autocomplete) return;
+    			
     	        TableCellListener tcl = (TableCellListener)e.getSource();
 //    	        System.out.println("Row   : " + tcl.getRow());
 //    	        System.out.println("Column: " + tcl.getColumn());
@@ -323,10 +326,10 @@ public class DataEntrySheet extends JPanel {
         autocompleteCheck.setSelectedIcon(selectedIcon);
         autocompleteCheck.setSelected(autocomplete);
         autocompleteCheck.addMouseListener(new MouseAdapter(){
-        	@Override
+        @Override
         	public void mousePressed(MouseEvent mouseEvent){
         		autocomplete = autocompleteCheck.isSelected();
-        	}
+			}
         });
         
         // Add the check box to the container
