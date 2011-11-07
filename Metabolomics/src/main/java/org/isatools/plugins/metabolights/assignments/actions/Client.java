@@ -1,6 +1,7 @@
 package org.isatools.plugins.metabolights.assignments.actions;
 
 import gov.nih.nlm.ncbi.www.soap.eutils.*;
+import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub.ItemType;
 
 public class Client {
     public static void main(String[] args) throws Exception
@@ -101,8 +102,26 @@ public class Client {
                 System.out.println("ID: "+res.getDocSum()[i].getId());
                 for (int k = 0; k < res.getDocSum()[i].getItem().length; k++)
                 {
-                    System.out.println("    " + res.getDocSum()[i].getItem()[k].getName() +
-                                       ": " + res.getDocSum()[i].getItem()[k].getItemContent());
+                	
+                	ItemType item = res.getDocSum()[i].getItem()[k];
+                	
+                	if ("SynonymList".equals(item.getName())){
+                		
+                		ItemType[] synonyms = item.getItem();
+                		
+                		System.out.println("SYNONYMS:");
+                		for (ItemType synonym: synonyms){
+                			
+                			System.out.println("       " + synonym.getName() +
+                                    ": " + synonym.getItemContent());
+                		}
+                		
+                		
+                	}else{
+                		
+                		System.out.println("    " + item.getName() +
+                                       ": " + item.getItemContent());
+                	}
                 }
             }
             System.out.println("-----------------------\n");

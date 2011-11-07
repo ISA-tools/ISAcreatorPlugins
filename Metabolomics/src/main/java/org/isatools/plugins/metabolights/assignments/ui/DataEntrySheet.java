@@ -14,7 +14,7 @@ import org.isatools.isacreator.spreadsheet.SpreadsheetCell;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCellRange;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
 import org.isatools.plugins.metabolights.assignments.IsaCreatorInfo;
-import org.isatools.plugins.metabolights.assignments.actions.IDGetterFromNameAction;
+import org.isatools.plugins.metabolights.assignments.actions.AutoCompletionAction;
 import org.isatools.plugins.metabolights.assignments.actions.SelectionRunner;
 import org.isatools.plugins.metabolights.assignments.TableCellListener;
 import org.isatools.plugins.metabolights.assignments.io.FileLoader;
@@ -111,10 +111,10 @@ public class DataEntrySheet extends JPanel {
         createBottomPanel();
         
         // Add a listener to the changes of the table
-        addChangesListener3();
+        addChangesListener();
     }
 
-    public void addChangesListener3(){
+    public void addChangesListener(){
     	Action action = new AbstractAction()
     	{
     		public void actionPerformed(ActionEvent e)
@@ -123,16 +123,13 @@ public class DataEntrySheet extends JPanel {
     			if (!autocomplete) return;
     			
     	        TableCellListener tcl = (TableCellListener)e.getSource();
-//    	        System.out.println("Row   : " + tcl.getRow());
-//    	        System.out.println("Column: " + tcl.getColumn());
-//    	        System.out.println("Old   : " + tcl.getOldValue());
-//    	        System.out.println("New   : " + tcl.getNewValue());
 
-                Integer columnNumber = 1; //sheet.getSpreadsheetFunctions().getModelIndexForColumn(TermTypes.IDENTIFIER);  // Is this the identifier column?
+                //Integer columnNumber = 1; //sheet.getSpreadsheetFunctions().getModelIndexForColumn(TermTypes.IDENTIFIER);  // Is this the identifier column?
 
-    	        if (tcl.getColumn() == columnNumber) {
-    	        	appendExtraInfoFromIdentifier(tcl.getNewValue().toString(), tcl.getRow());
-    	        }
+    	        //if (tcl.getColumn() == columnNumber) {
+    	        //	appendExtraInfoFromIdentifier(tcl.getNewValue().toString(), tcl.getRow());
+    	        //}
+    	       
     	    
     	    }
     	};
@@ -282,59 +279,19 @@ public class DataEntrySheet extends JPanel {
     	
     }
     public void createTopPanel() {
-        JPanel topContainer = new JPanel(new BorderLayout());
+        
+    	// Create the top container
+    	JPanel topContainer = new JPanel(new BorderLayout());
         topContainer.setBackground(UIHelper.BG_COLOR);
-
+        // Create a button container to add buttons, etc.
         Box buttonContainer = Box.createHorizontalBox();
         buttonContainer.setBackground(UIHelper.BG_COLOR);
 
+        // Add an info label
         info = new JLabel();
         buttonContainer.add(info);
-        //info.setText("This is the info label");	
-//        final JLabel loadButton = new JLabel(loadIcon);
-//        loadButton.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mousePressed(MouseEvent mouseEvent) {
-//                loadButton.setIcon(loadIcon);
-//                loadFile();
-//                
-//            }
-//
-//            @Override
-//            public void mouseExited(MouseEvent mouseEvent) {
-//                loadButton.setIcon(loadIcon);
-//            }
-//
-//            @Override
-//            public void mouseEntered(MouseEvent mouseEvent) {
-//                loadButton.setIcon(loadIconOver);
-//            }
-//        });
-//
-//        final JLabel saveButton = new JLabel(saveIcon);
-//        saveButton.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mousePressed(MouseEvent mouseEvent) {
-//                saveButton.setIcon(saveIcon);
-//                saveFile();
-//            }
-//
-//            @Override
-//            public void mouseExited(MouseEvent mouseEvent) {
-//                saveButton.setIcon(saveIcon);
-//            }
-//
-//            @Override
-//            public void mouseEntered(MouseEvent mouseEvent) {
-//                saveButton.setIcon(saveIconOver);
-//            }
-//        });
-//
-//        
-//        buttonContainer.add(saveButton);
-//        buttonContainer.add(Box.createHorizontalStrut(5));
-//        buttonContainer.add(loadButton);
-        
+
+        // Add a checkbox for activate/de-activate auto-completion.
         final JCheckBox autocompleteCheck = new JCheckBox();
         autocompleteCheck.setText("Autocomplete:");
         autocompleteCheck.setToolTipText("Activate autocomplete if you want to have related cells autocompleted after a cell id edited.");
@@ -342,8 +299,7 @@ public class DataEntrySheet extends JPanel {
         autocompleteCheck.setSelectedIcon(selectedIcon);
         autocompleteCheck.setSelected(autocomplete);
         autocompleteCheck.setHorizontalTextPosition(SwingConstants.LEFT);
-        
-        
+              
         // Add a listener to the state changed
         autocompleteCheck.addItemListener(new ItemListener(){
 			public void itemStateChanged(ItemEvent arg0) {
@@ -357,7 +313,7 @@ public class DataEntrySheet extends JPanel {
     	buttonContainer.add (autocompleteCheck);
 
         
-        
+        // Add a button to resolve IDs based on descriptions.
         final JLabel getIdButton = new JLabel(getIdIcon);
         getIdButton.setToolTipText("Fills the [identifier] based on the [description] column for the selected cells.");
         getIdButton.addMouseListener(new MouseAdapter() {
@@ -365,7 +321,7 @@ public class DataEntrySheet extends JPanel {
             public void mousePressed(MouseEvent mouseEvent) {
                 getIdButton.setIcon(getIdIcon);
                 
-                Action getIds = new SelectionRunner(sheet.getTable(), new IDGetterFromNameAction());
+                Action getIds = new SelectionRunner(sheet.getTable(), new AutoCompletionAction());
                 
                 getIds.actionPerformed(null);
             }
@@ -380,7 +336,7 @@ public class DataEntrySheet extends JPanel {
                 getIdButton.setIcon(getIdIconOver);
             }
         });
-        
+                        
         // Add the button to the container...
         buttonContainer.add(Box.createHorizontalStrut(5));
     	buttonContainer.add (getIdButton);
@@ -494,7 +450,7 @@ public class DataEntrySheet extends JPanel {
         
         logger.info("Adding the new sheet");
         sheet = newSpreadsheet;
-        addChangesListener3();
+        addChangesListener();
         add(getIsaCreatorInfo().addSpreadsheetSampleColumns(sheet),BorderLayout.CENTER);  //Add all missing sample columns to the spreadsheet
         validate();
         
