@@ -1,0 +1,55 @@
+package org.isatools.plugins.metabolights.assignments.actions;
+
+import static org.junit.Assert.*;
+
+import org.isatools.plugins.metabolights.assignments.actions.AutoCompletionAction;
+import org.isatools.plugins.metabolights.assignments.model.Metabolite;
+import org.junit.Test;
+
+public class AutoCompletionActionTest {
+
+	@Test
+	public void testGetMetaboliteFromEntrez() {
+		
+		// http://pubchem.ncbi.nlm.nih.gov/summary/summary.cgi?cid=985&loc=ec_rcs
+		// Palmitic acid: CHEBI:15756, LMFA01010001, C00249
+		Metabolite met = AutoCompletionAction.getMetaboliteFromEntrez("Palmitic Acid","CompleteSynonym" );
+		
+		assertEquals("CHEBI:15756", met.getIdentifier());
+		assertEquals("C16H32O2", met.getFormula());
+		assertEquals("Palmitic Acid", met.getDescription());
+	}
+	
+	@Test
+	public void testsGetMetaboliteFromPubChem(){
+		
+		// http://pubchem.ncbi.nlm.nih.gov/summary/summary.cgi?cid=985&loc=ec_rcs
+		// Palmitic acid: CHEBI:15756, LMFA01010001, C00249
+		Metabolite met = AutoCompletionAction.getMetaboliteFromPubChem("985");
+		
+		assertEquals("CHEBI:15756", met.getIdentifier());
+		assertEquals("C16H32O2", met.getFormula());
+		assertEquals("Palmitic Acid", met.getDescription());
+	}
+
+	@Test
+	public void testMatchRegEx() {
+		
+		// Test with KEGG compound id ("'C' followed by five-digit number")
+		assertEquals(AutoCompletionAction.matchRegEx("C12345","^C[0-9]{5}$"), true);
+		assertEquals(AutoCompletionAction.matchRegEx("C12345ABC","^C[0-9]{5}$"), false);
+		assertEquals(AutoCompletionAction.matchRegEx("C1","^C[0-9]{5}$"), false);
+		assertEquals(AutoCompletionAction.matchRegEx("AAAAAAC12345","^C[0-9]{5}$"), false);
+		
+		
+		// CHEBI ID
+		assertEquals(AutoCompletionAction.matchRegEx("CHEBI:12345","^CHEBI:[0-9]+$"), true);
+		assertEquals(AutoCompletionAction.matchRegEx("CHEBI:123456789","^CHEBI:[0-9]+$"), true);
+		assertEquals(AutoCompletionAction.matchRegEx("AAAACHEBI:12345","^CHEBI:[0-9]+$"), false);
+		assertEquals(AutoCompletionAction.matchRegEx("CHEBI:","^CHEBI:[0-9]+$"), false);
+		
+		
+		
+	}
+
+}
