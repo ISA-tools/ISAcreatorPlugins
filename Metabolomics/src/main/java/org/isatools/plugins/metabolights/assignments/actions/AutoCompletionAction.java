@@ -19,20 +19,22 @@ import org.isatools.plugins.metabolights.assignments.model.Metabolite;
 
 public class AutoCompletionAction extends AbstractAction{
 
-	final String IDENTIFIER_COL_NAME = "identifier";
-	final String FORMULA_COL_NAME = "chemical_formula";
-	final String DESCRIPTION_COL_NAME = "description";
+	static final String IDENTIFIER_COL_NAME = "identifier";
+	static final String FORMULA_COL_NAME = "chemical_formula";
+	static final String DESCRIPTION_COL_NAME = "description";
 	
-	SelectionRunner source;
+	CellToAutoComplete source;
+	JTable table;
 	String currentCellValue;
 
 	public void actionPerformed(ActionEvent e) {
 		
 		//Get the object that has generated the event
-		source = (SelectionRunner) e.getSource();
+		source = (CellToAutoComplete) e.getSource();
+		table = source.getTable();
 		
 		// Get the value of the source cell
-		currentCellValue = source.getTable().getValueAt(source.getRow(), source.getCol()).toString();
+		currentCellValue = table.getValueAt(source.getRow(), source.getCol()).toString();
 		
 		// If it's empty
 		if (currentCellValue == null || currentCellValue.equals("")) return;
@@ -50,13 +52,17 @@ public class AutoCompletionAction extends AbstractAction{
 	}
 	private void autoCompleteColumns(Metabolite met){
 		
+		// If metabolite is null there is nothing to fill
+		if (met == null) return;
 		
-		setColumn(met.getDescription(), DESCRIPTION_COL_NAME);
-		setColumn(met.getFormula(), FORMULA_COL_NAME);
-		setColumn(met.getIdentifier(), IDENTIFIER_COL_NAME);
+		setColumn(DESCRIPTION_COL_NAME, met.getDescription() );
+		setColumn(FORMULA_COL_NAME, met.getFormula() );
+		setColumn(IDENTIFIER_COL_NAME, met.getIdentifier() );
+		
+		table.validate();
 		
 	}
-	private void setColumn(String value, String columnName){
+	private void setColumn(String columnName,String value){
 		
 		
 		// Only set the value if empty...
@@ -64,7 +70,7 @@ public class AutoCompletionAction extends AbstractAction{
 			
 			int colIndex = getColIndexByName(columnName);
 			
-			source.getTable().setValueAt( value, source.getRow(), colIndex);
+			table.setValueAt( value, source.getRow(), colIndex);
 		}
 		
 	}
@@ -85,7 +91,7 @@ public class AutoCompletionAction extends AbstractAction{
 		int columnIndex = getColIndexByName(columnName);
 		
 		// Get the value of the cell
-		String value = source.getTable().getValueAt(source.getRow(), columnIndex).toString();
+		String value = table.getValueAt(source.getRow(), columnIndex).toString();
 		
 		// If It's empty
 		if (value == null || value.equals("")) return true;
@@ -95,7 +101,7 @@ public class AutoCompletionAction extends AbstractAction{
 		
 	}
 	private int getColIndexByName(String columnName){
-		return source.getTable().getColumnModel().getColumnIndex(columnName);
+		return table.getColumnModel().getColumnIndex(columnName);
 	}
 	
 	
@@ -103,16 +109,20 @@ public class AutoCompletionAction extends AbstractAction{
 	private Metabolite getMetabolite(){
 		
 		// Get the current column name
-		String columnName = source.getTable().getColumnName(source.getCol());
+		String columnName = table.getColumnName(source.getCol());
+		
+		return getMetabolite(columnName, currentCellValue);
+		
+	}
+	public static Metabolite getMetabolite(String columnName, String value){
 		
 		// If it the description column
 		if (DESCRIPTION_COL_NAME.equals(columnName) || IDENTIFIER_COL_NAME.equals(columnName)){
-			return getMetaboliteFromEntrez(currentCellValue, "CompleteSynonym");
+			return getMetaboliteFromEntrez(value, "Synonym");
 		} else if (FORMULA_COL_NAME.equals(columnName)){
-			return getMetaboliteFromEntrez(currentCellValue, "All Fields");
+			return getMetaboliteFromEntrez(value, "All Fields");
 		}
 		return null;
-		
 		
 	}
 	public static Metabolite getMetaboliteFromEntrez(String term , String field){
@@ -138,6 +148,9 @@ public class AutoCompletionAction extends AbstractAction{
            req.setRetMax("1");
            EUtilsServiceStub.ESearchResult res = service.run_eSearch(req);
 
+           if (res.getIdList() == null) return null;
+           if (res.getIdList().getId() == null) return null;
+           
            
            // results output
            if (res.getIdList().getId().length>0)
@@ -205,16 +218,23 @@ public class AutoCompletionAction extends AbstractAction{
             		   return met;
             	   }
             	   else if ("SynonymList".equals(name)) {
+            		   
+            		   // Get the identifier
             		   met.setIdentifier(getBestID(it));
             		   
+            		   // Get the name provisionally, 
+            		   if (it.getItem()!= null){
+            			   // ...get the first name
+            			   met.setDescription(it.getItem()[0].getItemContent());
+            		   }
             		   
+            	// TODO: This doesn't work always...where is the name?
             	   } else if ("MeSHHeadingList".equals(name)){
             		   
-            		   ItemType nameItem = it.getItem()[0];
-            		   
             		   // If there is a name in MeSHHeadingList
-            		   if (nameItem != null){
-            			   met.setDescription(nameItem.getItemContent());
+            		   if (it.getItem() != null){
+                		   
+            			   met.setDescription(it.getItem()[0].getItemContent());
             		   }
             	   }
                }
@@ -228,7 +248,7 @@ public class AutoCompletionAction extends AbstractAction{
 	public static String getBestID(ItemType synonymItem){
 		
 		//Prioirity list of ids
-		String[] prioritylist = {"CHEBI:", "C[0-9]:", "LM"};
+		String[] prioritylist = {"^CHEBI:[0-9]+$", "^HMDB[0-9]+$", "^LM[A-Z]{2}[0-9]+$", "^C[0-9]{5}$"};
 		String bestId = null;
 		// Set the priority score to the lower
 		int priorityScore = prioritylist.length;
@@ -254,7 +274,7 @@ public class AutoCompletionAction extends AbstractAction{
     				}else{
     					
     					// If previous synonym found is of less priority...
-    					if (priorityScore< i){
+    					if (priorityScore > i){
     						//... highest priority item found
     						// Get the new synonym
     						bestId = name;

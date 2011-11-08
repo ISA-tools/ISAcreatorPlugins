@@ -32,13 +32,12 @@ public class SelectionRunner extends AbstractAction{
 				
 				// Calculate the cell to edit, row should be already correct and column as well
 				
-				// Create the event to pass to the action
-				ActionEvent event = new ActionEvent(this,0,"NEW_CELL_FOUND");
+				// Create the event to pass a CellAutoComplete object
+				ActionEvent event = new ActionEvent(new CellToAutoComplete(table, row, col),0,"NEW_CELL_FOUND");
 				action.actionPerformed(event);
 				
 			}
 		
-			table.validate();
 		}
 	}
 
