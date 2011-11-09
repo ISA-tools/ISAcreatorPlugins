@@ -3,7 +3,10 @@ package org.isatools.plugins.metabolights.assignments.ui;
 import org.apache.log4j.Logger;
 import org.isatools.isacreator.apiutils.SpreadsheetUtils;
 import org.isatools.isacreator.common.UIHelper;
+import org.isatools.isacreator.configuration.Ontology;
+import org.isatools.isacreator.configuration.RecommendedOntology;
 import org.isatools.isacreator.model.Assay;
+import org.isatools.isacreator.ontologymanager.OLSClient;
 import org.isatools.isacreator.ontologymanager.OntologySourceRefObject;
 import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
@@ -11,18 +14,23 @@ import org.isatools.isacreator.spreadsheet.SpreadsheetCell;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCellRange;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
 import org.isatools.plugins.metabolights.assignments.IsaCreatorInfo;
-import org.isatools.plugins.metabolights.assignments.TableCellListener;
 import org.isatools.plugins.metabolights.assignments.actions.AutoCompletionAction;
+import org.isatools.plugins.metabolights.assignments.actions.CellToAutoComplete;
 import org.isatools.plugins.metabolights.assignments.actions.SelectionRunner;
+import org.isatools.plugins.metabolights.assignments.TableCellListener;
 import org.isatools.plugins.metabolights.assignments.io.FileLoader;
 import org.isatools.plugins.metabolights.assignments.io.FileWriter;
-import org.isatools.plugins.metabolights.ols.TermTypes;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
@@ -65,6 +73,13 @@ public class DataEntrySheet extends JPanel {
         return isaCreatorInfo;
     }
 
+//    public OntologyLookup getOntologyLookup() {
+//        if (ontologyLookup == null)
+//            ontologyLookup = new OntologyLookup();  //EBI OLS
+//
+//        return ontologyLookup;
+//    }
+
     @InjectedResource
     private ImageIcon saveIcon, saveIconOver, loadIcon, loadIconOver, 
     					okIcon,	okIconOver, importSpecieIcon, importSpecieIconOver,
@@ -106,7 +121,16 @@ public class DataEntrySheet extends JPanel {
     			
     	        TableCellListener tcl = (TableCellListener)e.getSource();
 
-                validateColumns(tcl);
+    	        info.setText("Looking up ...");
+    	        // Create an autocompletion action and invoke the actionperformed method
+                AutoCompletionAction aca = new AutoCompletionAction();
+                aca.actionPerformed(new ActionEvent(new CellToAutoComplete(tcl.getTable(), tcl.getRow(), tcl.getColumn()),1,"CELL_CHANGED"));
+                
+                info.setText("Finished.");
+                
+                // Repaint the table
+                sheet.getTable().repaint();
+                
     	    }
     	};
 
@@ -114,92 +138,97 @@ public class DataEntrySheet extends JPanel {
     	//sheet.getTable().setBackground(Color.RED);
     }
 
-    private void validateColumns(TableCellListener tcl) {
 
-        Integer column = tcl.getColumn();
-        //Integer sheetColumn = sheet.getSpreadsheetFunctions().getModelIndexForColumn(TermTypes.IDENTIFIER);
-
-        if (column == sheet.getSpreadsheetFunctions().getModelIndexForColumn(TermTypes.IDENTIFIER)) { // Is this the identifier column?        //Column 1
-            //Add the name/description from the identifier
-            getNamebyId(tcl.getNewValue().toString(), tcl.getRow(), TermTypes.DESCRIPTION);
-        } else if (column == sheet.getSpreadsheetFunctions().getModelIndexForColumn(TermTypes.DESCRIPTION)) { // Is this the name column?        //Column 5
-            //Add the name/description from the identifier
-            populateIdFromName(tcl.getNewValue().toString(), tcl.getRow(), TermTypes.CHEBI, TermTypes.IDENTIFIER);
-        }
-    }
-
-    private void getNamebyId(String identifiers, int row, String columnName){
-        String ontology = null;
-
-        if (!identifiers.contains(","))
-            identifiers = identifiers + ","; //Make this one entry into a comma separated list
-
-        //Which ontology should we use?
-        if (identifiers.toUpperCase().contains(TermTypes.CHEBI)){
-            ontology = TermTypes.CHEBI;
-        }
-
-        if (identifiers.toUpperCase().contains(TermTypes.PUBMED)){
-            ontology = TermTypes.PUBMED;
-        }
-
-        if (identifiers.toUpperCase().contains(TermTypes.KEGG)){
-            ontology = TermTypes.KEGG;
-        }
-
-        //TODO, for all entries, loop until a name has been found
-        List<String> identifierList = Arrays.asList(identifiers.split(","));    //Get all the individual identifiers
-        for(String identifier: identifierList){
-            populateNameFromId(identifier, row, ontology, columnName);
-        }
-
-    }
-
-    /*
-    This method sets the column name based on the ontology name, in the correct row/column
-     */
-    private boolean populateNameFromId(String identifier, int row, String ontology, String columnName){
-
-        Integer columnNumber = null;
-        Boolean termFound = false;
-
-        if (identifier != null && identifier.length() > 0) {
-
-            String ontologyTermName =null;//TODO, fix! getOntologyLookup().getNameByIdAndOntology(identifier, ontology);
-
-            if (ontologyTermName != null && ontologyTermName.length() > 0){  //Do we have a name?
-                columnNumber = sheet.getSpreadsheetFunctions().getModelIndexForColumn(columnName); //Get the column number for the column name passed in
-
-                if (columnNumber != null && columnNumber > 0){  //Do we have the column in the model
-                    SpreadsheetCell spreadsheetCell = (SpreadsheetCell) sheet.getTable().getValueAt(row, columnNumber);
-
-                    if (spreadsheetCell == null || spreadsheetCell.isEmpty())  //Does the cell already have some values?
-                        sheet.getTable().setValueAt(ontologyTermName, row, columnNumber);
-
-                    termFound = true;
-                }
-            }
-
-        }
-
-        return termFound;
-    }
-
-    private void populateIdFromName(String identifier,  int row, String ontology, String columnName){
-        //Find if from the name
-        Map<OntologySourceRefObject, List<OntologyTerm>> results = null; //TODO, fix! = getOntologyLookup().getIdByName(identifier, ontology);
-        Integer columnNumber = null;
-
-    	if (results.size()!=0){
-    		OntologyTerm ot = results.values().iterator().next().get(0);
-
-            columnNumber = sheet.getSpreadsheetFunctions().getModelIndexForColumn(columnName); //Get the column number for the column name passed in
-            SpreadsheetCell spreadsheetCell = (SpreadsheetCell) sheet.getTable().getValueAt(row, columnNumber);
-
-            if (spreadsheetCell == null || spreadsheetCell.isEmpty())  //Does the cell already have some values?
-    		    sheet.getTable().setValueAt(ot.getOntologySource()+":"+ ot.getOntologySourceAccession(), row, columnNumber);
-    	}
-    }
+//    private  void populateNameFromId(String identifiers, int row, String columnName){
+//        String ontology = null;
+//        String identifiersOrg = null;  // http://www.ebi.ac.uk/miriam/main/mdb?section=browse
+//
+//        if (!identifiers.contains(","))
+//            identifiers = identifiers + ","; //Make this one entry into a comma separated list
+//
+//        //Which ontology should we use?
+//        if (identifiers.toUpperCase().contains(TermTypes.CHEBI)){
+//            ontology = TermTypes.CHEBI;
+//        }
+//
+//        if (identifiers.toUpperCase().contains(TermTypes.PUBMED)){
+//            ontology = TermTypes.PUBMED;
+//            identifiersOrg = "urn:miriam:pubmed";
+//        }
+//
+//        if (identifiers.toUpperCase().contains(TermTypes.KEGG)){
+//            ontology = TermTypes.KEGG;
+//            identifiersOrg = "urn:miriam:kegg.drug";
+//        }
+//
+//        //TODO, for all entries, loop until a name has been found
+//        List<String> identifierList = Arrays.asList(identifiers.split(","));    //Get all the individual identifiers
+//        for(String identifier: identifierList){
+//            populateNameFromId(identifier, row, ontology, columnName, identifiersOrg);
+//        }
+//
+//    }
+//
+//    private void findInIndentifiersOrg(String identifier, String identifiersOrg){
+//
+//         if (identifiersOrg != null){
+//            // Creation of the link to the Web Services
+//            MiriamLink link = new MiriamLink();
+//
+//            // Sets the address to access the Web Services
+//            link.setAddress("http://www.ebi.ac.uk/miriamws/main/MiriamWebServices");
+//
+//            Boolean entryFound = link.checkRegExp(identifier, identifiersOrg);
+//
+//            if (!entryFound){
+//                //TOOD,  bold or color the identifier that is not found???
+//
+//            }
+//
+//         }
+//    }
+//
+//    /*
+//    This method sets the column name based on the ontology name, in the correct row/column
+//     */
+//    private boolean populateNameFromId(String identifier, int row, String ontology, String columnName, String identifiersOrg){
+//
+//        Integer columnNumber = null;
+//        Boolean termFound = false;
+//
+//        if (identifier != null && identifier.length() > 0) {
+//
+//            String ontologyTermName = getOntologyLookup().getNameByIdAndOntology(identifier, ontology);
+//
+//            if (ontologyTermName != null && ontologyTermName.length() > 0){  //Do we have a name?
+//                columnNumber = sheet.getSpreadsheetFunctions().getModelIndexForColumn(columnName); //Get the column number for the column name passed in
+//
+//                if (columnNumber != null && columnNumber > 0){  //Do we have the column in the model
+//                    SpreadsheetCell spreadsheetCell = (SpreadsheetCell) sheet.getTable().getValueAt(row, columnNumber);
+//
+//                    if (spreadsheetCell == null || spreadsheetCell.isEmpty())  //Does the cell already have some values?
+//                        sheet.getTable().setValueAt(ontologyTermName, row, columnNumber);
+//
+//                    termFound = true;
+//                }
+//            }
+//
+//            if(identifiersOrg != null)  //Check to see if the identifier given is a stable id in identifiers.org
+//                findInIndentifiersOrg(identifier, identifiersOrg);//TODO
+//
+//        }
+//
+//        return termFound;
+//    }
+//
+//    private void appendExtraInfoFromIdentifier(String identifier, int row){
+//
+//
+//        //Add the name/description from the identifier
+//        populateNameFromId(identifier, row, TermTypes.DESCRIPTION);
+//
+//
+//    }
     
     public void createBottomPanel(){
     	JPanel bottomPannel = new JPanel(new BorderLayout());
@@ -249,7 +278,6 @@ public class DataEntrySheet extends JPanel {
 
     	
     }
-
     public void createTopPanel() {
         
     	// Create the top container
@@ -271,7 +299,7 @@ public class DataEntrySheet extends JPanel {
         autocompleteCheck.setSelectedIcon(selectedIcon);
         autocompleteCheck.setSelected(autocomplete);
         autocompleteCheck.setHorizontalTextPosition(SwingConstants.LEFT);
-
+              
         // Add a listener to the state changed
         autocompleteCheck.addItemListener(new ItemListener(){
 			public void itemStateChanged(ItemEvent arg0) {
@@ -287,7 +315,7 @@ public class DataEntrySheet extends JPanel {
         
         // Add a button to resolve IDs based on descriptions.
         final JLabel getIdButton = new JLabel(getIdIcon);
-        getIdButton.setToolTipText("Fills the [identifier] based on the [description] column for the selected cells.");
+        getIdButton.setToolTipText("Autocomplete other columns based on the current column looking up in PubChem.");
         getIdButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
@@ -295,7 +323,16 @@ public class DataEntrySheet extends JPanel {
                 
                 Action getIds = new SelectionRunner(sheet.getTable(), new AutoCompletionAction());
                 
+                // It doesn't do it...with invoke later it does it later (too late, after everything is done)
+                info.setText("Looking up ...");
+		        repaint();
+				
                 getIds.actionPerformed(null);
+                
+                info.setText("Finished.");
+                
+                sheet.getTable().repaint();
+
             }
 
             @Override
