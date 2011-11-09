@@ -18,6 +18,14 @@ public class AutoCompletionActionTest {
 		assertEquals("CHEBI:15756", met.getIdentifier());
 		assertEquals("C16H32O2", met.getFormula());
 		assertEquals("Palmitic Acid", met.getDescription());
+		
+		// Ganacaonin F (Not in CHEBI, but in LipidMaps)
+		met = AutoCompletionAction.getMetaboliteFromEntrez("5317482","uid" );
+		
+		assertEquals("LMPK12090043", met.getIdentifier());
+		assertEquals("C21H16O6", met.getFormula());
+		assertEquals("Gancaonin F", met.getDescription());
+		
 	}
 	
 	@Test
@@ -47,6 +55,12 @@ public class AutoCompletionActionTest {
 		assertEquals(AutoCompletionAction.matchRegEx("CHEBI:123456789","^CHEBI:[0-9]+$"), true);
 		assertEquals(AutoCompletionAction.matchRegEx("AAAACHEBI:12345","^CHEBI:[0-9]+$"), false);
 		assertEquals(AutoCompletionAction.matchRegEx("CHEBI:","^CHEBI:[0-9]+$"), false);
+		
+		// LipidMapID
+		assertEquals(AutoCompletionAction.matchRegEx("LMPK12090043","^LM[a-zA-Z]{2}[0-9]+$"), true);
+		assertEquals(AutoCompletionAction.matchRegEx("LMLMPK12090043","^LM[a-zA-Z]{2}[0-9]+$"), false);
+		assertEquals(AutoCompletionAction.matchRegEx("LMPK12090043 ","^LM[a-zA-Z]{2}[0-9]+$"), false);
+		
 		
 		
 		
