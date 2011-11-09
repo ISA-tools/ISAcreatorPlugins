@@ -16,7 +16,6 @@ import org.isatools.plugins.metabolights.assignments.actions.AutoCompletionActio
 import org.isatools.plugins.metabolights.assignments.actions.SelectionRunner;
 import org.isatools.plugins.metabolights.assignments.io.FileLoader;
 import org.isatools.plugins.metabolights.assignments.io.FileWriter;
-import org.isatools.plugins.metabolights.ols.OntologyLookup;
 import org.isatools.plugins.metabolights.ols.TermTypes;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
@@ -166,7 +165,7 @@ public class DataEntrySheet extends JPanel {
 
         if (identifier != null && identifier.length() > 0) {
 
-            String ontologyTermName = getOntologyLookup().getNameByIdAndOntology(identifier, ontology);
+            String ontologyTermName =null;//TODO, fix! getOntologyLookup().getNameByIdAndOntology(identifier, ontology);
 
             if (ontologyTermName != null && ontologyTermName.length() > 0){  //Do we have a name?
                 columnNumber = sheet.getSpreadsheetFunctions().getModelIndexForColumn(columnName); //Get the column number for the column name passed in
@@ -188,7 +187,7 @@ public class DataEntrySheet extends JPanel {
 
     private void populateIdFromName(String identifier,  int row, String ontology, String columnName){
         //Find if from the name
-        Map<OntologySourceRefObject, List<OntologyTerm>> results = getOntologyLookup().getIdByName(identifier, ontology);
+        Map<OntologySourceRefObject, List<OntologyTerm>> results = null; //TODO, fix! = getOntologyLookup().getIdByName(identifier, ontology);
         Integer columnNumber = null;
 
     	if (results.size()!=0){
