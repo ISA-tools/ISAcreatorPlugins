@@ -11,12 +11,8 @@ import org.isatools.isacreator.spreadsheet.SpreadsheetCell;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCellRange;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
 import org.isatools.plugins.metabolights.assignments.IsaCreatorInfo;
-<<<<<<< HEAD
 import org.isatools.plugins.metabolights.assignments.TableCellListener;
-import org.isatools.plugins.metabolights.assignments.actions.IDGetterFromNameAction;
-=======
 import org.isatools.plugins.metabolights.assignments.actions.AutoCompletionAction;
->>>>>>> 478aec0179a3600f5c06c9114815d23dd613d6bf
 import org.isatools.plugins.metabolights.assignments.actions.SelectionRunner;
 import org.isatools.plugins.metabolights.assignments.io.FileLoader;
 import org.isatools.plugins.metabolights.assignments.io.FileWriter;
@@ -27,9 +23,7 @@ import org.jdesktop.fuse.ResourceInjector;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
