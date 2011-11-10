@@ -151,7 +151,8 @@ public class TableCellListener implements PropertyChangeListener, Runnable
 		newValue = table.getModel().getValueAt(row, column);
 
 		//  The data has changed, invoke the supplied Action
-
+		if (newValue == null) return; 
+		
 		if (newValue.equals(oldValue))  //TODO, should be opposite??
 		{
 			//  Make a copy of the data in case another cell starts editing

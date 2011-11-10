@@ -24,6 +24,8 @@ import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
 import javax.swing.*;
+import javax.swing.table.TableColumn;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -109,8 +111,23 @@ public class DataEntrySheet extends JPanel {
         
         // Add a listener to the changes of the table
         addChangesListener();
+        
+        // Add custom cell editors
+        addCustomCellEditors();
     }
+	
+	private void addCustomCellEditors(){
+		
+		// TODO: Change the way we are specifiying the column
+		int colindex  = 3;
+		TableColumn col = sheet.getTable().getColumnModel().getColumn(colindex);
+		col.setCellEditor(new MetaboliteCellEditor());
 
+		// If the cell should appear like a combobox in its
+		// non-editing state, also set the combobox renderer
+		//col.setCellRenderer(new MetaboliteCellEditor());
+		
+	}
     public void addChangesListener(){
     	Action action = new AbstractAction()
     	{
