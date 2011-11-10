@@ -14,6 +14,7 @@ import javax.swing.JTable;
 
 import org.apache.commons.lang.StringUtils;
 import org.isatools.plugins.metabolights.assignments.model.Metabolite;
+import org.isatools.plugins.metabolights.assignments.model.OptionalMetabolitesList;
 
 
 
@@ -127,10 +128,27 @@ public class AutoCompletionAction extends AbstractAction{
 	}
 	public static Metabolite getMetaboliteFromEntrez(String term , String field){
 	
+		
+		
+		
        try
        {
        	
-           EUtilsServiceStub service = new EUtilsServiceStub();
+    	   // If we have it cached
+    	   if (OptionalMetabolitesList.getObject().isThereMetabolitesForTerm(term)){
+    		   // Get the metabolites cached
+    		   Metabolite[] mets = OptionalMetabolitesList.getObject().getMetabolitesForTerm(term);
+    		   
+    		   // If there isn't any
+    		   if (mets == null) return null;
+    		   
+    		   //return the first
+    		   return mets[0];
+    		   
+    	   }
+    	   
+    	   
+    	 EUtilsServiceStub service = new EUtilsServiceStub();
            // call NCBI ESearch utility
            // NOTE: search term should be URL encoded
            EUtilsServiceStub.ESearchRequest req = new EUtilsServiceStub.ESearchRequest();
@@ -138,29 +156,50 @@ public class AutoCompletionAction extends AbstractAction{
            req.setDb("pccompound");
            
            // prepare the term
-           term = prepareEntrezTerm(term);
+           String modifiedTerm = prepareEntrezTerm(term);
            
            // Search on synonyms only 
-           term = term + "[" + field + "]";
-           req.setTerm(term);
+           modifiedTerm = modifiedTerm + "[" + field + "]";
+           req.setTerm(modifiedTerm);
            
            // Get the first one
-           req.setRetMax("1");
+           req.setRetMax("3");
            EUtilsServiceStub.ESearchResult res = service.run_eSearch(req);
 
-           if (res.getIdList() == null) return null;
-           if (res.getIdList().getId() == null) return null;
-           
-           
-           // results output
-           if (res.getIdList().getId().length>0)
-           {
-               // Get the the id of the first element
-        	   Metabolite met = getMetaboliteFromPubChem(res.getIdList().getId()[0]);
-        	   return met;
+           if (res.getIdList() == null){
+        	 // Set to null the cached
+        	 OptionalMetabolitesList.getObject().setMetabolitesForTerm(null, term);
+        	 return null;
+        	   
            }
            
-           return null;
+           if (res.getIdList().getId() == null){
+        	  
+          	 // Set to null the cached
+          	 OptionalMetabolitesList.getObject().setMetabolitesForTerm(null, term);
+          	return null; 
+           }
+        	   
+           
+           Metabolite[] mets = new Metabolite[res.getIdList().getId().length];
+           
+           // results output
+           for (int i = 0; i < res.getIdList().getId().length;i++)
+           {
+        	   
+               // Get the the id of the first element
+        	   Metabolite met = getMetaboliteFromPubChem(res.getIdList().getId()[i]);
+        	   
+        	   //Add it to the array 
+        	   mets[i] = met;
+           }
+           
+           // Add it to the cache
+           OptionalMetabolitesList.getObject().setMetabolitesForTerm(mets, term);
+           
+           // Return the first
+           return mets[0];
+           
        }
        catch (Exception e) { 
     	   

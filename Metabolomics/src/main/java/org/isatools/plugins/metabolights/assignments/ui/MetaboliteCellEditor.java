@@ -28,15 +28,16 @@ import javax.swing.table.TableCellEditor;
 import org.isatools.isacreator.common.UIHelper;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCell;
 import org.isatools.plugins.metabolights.assignments.model.Metabolite;
+import org.isatools.plugins.metabolights.assignments.model.OptionalMetabolitesList;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
 public class MetaboliteCellEditor extends AbstractCellEditor implements TableCellEditor{
 		
 	JPanel panel;
-	JLabel label;
+	JLabel showMetList;
 	JTextField text;
-	SpreadsheetCell cell;
+	
 	Metabolite[] metabolites;
 	
 	@InjectedResource
@@ -54,13 +55,22 @@ public class MetaboliteCellEditor extends AbstractCellEditor implements TableCel
 			text.setHorizontalAlignment(JTextField.LEFT);
 			text.setPreferredSize(new Dimension(50,20));
 			
-			final JLabel showMetList = new JLabel(showMoreIcon);
+			showMetList = new JLabel(showMoreIcon);
 			showMetList.setToolTipText("There are more metabolites");
 			showMetList.addMouseListener(new MouseAdapter() {
 	            @Override
 	            public void mousePressed(MouseEvent mouseEvent) {
 	            	
-	            	JOptionPane.showMessageDialog(null, "Show more metbolites");
+	            	
+	            	String metabolites = "";
+	            	
+	            	Metabolite[] mets = OptionalMetabolitesList.getObject().getMetabolitesForTerm(text.getText());
+	            	
+	            	for (Metabolite met:mets){
+	            		metabolites = metabolites + met.getDescription() + "(" + met.getIdentifier() + "), " + met.getFormula() + "\n";
+	            	}
+	            	
+	            	JOptionPane.showMessageDialog(null, metabolites);
 
 	            }
 	        });
@@ -95,12 +105,18 @@ public class MetaboliteCellEditor extends AbstractCellEditor implements TableCel
 		private void updateData(SpreadsheetCell newMetabolite, boolean isSelected, JTable table) {
 			//this.metabolite = metabolite;
 			
-			if (cell != null){
-				text.setText(cell.toString());
+			if (newMetabolite != null){
+				text.setText(newMetabolite.toString());
+				
 			}else{
 				text.setText("");
 			}
 			
+			if (!OptionalMetabolitesList.getObject().isThereMetabolitesForTerm(text.getText())){
+				showMetList.setIcon(null);
+			}else{
+				showMetList.setIcon(showMoreIcon);
+			}
 
 		}
 
