@@ -17,7 +17,7 @@ public class AutoCompletionActionTest {
 		
 		assertEquals("CHEBI:15756", met.getIdentifier());
 		assertEquals("C16H32O2", met.getFormula());
-		assertEquals("Palmitic Acid", met.getDescription());
+		assertEquals("palmitic acid", met.getDescription());
 		
 		// Ganacaonin F (Not in CHEBI, but in LipidMaps)
 		met = AutoCompletionAction.getMetaboliteFromEntrez("5317482","uid" );
@@ -33,11 +33,11 @@ public class AutoCompletionActionTest {
 		
 		// http://pubchem.ncbi.nlm.nih.gov/summary/summary.cgi?cid=985&loc=ec_rcs
 		// Palmitic acid: CHEBI:15756, LMFA01010001, C00249
-		Metabolite met = AutoCompletionAction.getMetaboliteFromPubChem("985");
-		
+		Metabolite[] mets = AutoCompletionAction.getMetabolitesFromPubChem("985");
+		Metabolite met = mets[0];
 		assertEquals("CHEBI:15756", met.getIdentifier());
 		assertEquals("C16H32O2", met.getFormula());
-		assertEquals("Palmitic Acid", met.getDescription());
+		assertEquals("palmitic acid", met.getDescription());
 	}
 
 	@Test

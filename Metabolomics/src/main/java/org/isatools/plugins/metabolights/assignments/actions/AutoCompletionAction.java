@@ -119,7 +119,7 @@ public class AutoCompletionAction extends AbstractAction{
 		
 		// If it the description column
 		if (DESCRIPTION_COL_NAME.equals(columnName) || IDENTIFIER_COL_NAME.equals(columnName)){
-			return getMetaboliteFromEntrez(value, "Synonym");
+			return getMetaboliteFromEntrez(value, "CompleteSynonym");
 		} else if (FORMULA_COL_NAME.equals(columnName)){
 			return getMetaboliteFromEntrez(value, "All Fields");
 		}
@@ -163,7 +163,7 @@ public class AutoCompletionAction extends AbstractAction{
            req.setTerm(modifiedTerm);
            
            // Get the first one
-           req.setRetMax("3");
+           req.setRetMax("10");
            EUtilsServiceStub.ESearchResult res = service.run_eSearch(req);
 
            if (res.getIdList() == null){
@@ -179,21 +179,16 @@ public class AutoCompletionAction extends AbstractAction{
           	 OptionalMetabolitesList.getObject().setMetabolitesForTerm(null, term);
           	return null; 
            }
-        	   
            
-           Metabolite[] mets = new Metabolite[res.getIdList().getId().length];
+           // Declare an array of metabolites
+           Metabolite[] mets;
            
-           // results output
-           for (int i = 0; i < res.getIdList().getId().length;i++)
-           {
+           // Join id into one String separated by commas
+           String ids = org.apache.commons.lang.StringUtils.join(res.getIdList().getId(), ",");
         	   
-               // Get the the id of the first element
-        	   Metabolite met = getMetaboliteFromPubChem(res.getIdList().getId()[i]);
+           // Get the the id of the first element
+    	   mets = getMetabolitesFromPubChem(ids);
         	   
-        	   //Add it to the array 
-        	   mets[i] = met;
-           }
-           
            // Add it to the cache
            OptionalMetabolitesList.getObject().setMetabolitesForTerm(mets, term);
            
@@ -221,7 +216,7 @@ public class AutoCompletionAction extends AbstractAction{
 		// Return the term.
 		return term;
 	}
-	public static Metabolite getMetaboliteFromPubChem(String id){
+	public static Metabolite[] getMetabolitesFromPubChem(String id){
 		// retrieves document Summaries by list of primary IDs
        try
        {
@@ -232,56 +227,72 @@ public class AutoCompletionAction extends AbstractAction{
            req.setId(id);//"2519");
            EUtilsServiceStub.ESummaryResult res = service.run_eSummary(req);
            
-           // Instantiate the metabolite class
-           Metabolite met = new Metabolite();
+           Metabolite[] mets = new Metabolite[res.getDocSum().length];
            
            // results output
            for(int i=0; i<res.getDocSum().length; i++)
            {
         	   // Get the doc summary..
         	   DocSumType docSum = res.getDocSum()[i];
-        	   
-               // Go through all Items (properties)
-               for (int k = 0; k < docSum.getItem().length; k++)
-               {
-            	   // Get the item
-            	   ItemType it = docSum.getItem()[k];
-            	   // Get the name
-            	   String name =it.getName();
-            	   
-            	   // Populate met object
-            	   if ("MolecularFormula".equals(name)){
-            		   met.setFormula(it.getItemContent());
-            		   
-            		   // This should be the last property we are interested in.
-            		   return met;
-            	   }
-            	   else if ("SynonymList".equals(name)) {
-            		   
-            		   // Get the identifier
-            		   met.setIdentifier(getBestID(it));
-            		   
-            		   // Get the name provisionally, 
-            		   if (it.getItem()!= null){
-            			   // ...get the first name
-            			   met.setDescription(it.getItem()[0].getItemContent());
-            		   }
-            		   
-            	// TODO: This doesn't work always...where is the name?
-            	   } else if ("MeSHHeadingList".equals(name)){
-            		   
-            		   // If there is a name in MeSHHeadingList
-            		   if (it.getItem() != null){
-                		   
-            			   met.setDescription(it.getItem()[0].getItemContent());
-            		   }
-            	   }
-               }
+        	
+        	   // Get a metabolite from the Summary
+               Metabolite met = getMetaboliteFromDocSum(docSum);
+               
+               // Add it to the array
+               mets[i] = met;
                
            }
-           return met;
+
+           return mets;
        }
        catch(Exception e) { System.out.println(e.toString()); return null;}
+	}
+	/**
+	 * @param docSum
+	 * @param met
+	 */
+	private static Metabolite getMetaboliteFromDocSum(DocSumType docSum) {
+
+		Metabolite met = new Metabolite();
+		
+		// Go through all Items (properties)
+		   for (int k = 0; k < docSum.getItem().length; k++)
+		   {
+			   // Get the item
+			   ItemType it = docSum.getItem()[k];
+			   // Get the name
+			   String name =it.getName();
+			   
+			   // Populate met object
+			   if ("MolecularFormula".equals(name)){
+				   met.setFormula(it.getItemContent());
+				   
+				   // This should be the last property we are interested in.
+				   continue;
+			   }
+			   else if ("SynonymList".equals(name)) {
+				   
+				   // Get the identifier
+				   met.setIdentifier(getBestID(it));
+				   
+				   // Get the name provisionally, 
+				   if (it.getItem()!= null){
+					   // ...get the first name
+					   met.setDescription(it.getItem()[0].getItemContent());
+				   }
+				   
+			// TODO: This doesn't work always...where is the name?
+//			   } else if ("MeSHHeadingList".equals(name)){
+//				   
+//				   // If there is a name in MeSHHeadingList
+//				   if (it.getItem() != null){
+//		    		   
+//					   met.setDescription(it.getItem()[0].getItemContent());
+//				   }
+			   }
+		   }
+		   
+		   return met;
 	}
 	
 	public static String getBestID(ItemType synonymItem){

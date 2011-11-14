@@ -31,4 +31,7 @@ public class Metabolite {
 		this.description = description;
 	}
 	public Metabolite(){}
+	public String toString(){
+		return  getDescription() + "(" + getIdentifier() + "), " + getFormula();
+	}
 }

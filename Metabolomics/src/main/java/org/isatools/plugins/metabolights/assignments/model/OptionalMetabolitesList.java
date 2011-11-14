@@ -28,16 +28,16 @@ public class OptionalMetabolitesList {
 	}
 	
 	public boolean isThereMetabolitesForTerm(String term){
-		return metaboliteArrayMap.containsKey(term);
+		return metaboliteArrayMap.containsKey(term.toLowerCase());
 	}
 	public Metabolite[] getMetabolitesForTerm (String term){
 		
-		return metaboliteArrayMap.get(term);
+		return metaboliteArrayMap.get(term.toLowerCase());
 		
 	}
 	public void setMetabolitesForTerm(Metabolite[] metabolites, String term){
 		
-		metaboliteArrayMap.put(term, metabolites);
+		metaboliteArrayMap.put(term.toLowerCase(), metabolites);
 	}
 
 }

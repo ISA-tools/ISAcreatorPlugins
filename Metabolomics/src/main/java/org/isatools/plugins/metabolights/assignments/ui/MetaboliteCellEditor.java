@@ -16,11 +16,15 @@ import javax.swing.Action;
 import javax.swing.CellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
 import javax.swing.border.Border;
 import javax.swing.table.TableCellEditor;
@@ -37,6 +41,7 @@ public class MetaboliteCellEditor extends AbstractCellEditor implements TableCel
 	JPanel panel;
 	JLabel showMetList;
 	JTextField text;
+	JComboBox metList;
 	
 	Metabolite[] metabolites;
 	
@@ -46,6 +51,11 @@ public class MetaboliteCellEditor extends AbstractCellEditor implements TableCel
     public MetaboliteCellEditor() {
 		
 			ResourceInjector.get("metabolights-fileeditor-package.style").inject(this);
+			
+			setUpOldStyle();
+			//comboSetUp();
+    }
+    private void setUpOldStyle(){
 			
 			text = new JTextField() {
 			    @Override public void setBorder(Border border) {
@@ -61,7 +71,22 @@ public class MetaboliteCellEditor extends AbstractCellEditor implements TableCel
 	            @Override
 	            public void mousePressed(MouseEvent mouseEvent) {
 	            	
+//	            	Metabolite[] mets = OptionalMetabolitesList.getObject().getMetabolitesForTerm(text.getText());
+//	            	
+//	            	JList list = new JList(mets); //data has type Object[]
+//	            	list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+//	            	list.setLayoutOrientation(JList.VERTICAL);
+//	            	list.setVisibleRowCount(5);
+//	            	JScrollPane listScroller = new JScrollPane(list);
+//	            	listScroller.setPreferredSize(new Dimension(250, 80));
+//	            	panel.add(list);
+//	            	panel.setComponentZOrder(list, 0);
+//	            	list.setVisible(true);
+//	            	
+//	            	
 	            	
+
+//MESSAGE DIALOG OPTION	            	
 	            	String metabolites = "";
 	            	
 	            	Metabolite[] mets = OptionalMetabolitesList.getObject().getMetabolitesForTerm(text.getText());
@@ -101,25 +126,105 @@ public class MetaboliteCellEditor extends AbstractCellEditor implements TableCel
 			//text.setMargin(new Insets(-10, -10, -10, -10));
 			
     }
+    private void comboSetUp(){
+    	
+    	
+    	
+    	text = new JTextField() {
+		    @Override public void setBorder(Border border) {
+		        // No!
+		    }
+		};
+    	
+    	metList = new JComboBox();
+    	metList.setEditable(true);
+    	UIHelper.setJComboBoxAsHeavyweight(metList);
+    	//patternList.addActionListener(this);
+    	
+    	
+		// Create a panel to contain the text and the icon
+		panel = new JPanel();
+
+		
+		// Using springlayout:  see http://download.oracle.com/javase/tutorial/uiswing/layout/spring.html
+		SpringLayout lo = new SpringLayout();
+		
+		panel.setLayout(lo);
+		
+		// Create a constrain to force the icon to be on the right
+		//lo.putConstraint(SpringLayout.EAST, metList, 0, SpringLayout.EAST, panel);
+		//lo.putConstraint(SpringLayout.WEST, metList, 0, SpringLayout.WEST, panel);
+		
+		
+		// Add components (Text + icon)
+		//panel.add(metList);
+    	
+    	
+    }
 		
 		private void updateData(SpreadsheetCell newMetabolite, boolean isSelected, JTable table) {
 			//this.metabolite = metabolite;
 			
-			if (newMetabolite != null){
-				text.setText(newMetabolite.toString());
-				
-			}else{
-				text.setText("");
-			}
+			String value = (newMetabolite != null)?newMetabolite.toString():"";
 			
+			
+			// Combo option
+//			metList.setSelectedItem(value);
+//			text.setText(value);
+//			fillEditorWithMetabolites(value);
+			
+
+			// Custom option
+			text.setText(value);
 			if (!OptionalMetabolitesList.getObject().isThereMetabolitesForTerm(text.getText())){
 				showMetList.setIcon(null);
 			}else{
 				showMetList.setIcon(showMoreIcon);
 			}
-
+			
+			
 		}
+		private void fillEditorWithMetabolites(String value){
 
+			metList.removeAllItems();
+			
+			// If there are optional metabolites for this text
+			if (OptionalMetabolitesList.getObject().isThereMetabolitesForTerm(value)){
+				
+				Metabolite[] mets = OptionalMetabolitesList.getObject().getMetabolitesForTerm(value);
+				
+				// If there is more than one metabolte
+				if (mets.length>1){
+					// Go through all of them
+					for (int i =0; i<mets.length; i++){
+						
+						//metList.addItem(mets[i].getDescription() + " - " + mets[i].getFormula() + " (" + mets[i].getIdentifier() + ")");
+						metList.addItem(mets[i].getDescription());
+						
+					}
+				}
+			}
+			
+		}
+		private Metabolite[] getMetaboliteList(String value){
+			// If there are optional metabolites for this text
+			if (OptionalMetabolitesList.getObject().isThereMetabolitesForTerm(value)){
+				
+				return OptionalMetabolitesList.getObject().getMetabolitesForTerm(value);
+			}else{
+				return null;
+			}
+		}
+		private boolean doWeHaveAListOfMetabolites(String value){
+			
+			Metabolite[] mets = getMetaboliteList(value);
+			
+			if (mets == null || mets.length==1){
+				return false;
+			} else{
+				return true;
+			}
+		}
 		public Component getTableCellEditorComponent(JTable table, Object value,
 				boolean isSelected, int row, int column) {
 			
@@ -127,11 +232,27 @@ public class MetaboliteCellEditor extends AbstractCellEditor implements TableCel
 
 			updateData(newMetabolite, true, table);
 			
+
 			return panel;
+			// Combo option
+//			if (metList.getItemCount() == 0){
+//				return text;
+//			}else{
+//
+//				return metList;
+//			}
 		}
 
 		public Object getCellEditorValue() {
+			
+			// Custom option
 			return text.getText();
+			
+//			if (metList.getItemCount()==0){
+//				return text.getText();
+//			}else{
+//				return (metList.getSelectedItem()==null)?"":metList.getSelectedItem().toString();
+//			}
 		}
 	}
 
