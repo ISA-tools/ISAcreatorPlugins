@@ -19,6 +19,7 @@ import javax.swing.AbstractCellEditor;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.CellEditor;
+import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -35,6 +36,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
 import javax.swing.border.Border;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 
 import org.isatools.isacreator.common.UIHelper;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCell;
@@ -43,14 +45,14 @@ import org.isatools.plugins.metabolights.assignments.model.OptionalMetabolitesLi
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
-public class MetaboliteCellEditor extends AbstractCellEditor implements TableCellEditor{
+public class MetaboliteCellEditor extends DefaultCellEditor implements TableCellEditor{
 		
-	// For both options
-	JTextField text;
+	 //For editing
+	static JTextField text = new JTextField();
 	
 	// For customize options
-	JPanel panel;
-	JLabel showMetList;
+	static JPanel panel;
+	static JLabel showMetList;
 	
 	Metabolite[] metabolites;
 	
@@ -58,7 +60,7 @@ public class MetaboliteCellEditor extends AbstractCellEditor implements TableCel
     private ImageIcon showMoreIcon;
 	
     public MetaboliteCellEditor() {
-		
+			super(text);
 			ResourceInjector.get("metabolights-fileeditor-package.style").inject(this);
 			
 			customeStyleSetUp();
@@ -73,6 +75,7 @@ public class MetaboliteCellEditor extends AbstractCellEditor implements TableCel
 			text.setHorizontalAlignment(JTextField.LEFT);
 			text.setPreferredSize(new Dimension(50,20));
 			
+			// Pre-configure the icon
 			showMetList = new JLabel(showMoreIcon);
 			showMetList.setToolTipText("There are more metabolites");
 			showMetList.addMouseListener(new MouseAdapter() {
@@ -80,7 +83,6 @@ public class MetaboliteCellEditor extends AbstractCellEditor implements TableCel
 	            public void mousePressed(MouseEvent mouseEvent) {
 
 	            	//MESSAGE DIALOG OPTION	            	
-	            	//showMetabolites();
 	            	Metabolite met = chooseAMetabolite();
 	            	
 	            	if (met !=null){
@@ -129,23 +131,25 @@ public class MetaboliteCellEditor extends AbstractCellEditor implements TableCel
 			// Add components (Text + icon)
 			panel.add(text);
 			panel.add(showMetList);
-			panel.setForeground(UIHelper.BG_COLOR);
-			panel.setBackground(UIHelper.DARK_GREEN_COLOR);
-			text.setForeground(panel.getForeground());
-			text.setBackground(panel.getBackground());
 			text.setFont(UIHelper.VER_11_PLAIN);
 			//text.setMargin(new Insets(-10, -10, -10, -10));
 			
     }
 		
-	private void updateData(SpreadsheetCell newMetabolite, boolean isSelected, JTable table) {
+	private void updateData(SpreadsheetCell newMetabolite, boolean isSelected, JTable table, int row) {
 		//this.metabolite = metabolite;
 		
 		String value = (newMetabolite != null)?newMetabolite.toString():"";
 		
-		
 		// Custom option
 		text.setText(value);
+		
+	
+		panel.setForeground(UIHelper.BG_COLOR);
+		panel.setBackground(UIHelper.DARK_GREEN_COLOR);
+		
+		text.setForeground(panel.getForeground());
+		text.setBackground(panel.getBackground());
 		
 		// If there is more than one metabolite
 		if (doWeHaveAListOfMetabolites(value)){
@@ -180,7 +184,7 @@ public class MetaboliteCellEditor extends AbstractCellEditor implements TableCel
 		
 		SpreadsheetCell newMetabolite = (SpreadsheetCell)value;
 
-		updateData(newMetabolite, true, table);
+		updateData(newMetabolite, true, table, row);
 		
 		return panel;
 	}

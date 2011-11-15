@@ -123,9 +123,8 @@ public class DataEntrySheet extends JPanel {
 		TableColumn col = sheet.getTable().getColumnModel().getColumn(colindex);
 		col.setCellEditor(new MetaboliteCellEditor());
 
-		// If the cell should appear like a combobox in its
-		// non-editing state, also set the combobox renderer
-		//col.setCellRenderer(new MetaboliteCellEditor());
+		// non-editing state
+		col.setCellRenderer(new MetaboliteCellRenderer());
 		
 	}
     public void addChangesListener(){

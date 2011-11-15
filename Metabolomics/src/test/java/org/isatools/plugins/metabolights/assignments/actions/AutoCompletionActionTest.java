@@ -20,6 +20,7 @@ public class AutoCompletionActionTest {
 		assertEquals("palmitic acid", met.getDescription());
 		
 		// Ganacaonin F (Not in CHEBI, but in LipidMaps)
+		//http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pccompound&id=5317482
 		met = AutoCompletionAction.getMetaboliteFromEntrez("5317482","uid" );
 		
 		assertEquals("LMPK12090043", met.getIdentifier());

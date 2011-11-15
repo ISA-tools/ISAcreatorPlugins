@@ -127,13 +127,9 @@ public class AutoCompletionAction extends AbstractAction{
 		
 	}
 	public static Metabolite getMetaboliteFromEntrez(String term , String field){
-	
-		
-		
 		
        try
        {
-       	
     	   // If we have it cached
     	   if (OptionalMetabolitesList.getObject().areThereMetabolitesForTerm(term)){
     		   // Get the metabolites cached
@@ -148,8 +144,9 @@ public class AutoCompletionAction extends AbstractAction{
     	   }
     	   
     	   
-    	 EUtilsServiceStub service = new EUtilsServiceStub();
-           // call NCBI ESearch utility
+    	   EUtilsServiceStub service = new EUtilsServiceStub();
+           
+    	   // call NCBI ESearch utility
            // NOTE: search term should be URL encoded
            EUtilsServiceStub.ESearchRequest req = new EUtilsServiceStub.ESearchRequest();
            // Search only in PubChem Compound
@@ -253,7 +250,13 @@ public class AutoCompletionAction extends AbstractAction{
 	 */
 	private static Metabolite getMetaboliteFromDocSum(DocSumType docSum) {
 
+		// Sample data:
+		// http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pccompound&id=19923,12120
+		
 		Metabolite met = new Metabolite();
+		
+		// String for the CID
+		String CID = "";
 		
 		// Go through all Items (properties)
 		   for (int k = 0; k < docSum.getItem().length; k++)
@@ -269,8 +272,10 @@ public class AutoCompletionAction extends AbstractAction{
 				   
 				   // This should be the last property we are interested in.
 				   continue;
-			   }
-			   else if ("SynonymList".equals(name)) {
+			   } else if ("CID".equals(name)){
+				   CID = "CID" + it.getItemContent();
+				   
+			   } else if ("SynonymList".equals(name)) {
 				   
 				   // Get the identifier
 				   met.setIdentifier(getBestID(it));
@@ -291,6 +296,9 @@ public class AutoCompletionAction extends AbstractAction{
 //				   }
 			   }
 		   }
+		   
+		   // If we don't have a ideal id
+		   if (met.getIdentifier() == null) met.setIdentifier(CID);
 		   
 		   return met;
 	}
