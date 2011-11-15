@@ -135,7 +135,7 @@ public class AutoCompletionAction extends AbstractAction{
        {
        	
     	   // If we have it cached
-    	   if (OptionalMetabolitesList.getObject().isThereMetabolitesForTerm(term)){
+    	   if (OptionalMetabolitesList.getObject().areThereMetabolitesForTerm(term)){
     		   // Get the metabolites cached
     		   Metabolite[] mets = OptionalMetabolitesList.getObject().getMetabolitesForTerm(term);
     		   

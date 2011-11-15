@@ -27,7 +27,7 @@ public class OptionalMetabolitesList {
 		return singleton;
 	}
 	
-	public boolean isThereMetabolitesForTerm(String term){
+	public boolean areThereMetabolitesForTerm(String term){
 		return metaboliteArrayMap.containsKey(term.toLowerCase());
 	}
 	public Metabolite[] getMetabolitesForTerm (String term){
