@@ -1,43 +1,5 @@
 package org.isatools.plugins.metabolights.assignments.ui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.HeadlessException;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.AbstractCellEditor;
-import javax.swing.Action;
-import javax.swing.ButtonGroup;
-import javax.swing.CellEditor;
-import javax.swing.DefaultCellEditor;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.SpringLayout;
-import javax.swing.border.Border;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
-
 import org.isatools.isacreator.common.UIHelper;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCell;
 import org.isatools.plugins.metabolights.assignments.model.Metabolite;
@@ -45,9 +7,21 @@ import org.isatools.plugins.metabolights.assignments.model.OptionalMetabolitesLi
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.table.TableCellEditor;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 public class MetaboliteCellEditor extends DefaultCellEditor implements TableCellEditor{
 		
-	 //For editing
+	 /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	//For editing
 	static JTextField text = new JTextField();
 	
 	// For customize options

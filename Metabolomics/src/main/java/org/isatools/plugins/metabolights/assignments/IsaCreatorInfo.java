@@ -14,9 +14,7 @@ import org.isatools.isacreator.model.Study;
 import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
 import org.isatools.isacreator.ontologyselectiontool.OntologySourceManager;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
-import org.isatools.isacreator.spreadsheet.SpreadsheetCellRange;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
-import org.isatools.plugins.metabolights.assignments.ui.DataEntrySheet;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.File;

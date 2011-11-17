@@ -11,8 +11,6 @@ import java.util.regex.Matcher;
 import javax.swing.AbstractAction;
 import javax.swing.JTable;
 
-
-import org.apache.commons.lang.StringUtils;
 import org.isatools.plugins.metabolights.assignments.model.Metabolite;
 import org.isatools.plugins.metabolights.assignments.model.OptionalMetabolitesList;
 
@@ -20,6 +18,8 @@ import org.isatools.plugins.metabolights.assignments.model.OptionalMetabolitesLi
 
 public class AutoCompletionAction extends AbstractAction{
 
+	private static final long serialVersionUID = -8763504793982792175L;
+	
 	static final String IDENTIFIER_COL_NAME = "identifier";
 	static final String FORMULA_COL_NAME = "chemical_formula";
 	static final String DESCRIPTION_COL_NAME = "description";
@@ -126,6 +126,7 @@ public class AutoCompletionAction extends AbstractAction{
 		return null;
 		
 	}
+	
 	public static Metabolite getMetaboliteFromEntrez(String term , String field){
 		
        try
@@ -181,10 +182,19 @@ public class AutoCompletionAction extends AbstractAction{
            Metabolite[] mets;
            
            // Join id into one String separated by commas
-           String ids = org.apache.commons.lang.StringUtils.join(res.getIdList().getId(), ",");
-        	   
+           
+           
+           //Stopped using the commons-lang library as we could not get Apache Felix to resolve 
+           // it properly when running the plugin from ISAcreator
+           //String ids = StringUtils.join(res.getIdList().getId(), ",");        
+           StringBuffer idsInString = new StringBuffer();
+           String[] listOfIDs = res.getIdList().getId();
+           for (String currentID : listOfIDs) {
+        	   idsInString.append(",").append(currentID);
+           }
+	   
            // Get the the id of the first element
-    	   mets = getMetabolitesFromPubChem(ids);
+    	   mets = getMetabolitesFromPubChem(idsInString.toString());
         	   
            // Add it to the cache
            OptionalMetabolitesList.getObject().setMetabolitesForTerm(mets, term);
@@ -200,10 +210,22 @@ public class AutoCompletionAction extends AbstractAction{
        }
        
 	}
+	
+	private static boolean isParsableToInt(String i) {
+		try
+		{
+			Integer.parseInt(i);
+			return true;
+		}
+		catch(NumberFormatException nfe){
+			return false;
+		}
+	}
+	
 	public static String prepareEntrezTerm(String term){
 		
 		// If not is numeric, enclose the term in double quotes
-		if (!StringUtils.isNumeric(term)){
+		if (!isParsableToInt(term)){
 			term = "\"" + term + "\"";
 		}
 		
