@@ -40,6 +40,7 @@ import javax.swing.table.TableCellRenderer;
 
 import org.isatools.isacreator.common.UIHelper;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCell;
+import org.isatools.plugins.metabolights.assignments.actions.AutoCompletionAction;
 import org.isatools.plugins.metabolights.assignments.model.Metabolite;
 import org.isatools.plugins.metabolights.assignments.model.OptionalMetabolitesList;
 import org.jdesktop.fuse.InjectedResource;
@@ -52,15 +53,18 @@ public class MetaboliteCellEditor extends DefaultCellEditor implements TableCell
 	
 	// For customize options
 	static JPanel panel;
+	
 	static JLabel showMetList;
 	
+	private JTable table;
 	Metabolite[] metabolites;
 	
 	@InjectedResource
     private ImageIcon showMoreIcon;
 	
-    public MetaboliteCellEditor() {
+    public MetaboliteCellEditor(JTable table) {
 			super(text);
+			this.table = table; 
 			ResourceInjector.get("metabolights-fileeditor-package.style").inject(this);
 			
 			customeStyleSetUp();
@@ -86,7 +90,12 @@ public class MetaboliteCellEditor extends DefaultCellEditor implements TableCell
 	            	Metabolite met = chooseAMetabolite();
 	            	
 	            	if (met !=null){
+	            		
+	            		// Add it to the OptionalMetabolites to avoid a new search in pubchem
+	            		OptionalMetabolitesList.getObject().setMetabolitesForTerm(new Metabolite[]{met}, met.getDescription());
 	            		text.setText(met.getDescription());
+	            		table.setValueAt("", table.getEditingRow(), table.getColumnModel().getColumnIndex(AutoCompletionAction.FORMULA_COL_NAME));
+	            		table.setValueAt("", table.getEditingRow(), table.getColumnModel().getColumnIndex(AutoCompletionAction.IDENTIFIER_COL_NAME));
 	            	}
 
 	            }

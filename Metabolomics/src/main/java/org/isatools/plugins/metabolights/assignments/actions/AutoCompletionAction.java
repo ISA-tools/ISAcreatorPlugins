@@ -20,9 +20,9 @@ import org.isatools.plugins.metabolights.assignments.model.OptionalMetabolitesLi
 
 public class AutoCompletionAction extends AbstractAction{
 
-	static final String IDENTIFIER_COL_NAME = "identifier";
-	static final String FORMULA_COL_NAME = "chemical_formula";
-	static final String DESCRIPTION_COL_NAME = "description";
+	public static final String IDENTIFIER_COL_NAME = "identifier";
+	public static final String FORMULA_COL_NAME = "chemical_formula";
+	public static final String DESCRIPTION_COL_NAME = "description";
 	
 	CellToAutoComplete source;
 	JTable table;

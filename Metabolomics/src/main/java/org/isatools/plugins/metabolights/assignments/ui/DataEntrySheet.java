@@ -119,9 +119,9 @@ public class DataEntrySheet extends JPanel {
 	private void addCustomCellEditors(){
 		
 		// TODO: Change the way we are specifiying the column
-		int colindex  = 3;
+		int colindex  = sheet.getTable().getColumnModel().getColumnIndex(AutoCompletionAction.DESCRIPTION_COL_NAME);
 		TableColumn col = sheet.getTable().getColumnModel().getColumn(colindex);
-		col.setCellEditor(new MetaboliteCellEditor());
+		col.setCellEditor(new MetaboliteCellEditor(sheet.getTable()));
 
 		// non-editing state
 		col.setCellRenderer(new MetaboliteCellRenderer());
