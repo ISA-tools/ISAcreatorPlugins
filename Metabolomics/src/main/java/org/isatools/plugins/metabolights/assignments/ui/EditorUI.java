@@ -24,7 +24,8 @@ import java.io.IOException;
 public class EditorUI extends AnimatableJFrame {
 	
 	private static Logger logger = Logger.getLogger(EditorUI.class);
-
+	
+	private static final long serialVersionUID = -5036524042579480467L;
     public static final float DESIRED_OPACITY = .94f;
     public static final String PLUGIN_VERSION = "0.1";
 

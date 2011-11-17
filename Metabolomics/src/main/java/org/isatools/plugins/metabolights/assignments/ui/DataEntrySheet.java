@@ -3,11 +3,7 @@ package org.isatools.plugins.metabolights.assignments.ui;
 import org.apache.log4j.Logger;
 import org.isatools.isacreator.apiutils.SpreadsheetUtils;
 import org.isatools.isacreator.common.UIHelper;
-import org.isatools.isacreator.configuration.Ontology;
-import org.isatools.isacreator.configuration.RecommendedOntology;
 import org.isatools.isacreator.model.Assay;
-import org.isatools.isacreator.ontologymanager.OLSClient;
-import org.isatools.isacreator.ontologymanager.OntologySourceRefObject;
 import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCell;
@@ -28,16 +24,12 @@ import javax.swing.table.TableColumn;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by the ISA team
@@ -124,7 +116,7 @@ public class DataEntrySheet extends JPanel {
 		col.setCellEditor(new MetaboliteCellEditor(sheet.getTable()));
 
 		// non-editing state
-		col.setCellRenderer(new MetaboliteCellRenderer());
+		col.setCellRenderer(new MetaboliteCellRenderer()); 
 		
 	}
     public void addChangesListener(){

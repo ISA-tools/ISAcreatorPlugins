@@ -3,27 +3,22 @@ package org.isatools.plugins.metabolights.assignments.actions;
 import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub;
 import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub.DocSumType;
 import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub.ItemType;
-
-import java.awt.event.ActionEvent;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-
-import javax.swing.AbstractAction;
-import javax.swing.JTable;
-
-
-import org.apache.commons.lang.StringUtils;
 import org.isatools.plugins.metabolights.assignments.model.Metabolite;
 import org.isatools.plugins.metabolights.assignments.model.OptionalMetabolitesList;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 
 public class AutoCompletionAction extends AbstractAction{
-
+	
 	public static final String IDENTIFIER_COL_NAME = "identifier";
 	public static final String FORMULA_COL_NAME = "chemical_formula";
 	public static final String DESCRIPTION_COL_NAME = "description";
-	
+
 	CellToAutoComplete source;
 	JTable table;
 	String currentCellValue;
@@ -181,10 +176,19 @@ public class AutoCompletionAction extends AbstractAction{
            Metabolite[] mets;
            
            // Join id into one String separated by commas
-           String ids = org.apache.commons.lang.StringUtils.join(res.getIdList().getId(), ",");
-        	   
+           //String ids = org.apache.commons.lang.StringUtils.join(res.getIdList().getId(), ",");
+
+           //Stopped using the commons-lang library as we could not get Apache Felix to resolve
+           // it properly when running the plugin from ISAcreator
+           StringBuffer idsInString = new StringBuffer();
+           String[] listOfIDs = res.getIdList().getId();
+           for (String currentID : listOfIDs) {
+        	   idsInString.append(",").append(currentID);
+           }
+	   
            // Get the the id of the first element
-    	   mets = getMetabolitesFromPubChem(ids);
+           mets = getMetabolitesFromPubChem(idsInString.toString());
+    	   //mets = getMetabolitesFromPubChem(ids);
         	   
            // Add it to the cache
            OptionalMetabolitesList.getObject().setMetabolitesForTerm(mets, term);
@@ -200,10 +204,23 @@ public class AutoCompletionAction extends AbstractAction{
        }
        
 	}
+	
+	private static boolean isParsableToInt(String i) {
+		try
+		{
+			Integer.parseInt(i);
+			return true;
+		}
+		catch(NumberFormatException nfe){
+			return false;
+		}
+	}
+	
 	public static String prepareEntrezTerm(String term){
 		
 		// If not is numeric, enclose the term in double quotes
-		if (!StringUtils.isNumeric(term)){
+		//if (!StringUtils.isNumeric(term)){
+        if (!isParsableToInt(term)){
 			term = "\"" + term + "\"";
 		}
 		
@@ -244,9 +261,9 @@ public class AutoCompletionAction extends AbstractAction{
        }
        catch(Exception e) { System.out.println(e.toString()); return null;}
 	}
+
 	/**
 	 * @param docSum
-	 * @param met
 	 */
 	private static Metabolite getMetaboliteFromDocSum(DocSumType docSum) {
 

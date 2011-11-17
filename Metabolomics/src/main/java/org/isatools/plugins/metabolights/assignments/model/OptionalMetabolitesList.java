@@ -2,9 +2,6 @@ package org.isatools.plugins.metabolights.assignments.model;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-
-import net.sf.saxon.expr.SingletonAtomizer;
 
 /**
  * Holds all the metabolites that has been retrieved in pubChem and stores them per row
