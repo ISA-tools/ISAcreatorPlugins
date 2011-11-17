@@ -3,16 +3,13 @@ package org.isatools.plugins.metabolights.assignments.actions;
 import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub;
 import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub.DocSumType;
 import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub.ItemType;
-
-import java.awt.event.ActionEvent;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-
-import javax.swing.AbstractAction;
-import javax.swing.JTable;
-
 import org.isatools.plugins.metabolights.assignments.model.Metabolite;
 import org.isatools.plugins.metabolights.assignments.model.OptionalMetabolitesList;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 
@@ -180,9 +177,10 @@ public class AutoCompletionAction extends AbstractAction{
            
            // Join id into one String separated by commas
            //String ids = org.apache.commons.lang.StringUtils.join(res.getIdList().getId(), ",");
-           //Stopped using the commons-lang library as we could not get Apache Felix to resolve 
+
+           //Stopped using the commons-lang library as we could not get Apache Felix to resolve
            // it properly when running the plugin from ISAcreator
-            StringBuffer idsInString = new StringBuffer();
+           StringBuffer idsInString = new StringBuffer();
            String[] listOfIDs = res.getIdList().getId();
            for (String currentID : listOfIDs) {
         	   idsInString.append(",").append(currentID);
@@ -263,9 +261,9 @@ public class AutoCompletionAction extends AbstractAction{
        }
        catch(Exception e) { System.out.println(e.toString()); return null;}
 	}
+
 	/**
 	 * @param docSum
-	 * @param met
 	 */
 	private static Metabolite getMetaboliteFromDocSum(DocSumType docSum) {
 
