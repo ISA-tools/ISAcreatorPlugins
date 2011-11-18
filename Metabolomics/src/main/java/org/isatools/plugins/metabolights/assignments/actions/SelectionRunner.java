@@ -1,7 +1,10 @@
 package org.isatools.plugins.metabolights.assignments.actions;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JTable;
 
 public class SelectionRunner extends AbstractAction{
 

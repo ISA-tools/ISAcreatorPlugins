@@ -16,11 +16,16 @@ import org.isatools.plugins.metabolights.assignments.io.ConfigurationLoader;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 import javax.swing.border.EtchedBorder;
-import java.awt.*;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Image;
+
 import java.io.IOException;
 
+@SuppressWarnings("restriction")
 public class EditorUI extends AnimatableJFrame {
 	
 	private static Logger logger = Logger.getLogger(EditorUI.class);

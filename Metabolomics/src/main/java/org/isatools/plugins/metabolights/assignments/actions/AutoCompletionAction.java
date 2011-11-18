@@ -6,12 +6,12 @@ import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub.ItemType;
 import org.isatools.plugins.metabolights.assignments.model.Metabolite;
 import org.isatools.plugins.metabolights.assignments.model.OptionalMetabolitesList;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+import javax.swing.AbstractAction;
+import javax.swing.JTable;
 
 public class AutoCompletionAction extends AbstractAction{
 	

@@ -12,13 +12,17 @@ import org.isatools.plugins.metabolights.assignments.ui.EditorUI;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
 	
