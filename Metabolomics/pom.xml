@@ -250,6 +250,8 @@
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
+                    <meminitial>128m</meminitial>
+                    <maxmem>512m</maxmem>
                 </configuration>
             </plugin>
             <plugin>
@@ -261,9 +263,18 @@
                     <instructions>
                         <Import-Package>*</Import-Package>
                         <Export-Package>org.isatools.plugins.metabolights.assignments
+                        				,
+                        				gov.nih.nlm.ncbi.*, 
+                        				org.apache.axis2.*,
+                        				org.apache.xmlbeans.*, 
+                        				org.apache.ws.*,
+                        				org.codehaus.jettison.*,
+                        				org.apache.catalina.tribes.*
+                        				
                         </Export-Package>
                         <Bundle-Activator>org.isatools.plugins.metabolights.assignments.Activator</Bundle-Activator>
                         <Bundle-Vendor>ISAteam</Bundle-Vendor>
+                        <!-- <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency> -->
                     </instructions>
                 </configuration>
             </plugin>
