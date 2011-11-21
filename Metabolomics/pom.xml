@@ -62,6 +62,18 @@
             		<artifactId>commons-lang</artifactId>
             		<groupId>commons-lang</groupId>
             	</exclusion>
+            	<exclusion>
+            		<artifactId>jsr181-api</artifactId>
+            		<groupId>javax.jws</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>jsr181</artifactId>
+            		<groupId>javax.jws</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>jsr250-api</artifactId>
+            		<groupId>javax.annotation</groupId>
+            	</exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -262,15 +274,9 @@
                 <configuration>
                     <instructions>
                         <Import-Package>*</Import-Package>
-                        <Export-Package>org.isatools.plugins.metabolights.assignments
-                        				,
-                        				gov.nih.nlm.ncbi.*, 
-                        				org.apache.axis2.*,
-                        				org.apache.xmlbeans.*, 
-                        				org.apache.ws.*,
-                        				org.codehaus.jettison.*,
-                        				org.apache.catalina.tribes.*
-                        				
+                        <Export-Package>
+                        	org.isatools.plugins.metabolights.assignments
+                        	,gov.nih.nlm.ncbi.*
                         </Export-Package>
                         <Bundle-Activator>org.isatools.plugins.metabolights.assignments.Activator</Bundle-Activator>
                         <Bundle-Vendor>ISAteam</Bundle-Vendor>

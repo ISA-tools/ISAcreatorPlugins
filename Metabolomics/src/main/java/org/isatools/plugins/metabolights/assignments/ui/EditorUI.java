@@ -17,16 +17,19 @@ import org.isatools.plugins.metabolights.assignments.io.ConfigurationLoader;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
-import javassist.expr.Instanceof;
 
-import javax.swing.*;
 import javax.swing.border.EtchedBorder;
-import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import javax.swing.JComponent;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Image;
+
+import java.io.IOException;
+
+@SuppressWarnings("restriction")
 public class EditorUI extends AnimatableJFrame implements PropertyChangeListener {
 	
 	private static Logger logger = Logger.getLogger(EditorUI.class);

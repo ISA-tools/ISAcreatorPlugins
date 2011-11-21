@@ -7,14 +7,13 @@ import org.isatools.plugins.metabolights.assignments.model.Metabolite;
 import org.isatools.plugins.metabolights.assignments.model.OptionalMetabolitesList;
 import org.isatools.plugins.metabolights.assignments.ui.ProgressTrigger;
 
-import javax.swing.*;
-
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+import javax.swing.AbstractAction;
+import javax.swing.JTable;
 
 public class AutoCompletionAction extends AbstractAction{
 	

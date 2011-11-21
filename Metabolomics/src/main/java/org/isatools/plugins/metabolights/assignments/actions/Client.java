@@ -1,6 +1,7 @@
 package org.isatools.plugins.metabolights.assignments.actions;
 
-import gov.nih.nlm.ncbi.www.soap.eutils.*;
+
+import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub;
 import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub.ItemType;
 
 public class Client {

@@ -8,10 +8,19 @@ import org.isatools.plugins.metabolights.assignments.model.OptionalMetabolitesLi
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
-import javax.swing.*;
+import javax.swing.DefaultCellEditor;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SpringLayout;
 import javax.swing.border.Border;
 import javax.swing.table.TableCellEditor;
-import java.awt.*;
+
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
