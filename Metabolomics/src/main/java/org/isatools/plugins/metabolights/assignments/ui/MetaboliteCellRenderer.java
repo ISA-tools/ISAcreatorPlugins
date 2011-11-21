@@ -5,6 +5,7 @@ import java.awt.Dimension;
 
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 
 import org.isatools.isacreator.spreadsheet.SpreadsheetCellRenderer;
 import org.isatools.plugins.metabolights.assignments.model.Metabolite;
@@ -19,6 +20,7 @@ public class MetaboliteCellRenderer extends SpreadsheetCellRenderer{
 	public MetaboliteCellRenderer(){
 		super();
 		ResourceInjector.get("metabolights-fileeditor-package.style").inject(this);
+		// Set the position of the text related to the icon (we want the icon on the RIGHT)
 		setHorizontalTextPosition(LEFT);
 	}
 	
@@ -39,10 +41,8 @@ public class MetaboliteCellRenderer extends SpreadsheetCellRenderer{
 			setIcon(null);
 		}
 		
-		// Set up the dimensions
-		int width = table.getColumnModel().getColumn(column).getWidth();
-		int height = table.getRowHeight(row);
-		setPreferredSize(new Dimension(width,height));
+		// Set the alignment AFTER super call, otherwise it will be overridden.
+		setHorizontalAlignment(JTextField.RIGHT);
 		
 		return this;
 		

@@ -8,6 +8,7 @@ import org.isatools.isacreator.common.UIHelper;
 import org.isatools.isacreator.effects.AnimatableJFrame;
 import org.isatools.isacreator.effects.FooterPanel;
 import org.isatools.isacreator.effects.HUDTitleBar;
+import org.isatools.isacreator.effects.InfiniteProgressPanel;
 import org.isatools.isacreator.gui.ISAcreator;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
 import org.isatools.plugins.metabolights.assignments.IsaCreatorInfo;
@@ -16,12 +17,17 @@ import org.isatools.plugins.metabolights.assignments.io.ConfigurationLoader;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
+import javassist.expr.Instanceof;
+
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
-public class EditorUI extends AnimatableJFrame {
+public class EditorUI extends AnimatableJFrame implements PropertyChangeListener {
 	
 	private static Logger logger = Logger.getLogger(EditorUI.class);
 	
@@ -36,7 +42,14 @@ public class EditorUI extends AnimatableJFrame {
     private boolean amIAlone = true;
 
     private IsaCreatorInfo isaCreatorInfo;
+    
+    // Progress trigger
+    private ProgressTrigger progressTrigger = new ProgressTrigger();
+	private static InfiniteProgressPanel progressIndicator;
 
+	public ProgressTrigger getProgressTrigger() {
+		return progressTrigger;
+	}
     private IsaCreatorInfo getIsaCreatorInfo() {
         if (isaCreatorInfo == null)
             isaCreatorInfo = new IsaCreatorInfo();
@@ -91,9 +104,16 @@ public class EditorUI extends AnimatableJFrame {
 
         createSouthPanel();
 
+        configureProgressTrigger();
+        
         pack();
     }
-
+    // Configures the progress triggered.
+    private void configureProgressTrigger(){
+    	
+    	progressTrigger.addPropertyChangeListener(this);
+    	
+    }
     private void createCentralPanel(String technologyType) {
 
         TableReferenceObject tableReferenceObject = loadConfiguration(technologyType);
@@ -179,12 +199,34 @@ public class EditorUI extends AnimatableJFrame {
         }
     }
 
-//    private void swapContainers(Container newContainer) {
-//        if (newContainer != null) {
-//            swappableContainer.removeAll();
-//            swappableContainer.add(newContainer);
-//            swappableContainer.repaint();
-//            swappableContainer.validate();
-//        }
-//    }
+	public void propertyChange(PropertyChangeEvent arg0) {
+		// TODO Auto-generated method stub
+
+		// For the progress bar
+		if (arg0.getSource() instanceof ProgressTrigger){
+			propertyChangeProgressTrigger(arg0, (ProgressTrigger) arg0.getSource());
+			
+		}
+		
+	}
+	@SuppressWarnings("static-access")
+	private void propertyChangeProgressTrigger(PropertyChangeEvent arg0, ProgressTrigger pt){
+		
+		// If the process is starting
+		if (arg0.getPropertyName().equals(pt.PROGRESS_START)){
+			 
+			progressIndicator = new InfiniteProgressPanel(pt.getProcessDescription());
+			
+			          
+			progressIndicator.setSize(new Dimension(
+											getWidth(),
+											getHeight()));
+			setGlassPane(progressIndicator);
+	        progressIndicator.start();
+	        validate();
+	        
+		} else if (arg0.getPropertyName().equals(pt.PROGRESS_END)){
+			progressIndicator.stop();
+		}
+	}
 }

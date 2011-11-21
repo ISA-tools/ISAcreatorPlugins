@@ -5,8 +5,11 @@ import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub.DocSumType;
 import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub.ItemType;
 import org.isatools.plugins.metabolights.assignments.model.Metabolite;
 import org.isatools.plugins.metabolights.assignments.model.OptionalMetabolitesList;
+import org.isatools.plugins.metabolights.assignments.ui.ProgressTrigger;
 
 import javax.swing.*;
+
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,7 +25,15 @@ public class AutoCompletionAction extends AbstractAction{
 	CellToAutoComplete source;
 	JTable table;
 	String currentCellValue;
+	ProgressTrigger progressTrigger;
 
+	
+	public ProgressTrigger getProgressTrigger() {
+		return progressTrigger;
+	}
+	public void setProgressTrigger(ProgressTrigger progressTrigger) {
+		this.progressTrigger = progressTrigger;
+	}
 	public void actionPerformed(ActionEvent e) {
 		
 		//Get the object that has generated the event
@@ -31,20 +42,29 @@ public class AutoCompletionAction extends AbstractAction{
 		
 		// Get the value of the source cell
 		currentCellValue = table.getValueAt(source.getRow(), source.getCol()).toString();
-		
+
 		// If it's empty
 		if (currentCellValue == null || currentCellValue.equals("")) return;
 		
 		// If there isn't anything to autocomplete
 		if (!isThereAnythingToAutocomplete()) return;
+
+		//If we have a progress trigger instance
+		if (progressTrigger != null) progressTrigger.triggerProgressStart("Looking up metabolites for " + currentCellValue);
 		
 		// At this point there is some autocompletion to do
+		table.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		
 		// Get the Metabolite object based on the column
 		Metabolite met = getMetabolite();
 
 		// Populate the Autocomplete columns
 		autoCompleteColumns(met);
+
+		//If we have a progress trigger instance
+		if (progressTrigger != null) progressTrigger.triggerPregressEnd();
+
+		table.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 	private void autoCompleteColumns(Metabolite met){
 		
