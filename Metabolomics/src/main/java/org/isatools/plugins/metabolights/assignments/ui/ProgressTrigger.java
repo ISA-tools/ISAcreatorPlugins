@@ -25,11 +25,11 @@ public class ProgressTrigger {
     	mPcs.removePropertyChangeListener(listener);
     }
     public void triggerProgressStart(String processDescription){
-
-    	mPcs.firePropertyChange(PROGRESS_START, null, null);
+    	//At the second paste it leaves a Thread open and then mouse clicks doesn't work anymore.
+    	//mPcs.firePropertyChange(PROGRESS_START, null, null);
     }
     public void triggerPregressEnd(){
     	
-    	mPcs.firePropertyChange(PROGRESS_END, null, null);
+    	//mPcs.firePropertyChange(PROGRESS_END, null, null);
     }
 }

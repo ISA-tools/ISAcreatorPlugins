@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 
 public class AutoCompletionAction extends AbstractAction{
 	

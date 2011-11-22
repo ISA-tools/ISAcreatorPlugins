@@ -6,9 +6,11 @@ import org.isatools.isacreator.common.UIHelper;
 import org.isatools.isacreator.effects.InfiniteProgressPanel;
 import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
+import org.isatools.isacreator.spreadsheet.CopyPasteObserver;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCell;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCellRange;
+import org.isatools.isacreator.spreadsheet.SpreadsheetEvent;
 import org.isatools.isacreator.spreadsheet.TableReferenceObject;
 import org.isatools.plugins.metabolights.assignments.IsaCreatorInfo;
 import org.isatools.plugins.metabolights.assignments.actions.AutoCompletionAction;
@@ -130,7 +132,7 @@ public class DataEntrySheet extends JPanel {
     			
     	        TableCellListener tcl = (TableCellListener)e.getSource();
 
-    	        // Create an autocompletion action and invoke the actionperformed method
+    	        // Create an auto-completion action and invoke the actionperformed method
                 AutoCompletionAction aca = new AutoCompletionAction();
                 
                 // Add a progress trigger to the action
@@ -149,6 +151,30 @@ public class DataEntrySheet extends JPanel {
     	
     	// Add copypaste actionListener
     	new CopyPasteAdaptor(sheet);
+    	
+    	// Listen to Paste events...
+    	sheet.registerCopyPasteObserver(new CopyPasteObserver() {
+            public void notifyOfEvent(SpreadsheetEvent event) {
+                if(event == SpreadsheetEvent.COPY) {
+                    System.out.println("Copy event recorded");
+                    
+                }
+                // If event is paste
+                if(event == SpreadsheetEvent.PASTE) {
+                	// If autocomplete deactivated...exit
+                	if (!autocomplete) return;
+                	
+                	//Auto-complete
+                    Action getIds = new SelectionRunner(sheet.getTable(), new AutoCompletionAction(),parentFrame.getProgressTrigger());
+                    
+                    getIds.actionPerformed(null);
+                    
+                    sheet.getTable().repaint();
+                    
+                }
+            }
+        });
+    	
     }
     
     public void createBottomPanel(){
@@ -243,16 +269,8 @@ public class DataEntrySheet extends JPanel {
                 getIdButton.setIcon(getIdIcon);
                 
                 Action getIds = new SelectionRunner(sheet.getTable(), new AutoCompletionAction(),parentFrame.getProgressTrigger());
-                
-                // It doesn't do it...with invoke later it does it later (too late, after everything is done)
-                //info.setText("Looking up ...");
-		        //repaint();
-                
-                // Listen to the property change to start the progress
-				
+               
                 getIds.actionPerformed(null);
-                
-                //info.setText("Finished.");
                 
                 sheet.getTable().repaint();
 
