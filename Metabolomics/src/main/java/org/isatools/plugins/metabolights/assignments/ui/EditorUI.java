@@ -14,6 +14,8 @@ import org.isatools.isacreator.spreadsheet.TableReferenceObject;
 import org.isatools.plugins.metabolights.assignments.IsaCreatorInfo;
 import org.isatools.plugins.metabolights.assignments.MetabolomicsResultEditor;
 import org.isatools.plugins.metabolights.assignments.io.ConfigurationLoader;
+import org.isatools.plugins.metabolights.assignments.model.RemoteInfo;
+import org.isatools.plugins.metabolights.assignments.model.RemoteInfo.remoteProperties;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
@@ -65,7 +67,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
     public static String getPluginVersion() {
         return PLUGIN_VERSION;
     }
-
+    
     static {
         ResourceInjector.addModule("org.jdesktop.fuse.swing.SwingModule");
 
@@ -108,6 +110,8 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
         createSouthPanel();
 
         configureProgressTrigger();
+        
+        checkVersion();
         
         pack();
     }
@@ -231,5 +235,42 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 		} else if (arg0.getPropertyName().equals(pt.PROGRESS_END)){
 			progressIndicator.stop();
 		}
+	}
+	private void checkVersion(){
+        String remoteVersion = RemoteInfo.getProperty(remoteProperties.VERSION);
+        
+        if (remoteVersion == null) return;
+        
+        if (!PLUGIN_VERSION.equals(remoteVersion)){
+        	openUrl (RemoteInfo.getProperty(remoteProperties.DOWNLOADURL));
+        }else{
+        	
+        }
+	}
+	private void openUrl(String url){
+		if( !java.awt.Desktop.isDesktopSupported() ) {
+
+            System.err.println( "Desktop is not supported (fatal)" );
+            return;
+        }
+
+        java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+
+        if( !desktop.isSupported( java.awt.Desktop.Action.BROWSE ) ) {
+
+            System.err.println( "Desktop doesn't support the browse action (fatal)" );
+            return;
+        }
+
+        try {
+
+            java.net.URI uri = new java.net.URI( url);
+            desktop.browse( uri );
+        }
+        catch ( Exception e ) {
+
+            System.err.println( e.getMessage() );
+        }
+        
 	}
 }

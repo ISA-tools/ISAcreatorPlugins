@@ -155,10 +155,10 @@ public class DataEntrySheet extends JPanel {
     	// Listen to Paste events...
     	sheet.registerCopyPasteObserver(new CopyPasteObserver() {
             public void notifyOfEvent(SpreadsheetEvent event) {
-                if(event == SpreadsheetEvent.COPY) {
-                    System.out.println("Copy event recorded");
-                    
-                }
+//                if(event == SpreadsheetEvent.COPY) {
+//                    System.out.println("Copy event recorded");
+//                    
+//                }
                 // If event is paste
                 if(event == SpreadsheetEvent.PASTE) {
                 	// If autocomplete deactivated...exit
@@ -240,8 +240,8 @@ public class DataEntrySheet extends JPanel {
 
         // Add a checkbox for activate/de-activate auto-completion.
         final JCheckBox autocompleteCheck = new JCheckBox();
-        autocompleteCheck.setText("Autocomplete:");
-        autocompleteCheck.setToolTipText("Activate autocomplete if you want to have related cells autocompleted after a cell id edited.");
+        autocompleteCheck.setText("Deactivate Metabolite search:");
+        autocompleteCheck.setToolTipText("Activate autocomplete if you want to have related cells autocompleted after a cell is edited.");
         autocompleteCheck.setIcon(unSelectedIcon);
         autocompleteCheck.setSelectedIcon(selectedIcon);
         autocompleteCheck.setSelected(autocomplete);
@@ -252,6 +252,8 @@ public class DataEntrySheet extends JPanel {
 			public void itemStateChanged(ItemEvent arg0) {
 				// Change the autocomplete variable.
         		autocomplete = autocompleteCheck.isSelected();
+        		
+        		autocompleteCheck.setText(autocomplete?"Deactivate Metabolite search:":"Activate Metabolite search:");
 			}
         });
         

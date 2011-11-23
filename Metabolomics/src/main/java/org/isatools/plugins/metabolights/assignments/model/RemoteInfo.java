@@ -9,7 +9,7 @@ import java.util.Properties;
 public class RemoteInfo {
 	
 	static Properties props = getRemoteInfo();
-	static enum remoteProperties{
+	static public enum remoteProperties{
 		VERSION, DOWNLOADURL;
 		public String toString(){
 			return name().toString();
