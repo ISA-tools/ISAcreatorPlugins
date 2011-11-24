@@ -84,13 +84,13 @@ public class MetaboliteCellEditor extends DefaultCellEditor implements TableCell
 	            }
 	            private Metabolite chooseAMetabolite(){
 	            	
-	            	// Get the options
+	            	// Get the options  
 	            	Metabolite[] mets = OptionalMetabolitesList.getObject().getMetabolitesForTerm(text.getText());
 	
 	            	Metabolite s = (Metabolite)JOptionPane.showInputDialog(
 	            	                    panel,
 	            	                    "Choose a metabolite:\n",
-	            	                    "Chose a metabolite",
+	            	                    "We have found " + mets.length + " metabolites for \"" + text.getText() + "\".\nPlease choose the appropriate one:",
 	            	                    JOptionPane.PLAIN_MESSAGE,
 	            	                    null,
 	            	                    mets,

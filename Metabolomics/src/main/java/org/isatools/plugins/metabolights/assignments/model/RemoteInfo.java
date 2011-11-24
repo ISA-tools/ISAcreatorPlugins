@@ -10,7 +10,7 @@ public class RemoteInfo {
 	
 	static Properties props = getRemoteInfo();
 	static public enum remoteProperties{
-		VERSION, DOWNLOADURL;
+		VERSION, DOWNLOADURL, PRIORITYIDPATTERNS;
 		public String toString(){
 			return name().toString();
 		}
@@ -39,6 +39,12 @@ public class RemoteInfo {
 		
 		return  props.getProperty(propertyName.toString());
 		
+	}
+	static public String getProperty(remoteProperties propertyName, String defaultValue){
+		
+		String remoteValue = getProperty(propertyName);
+		
+		return remoteValue==null?defaultValue:remoteValue;
 	}
 	
 	

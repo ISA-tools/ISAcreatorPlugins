@@ -5,6 +5,8 @@ import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub.DocSumType;
 import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub.ItemType;
 import org.isatools.plugins.metabolights.assignments.model.Metabolite;
 import org.isatools.plugins.metabolights.assignments.model.OptionalMetabolitesList;
+import org.isatools.plugins.metabolights.assignments.model.RemoteInfo;
+import org.isatools.plugins.metabolights.assignments.model.RemoteInfo.remoteProperties;
 import org.isatools.plugins.metabolights.assignments.ui.ProgressTrigger;
 
 import java.awt.Cursor;
@@ -343,7 +345,13 @@ public class AutoCompletionAction extends AbstractAction{
 	public static String getBestID(ItemType synonymItem){
 		
 		//Prioirity list of ids
-		String[] prioritylist = {"^CHEBI:[0-9]+$", "^HMDB[0-9]+$", "^LM[A-Z]{2}[0-9]+$", "^C[0-9]{5}$"};
+		//Get the remote ids...in a String
+		String remotePriorityPatterns = RemoteInfo.getProperty(remoteProperties.PRIORITYIDPATTERNS, "^CHEBI:[0-9]+$~^HMDB[0-9]+$~^LM[A-Z]{2}[0-9]+$~^C[0-9]{5}$");
+		
+		// Split into an array, use ~ as character separator.
+		String[] prioritylist = remotePriorityPatterns.split("~");//{"^CHEBI:[0-9]+$", "^HMDB[0-9]+$", "^LM[A-Z]{2}[0-9]+$", "^C[0-9]{5}$"};
+		
+		
 		String bestId = null;
 		// Set the priority score to the lower
 		int priorityScore = prioritylist.length;
