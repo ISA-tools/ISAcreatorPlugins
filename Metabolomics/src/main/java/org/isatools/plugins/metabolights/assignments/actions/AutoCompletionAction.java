@@ -54,9 +54,6 @@ public class AutoCompletionAction extends AbstractAction{
 		//If we have a progress trigger instance
 		if (progressTrigger != null) progressTrigger.triggerProgressStart("Looking up metabolites for " + currentCellValue);
 		
-		// At this point there is some autocompletion to do
-		table.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		
 		// Get the Metabolite object based on the column
 		Metabolite met = getMetabolite();
 
@@ -66,7 +63,6 @@ public class AutoCompletionAction extends AbstractAction{
 		//If we have a progress trigger instance
 		if (progressTrigger != null) progressTrigger.triggerPregressEnd();
 
-		table.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 	private void autoCompleteColumns(Metabolite met){
 		
@@ -84,7 +80,7 @@ public class AutoCompletionAction extends AbstractAction{
 		
 		
 		// Only set the value if empty...
-		if (isColumnEmpty(columnName)){
+		if (isColumnEmpty(columnName)|| source.getForce()){
 			
 			int colIndex = getColIndexByName(columnName);
 			
@@ -94,6 +90,9 @@ public class AutoCompletionAction extends AbstractAction{
 	}
 	
 	private boolean isThereAnythingToAutocomplete(){
+		
+		// If autocomplete is forced
+		if (source.getForce()) return true;
 		
 		int emptyCells = 0;
 		

@@ -26,6 +26,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JComponent;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Image;
 
@@ -222,18 +223,24 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 		// If the process is starting
 		if (arg0.getPropertyName().equals(pt.PROGRESS_START)){
 			 
-			progressIndicator = new InfiniteProgressPanel(pt.getProcessDescription());
+//			progressIndicator = new InfiniteProgressPanel(pt.getProcessDescription());
+//			
+//			          
+//			progressIndicator.setSize(new Dimension(
+//											getWidth(),
+//											getHeight()));
+//			setGlassPane(progressIndicator);
+//	        progressIndicator.start();
+//	        validate();
+
+			// At this point activate the wait cursor
+			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			
-			          
-			progressIndicator.setSize(new Dimension(
-											getWidth(),
-											getHeight()));
-			setGlassPane(progressIndicator);
-	        progressIndicator.start();
-	        validate();
-	        
 		} else if (arg0.getPropertyName().equals(pt.PROGRESS_END)){
-			progressIndicator.stop();
+//			progressIndicator.stop();
+			// Deactivate the wait cursor
+			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			
 		}
 	}
 	private void checkVersion(){

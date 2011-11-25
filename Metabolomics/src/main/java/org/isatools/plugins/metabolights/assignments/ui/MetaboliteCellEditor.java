@@ -8,21 +8,31 @@ import org.isatools.plugins.metabolights.assignments.model.OptionalMetabolitesLi
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
+import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
+import javax.swing.InputMap;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.table.TableCellEditor;
+import javax.swing.text.Caret;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.EventObject;
 
 public class MetaboliteCellEditor extends DefaultCellEditor implements TableCellEditor{
 		
@@ -38,16 +48,18 @@ public class MetaboliteCellEditor extends DefaultCellEditor implements TableCell
 	static JPanel panel;
 	
 	static JLabel showMetList;
-	
+	private DataEntrySheet des;
 	private JTable table;
+	private EventObject event;
 	Metabolite[] metabolites;
 	
 	@InjectedResource
     private ImageIcon showMoreIcon;
 	
-    public MetaboliteCellEditor(JTable table) {
+    public MetaboliteCellEditor(DataEntrySheet des) {
 			super(text);
-			this.table = table; 
+			this.des =des;
+			this.table = des.getSheet().getTable(); 
 			ResourceInjector.get("metabolights-fileeditor-package.style").inject(this);
 			
 			customeStyleSetUp();
@@ -60,11 +72,13 @@ public class MetaboliteCellEditor extends DefaultCellEditor implements TableCell
 			    }
 			};
 			text.setHorizontalAlignment(JTextField.LEFT);
-			text.setPreferredSize(new Dimension(50,20));
+			text.setSelectedTextColor(Color.CYAN);
+			//text.setPreferredSize(new Dimension(50,20));
 			
 			// Pre-configure the icon
 			showMetList = new JLabel(showMoreIcon);
 			showMetList.setToolTipText("There are more metabolites");
+			showMetList.setFocusable(false);
 			showMetList.addMouseListener(new MouseAdapter() {
 	            @Override
 	            public void mousePressed(MouseEvent mouseEvent) {
@@ -77,8 +91,9 @@ public class MetaboliteCellEditor extends DefaultCellEditor implements TableCell
 	            		// Add it to the OptionalMetabolites to avoid a new search in pubchem
 	            		OptionalMetabolitesList.getObject().setMetabolitesForTerm(new Metabolite[]{met}, met.getDescription());
 	            		text.setText(met.getDescription());
-	            		table.setValueAt("", table.getEditingRow(), table.getColumnModel().getColumnIndex(AutoCompletionAction.FORMULA_COL_NAME));
-	            		table.setValueAt("", table.getEditingRow(), table.getColumnModel().getColumnIndex(AutoCompletionAction.IDENTIFIER_COL_NAME));
+	            		des.setForceAutoComplete(true);
+	            		//table.setValueAt("", table.getEditingRow(), table.getColumnModel().getColumnIndex(AutoCompletionAction.FORMULA_COL_NAME));
+	            		//table.setValueAt("", table.getEditingRow(), table.getColumnModel().getColumnIndex(AutoCompletionAction.IDENTIFIER_COL_NAME));
 	            	}
 
 	            }
@@ -89,8 +104,8 @@ public class MetaboliteCellEditor extends DefaultCellEditor implements TableCell
 	
 	            	Metabolite s = (Metabolite)JOptionPane.showInputDialog(
 	            	                    panel,
-	            	                    "Choose a metabolite:\n",
 	            	                    "We have found " + mets.length + " metabolites for \"" + text.getText() + "\".\nPlease choose the appropriate one:",
+	            	                    "Choose a metabolite:\n",
 	            	                    JOptionPane.PLAIN_MESSAGE,
 	            	                    null,
 	            	                    mets,
@@ -107,35 +122,50 @@ public class MetaboliteCellEditor extends DefaultCellEditor implements TableCell
 	        });
 			
 			// Create a panel to contain the text and the icon
-			panel = new JPanel();
-			
-			// Using springlayout:  see http://download.oracle.com/javase/tutorial/uiswing/layout/spring.html
-			SpringLayout lo = new SpringLayout();
-			
-			panel.setLayout(lo);
-			
-			// Create a constrain to force the icon to be on the right
-			lo.putConstraint(SpringLayout.EAST, showMetList, 0, SpringLayout.EAST, panel);
-			lo.putConstraint(SpringLayout.EAST, text, 1, SpringLayout.WEST, showMetList);
-			lo.putConstraint(SpringLayout.WEST, text, 0, SpringLayout.WEST, panel);
-			
-			
+			//panel = new JPanel();
+			// From http://www.jroller.com/santhosh/entry/keyboard_handling_in_tablecelleditor
+			// Override some methods in order to avoid the panel to get the focus.
+			panel = new JPanel(new BorderLayout()){
+//	            public void addNotify(){
+//	                super.addNotify();
+//	                text.requestFocus();
+//	             
+//	            }
+				public void requestFocus(){
+					text.requestFocus();
+				}
+
+	            protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed){
+	                InputMap map = text.getInputMap(condition);
+	                ActionMap am = text.getActionMap();
+
+	                if(map!=null && am!=null && isEnabled()){
+	                    Object binding = map.get(ks);
+	                    Action action = (binding==null) ? null : am.get(binding);
+	                    if(action!=null){
+	                        return SwingUtilities.notifyAction(action, ks, e, text,
+	                                e.getModifiers());
+	                    }
+	                }
+	                return false;
+	            }
+	        };
+
 			// Add components (Text + icon)
+	        panel.setRequestFocusEnabled(true);
 			panel.add(text);
-			panel.add(showMetList);
+			panel.add(showMetList, BorderLayout.EAST);
 			text.setFont(UIHelper.VER_11_PLAIN);
-			//text.setMargin(new Insets(-10, -10, -10, -10));
+			
 			
     }
 		
 	private void updateData(SpreadsheetCell newMetabolite, boolean isSelected, JTable table, int row) {
-		//this.metabolite = metabolite;
 		
 		String value = (newMetabolite != null)?newMetabolite.toString():"";
 		
 		// Custom option
 		text.setText(value);
-		
 	
 		panel.setForeground(UIHelper.BG_COLOR);
 		panel.setBackground(UIHelper.DARK_GREEN_COLOR);
@@ -143,6 +173,14 @@ public class MetaboliteCellEditor extends DefaultCellEditor implements TableCell
 		text.setForeground(panel.getForeground());
 		text.setBackground(panel.getBackground());
 		
+		// Avoid loosing the first character when editing with the keyboard
+        if(event instanceof KeyEvent || event==null)
+        {
+            final Caret caret = text.getCaret();
+            caret.setDot(0);
+            text.setText("");                
+        }
+
 		// If there is more than one metabolite
 		if (doWeHaveAListOfMetabolites(value)){
 			showMetList.setIcon(showMoreIcon);
@@ -150,7 +188,13 @@ public class MetaboliteCellEditor extends DefaultCellEditor implements TableCell
 			showMetList.setIcon(null);
 		}
 		
+		
 	}
+	public boolean isCellEditable(EventObject anEvent)
+    {
+        event=anEvent;
+        return super.isCellEditable(anEvent);
+    }
 		
 	private Metabolite[] getMetaboliteList(String value){
 		// If there are optional metabolites for this text
