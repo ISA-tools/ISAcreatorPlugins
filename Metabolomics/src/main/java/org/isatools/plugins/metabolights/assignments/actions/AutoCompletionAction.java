@@ -5,6 +5,8 @@ import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub.DocSumType;
 import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub.ItemType;
 import org.isatools.plugins.metabolights.assignments.model.Metabolite;
 import org.isatools.plugins.metabolights.assignments.model.OptionalMetabolitesList;
+import org.isatools.plugins.metabolights.assignments.model.RemoteInfo;
+import org.isatools.plugins.metabolights.assignments.model.RemoteInfo.remoteProperties;
 import org.isatools.plugins.metabolights.assignments.ui.ProgressTrigger;
 
 import java.awt.Cursor;
@@ -52,9 +54,6 @@ public class AutoCompletionAction extends AbstractAction{
 		//If we have a progress trigger instance
 		if (progressTrigger != null) progressTrigger.triggerProgressStart("Looking up metabolites for " + currentCellValue);
 		
-		// At this point there is some autocompletion to do
-		table.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		
 		// Get the Metabolite object based on the column
 		Metabolite met = getMetabolite();
 
@@ -64,7 +63,6 @@ public class AutoCompletionAction extends AbstractAction{
 		//If we have a progress trigger instance
 		if (progressTrigger != null) progressTrigger.triggerPregressEnd();
 
-		table.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 	private void autoCompleteColumns(Metabolite met){
 		
@@ -82,7 +80,7 @@ public class AutoCompletionAction extends AbstractAction{
 		
 		
 		// Only set the value if empty...
-		if (isColumnEmpty(columnName)){
+		if (isColumnEmpty(columnName)|| source.getForce()){
 			
 			int colIndex = getColIndexByName(columnName);
 			
@@ -92,6 +90,9 @@ public class AutoCompletionAction extends AbstractAction{
 	}
 	
 	private boolean isThereAnythingToAutocomplete(){
+		
+		// If autocomplete is forced
+		if (source.getForce()) return true;
 		
 		int emptyCells = 0;
 		
@@ -343,7 +344,13 @@ public class AutoCompletionAction extends AbstractAction{
 	public static String getBestID(ItemType synonymItem){
 		
 		//Prioirity list of ids
-		String[] prioritylist = {"^CHEBI:[0-9]+$", "^HMDB[0-9]+$", "^LM[A-Z]{2}[0-9]+$", "^C[0-9]{5}$"};
+		//Get the remote ids...in a String
+		String remotePriorityPatterns = RemoteInfo.getProperty(remoteProperties.PRIORITYIDPATTERNS, "^CHEBI:[0-9]+$~^HMDB[0-9]+$~^LM[A-Z]{2}[0-9]+$~^C[0-9]{5}$");
+		
+		// Split into an array, use ~ as character separator.
+		String[] prioritylist = remotePriorityPatterns.split("~");//{"^CHEBI:[0-9]+$", "^HMDB[0-9]+$", "^LM[A-Z]{2}[0-9]+$", "^C[0-9]{5}$"};
+		
+		
 		String bestId = null;
 		// Set the priority score to the lower
 		int priorityScore = prioritylist.length;

@@ -62,15 +62,26 @@ public class DataEntrySheet extends JPanel {
 
     private String fileName;
     private JLabel info;
-    private boolean autocomplete= true;
     
-    public static String TAXID = "taxid";
+    private boolean autocomplete= true;
+    private boolean forceAutoComplete=false;
+    
+    
+
+	public static String TAXID = "taxid";
     public static String SPECIES = "species";
     public static String SPECIEFIELD = "Characteristics[organism]";
     private boolean forceSpecieImport = false;
 
 	private IsaCreatorInfo isaCreatorInfo;
+	
+	public boolean isForceAutoComplete() {
+		return forceAutoComplete;
+	}
 
+	public void setForceAutoComplete(boolean forceAutoComplete) {
+		this.forceAutoComplete = forceAutoComplete;
+	}
     private IsaCreatorInfo getIsaCreatorInfo() {
         if (isaCreatorInfo == null)
             isaCreatorInfo = new IsaCreatorInfo();
@@ -116,7 +127,7 @@ public class DataEntrySheet extends JPanel {
 		
 		int colindex  = sheet.getTable().getColumnModel().getColumnIndex(AutoCompletionAction.DESCRIPTION_COL_NAME);
 		TableColumn col = sheet.getTable().getColumnModel().getColumn(colindex);
-		col.setCellEditor(new MetaboliteCellEditor(sheet.getTable()));
+		col.setCellEditor(new MetaboliteCellEditor(this));
 
 		// non-editing state
 		col.setCellRenderer(new MetaboliteCellRenderer()); 
@@ -138,7 +149,11 @@ public class DataEntrySheet extends JPanel {
                 // Add a progress trigger to the action
                 aca.setProgressTrigger(parentFrame.getProgressTrigger());
                 
-                aca.actionPerformed(new ActionEvent(new CellToAutoComplete(tcl.getTable(), tcl.getRow(), tcl.getColumn()),1,"CELL_CHANGED"));
+                aca.actionPerformed(new ActionEvent(new CellToAutoComplete(tcl.getTable(), tcl.getRow(), tcl.getColumn(), forceAutoComplete),1,"CELL_CHANGED"));
+                
+                // Force will be true after selecting a metabolite from the list of the MetaboliteCellEditor,
+                // In this case we only want to force it once
+                forceAutoComplete = false;
                 
                 // Repaint the table
                 sheet.getTable().repaint();
@@ -155,11 +170,13 @@ public class DataEntrySheet extends JPanel {
     	// Listen to Paste events...
     	sheet.registerCopyPasteObserver(new CopyPasteObserver() {
             public void notifyOfEvent(SpreadsheetEvent event) {
-                if(event == SpreadsheetEvent.COPY) {
-                    System.out.println("Copy event recorded");
-                    
-                }
-                // If event is paste
+				
+            	//                if(event == SpreadsheetEvent.COPY) {
+				//                    System.out.println("Copy event recorded");
+				//                    
+            	//                }
+                
+            	// If event is paste
                 if(event == SpreadsheetEvent.PASTE) {
                 	// If autocomplete deactivated...exit
                 	if (!autocomplete) return;
@@ -240,8 +257,8 @@ public class DataEntrySheet extends JPanel {
 
         // Add a checkbox for activate/de-activate auto-completion.
         final JCheckBox autocompleteCheck = new JCheckBox();
-        autocompleteCheck.setText("Autocomplete:");
-        autocompleteCheck.setToolTipText("Activate autocomplete if you want to have related cells autocompleted after a cell id edited.");
+        autocompleteCheck.setText("Deactivate Metabolite search:");
+        autocompleteCheck.setToolTipText("Activate autocomplete if you want to have related cells autocompleted after a cell is edited.");
         autocompleteCheck.setIcon(unSelectedIcon);
         autocompleteCheck.setSelectedIcon(selectedIcon);
         autocompleteCheck.setSelected(autocomplete);
@@ -252,6 +269,8 @@ public class DataEntrySheet extends JPanel {
 			public void itemStateChanged(ItemEvent arg0) {
 				// Change the autocomplete variable.
         		autocomplete = autocompleteCheck.isSelected();
+        		
+        		autocompleteCheck.setText(autocomplete?"Deactivate Metabolite search:":"Activate Metabolite search:");
 			}
         });
         

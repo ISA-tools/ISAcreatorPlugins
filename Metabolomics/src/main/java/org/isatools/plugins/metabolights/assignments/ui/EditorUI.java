@@ -14,6 +14,8 @@ import org.isatools.isacreator.spreadsheet.TableReferenceObject;
 import org.isatools.plugins.metabolights.assignments.IsaCreatorInfo;
 import org.isatools.plugins.metabolights.assignments.MetabolomicsResultEditor;
 import org.isatools.plugins.metabolights.assignments.io.ConfigurationLoader;
+import org.isatools.plugins.metabolights.assignments.model.RemoteInfo;
+import org.isatools.plugins.metabolights.assignments.model.RemoteInfo.remoteProperties;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
@@ -24,6 +26,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JComponent;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Image;
 
@@ -65,7 +68,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
     public static String getPluginVersion() {
         return PLUGIN_VERSION;
     }
-
+    
     static {
         ResourceInjector.addModule("org.jdesktop.fuse.swing.SwingModule");
 
@@ -108,6 +111,8 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
         createSouthPanel();
 
         configureProgressTrigger();
+        
+        checkVersion();
         
         pack();
     }
@@ -218,18 +223,61 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 		// If the process is starting
 		if (arg0.getPropertyName().equals(pt.PROGRESS_START)){
 			 
-			progressIndicator = new InfiniteProgressPanel(pt.getProcessDescription());
+//			progressIndicator = new InfiniteProgressPanel(pt.getProcessDescription());
+//			
+//			          
+//			progressIndicator.setSize(new Dimension(
+//											getWidth(),
+//											getHeight()));
+//			setGlassPane(progressIndicator);
+//	        progressIndicator.start();
+//	        validate();
+
+			// At this point activate the wait cursor
+			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			
-			          
-			progressIndicator.setSize(new Dimension(
-											getWidth(),
-											getHeight()));
-			setGlassPane(progressIndicator);
-	        progressIndicator.start();
-	        validate();
-	        
 		} else if (arg0.getPropertyName().equals(pt.PROGRESS_END)){
-			progressIndicator.stop();
+//			progressIndicator.stop();
+			// Deactivate the wait cursor
+			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			
 		}
+	}
+	private void checkVersion(){
+        String remoteVersion = RemoteInfo.getProperty(remoteProperties.VERSION);
+        
+        if (remoteVersion == null) return;
+        
+        if (!PLUGIN_VERSION.equals(remoteVersion)){
+        	openUrl (RemoteInfo.getProperty(remoteProperties.DOWNLOADURL));
+        }else{
+        	
+        }
+	}
+	private void openUrl(String url){
+		if( !java.awt.Desktop.isDesktopSupported() ) {
+
+            System.err.println( "Desktop is not supported (fatal)" );
+            return;
+        }
+
+        java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+
+        if( !desktop.isSupported( java.awt.Desktop.Action.BROWSE ) ) {
+
+            System.err.println( "Desktop doesn't support the browse action (fatal)" );
+            return;
+        }
+
+        try {
+
+            java.net.URI uri = new java.net.URI( url);
+            desktop.browse( uri );
+        }
+        catch ( Exception e ) {
+
+            System.err.println( e.getMessage() );
+        }
+        
 	}
 }

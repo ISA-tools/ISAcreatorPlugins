@@ -6,8 +6,10 @@ public class CellToAutoComplete {
 	private JTable table;
 	private int col;
 	private int row;
+	private boolean force;
 	
-	public CellToAutoComplete(JTable table, int row, int col){
+	public CellToAutoComplete(JTable table, int row, int col, boolean force){
+		this.force = force;
 		this.table = table;
 		this.row = row;
 		this.col = col;
@@ -23,5 +25,8 @@ public class CellToAutoComplete {
 
 	public int getRow() {
 		return row;
+	}
+	public boolean getForce(){
+		return this.force;
 	}
 }

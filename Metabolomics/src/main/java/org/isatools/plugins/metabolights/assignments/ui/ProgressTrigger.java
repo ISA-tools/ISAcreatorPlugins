@@ -1,4 +1,5 @@
 package org.isatools.plugins.metabolights.assignments.ui;
+import java.awt.Cursor;
 import java.beans.*;
 
 import javax.swing.SwingUtilities;
@@ -26,10 +27,13 @@ public class ProgressTrigger {
     }
     public void triggerProgressStart(String processDescription){
     	//At the second paste it leaves a Thread open and then mouse clicks doesn't work anymore.
-    	//mPcs.firePropertyChange(PROGRESS_START, null, null);
+    	mPcs.firePropertyChange(PROGRESS_START, null, null);
+		
+    	
     }
     public void triggerPregressEnd(){
     	
-    	//mPcs.firePropertyChange(PROGRESS_END, null, null);
+    	mPcs.firePropertyChange(PROGRESS_END, null, null);
+		
     }
 }
