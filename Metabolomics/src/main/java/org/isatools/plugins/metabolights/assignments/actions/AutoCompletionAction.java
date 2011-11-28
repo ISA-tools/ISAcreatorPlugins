@@ -193,7 +193,7 @@ public class AutoCompletionAction extends AbstractAction{
            req.setTerm(modifiedTerm);
            
            // Get the first one
-           req.setRetMax("10");
+           req.setRetMax(RemoteInfo.getProperty(remoteProperties.PUBCHEM_MAX_RECORD,"10"));
            EUtilsServiceStub.ESearchResult res = service.run_eSearch(req);
 
            if (res.getIdList() == null){
