@@ -10,7 +10,8 @@ public class RemoteInfo {
 	
 	static Properties props = getRemoteInfo();
 	static public enum remoteProperties{
-		VERSION, DOWNLOADURL, PRIORITYIDPATTERNS;
+		VERSION, DOWNLOADURL, PRIORITYIDPATTERNS,
+		PUBCHEMFIELD_FOR_DESCRIPTION, PUBCHEMFIELD_FOR_FORMULA, PUBCHEMFIELD_FOR_ID ;
 		public String toString(){
 			return name().toString();
 		}

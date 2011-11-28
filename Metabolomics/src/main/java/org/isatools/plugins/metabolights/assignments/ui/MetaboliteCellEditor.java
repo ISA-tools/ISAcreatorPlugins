@@ -1,4 +1,4 @@
-package org.isatools.plugins.metabolights.assignments.ui;
+	package org.isatools.plugins.metabolights.assignments.ui;
 
 import org.isatools.isacreator.common.UIHelper;
 import org.isatools.isacreator.spreadsheet.SpreadsheetCell;

@@ -124,8 +124,19 @@ public class DataEntrySheet extends JPanel {
 	
 	private void addCustomCellEditors(){
 
+		// Add a metabolite cell editor to Description column
+		addMetaboliteCellEditorToColumn(AutoCompletionAction.DESCRIPTION_COL_NAME);
+
 		
-		int colindex  = sheet.getTable().getColumnModel().getColumnIndex(AutoCompletionAction.DESCRIPTION_COL_NAME);
+		// Add a metabolite cell editor to Formula column
+		addMetaboliteCellEditorToColumn(AutoCompletionAction.FORMULA_COL_NAME);
+		
+		
+		
+	}
+	private void addMetaboliteCellEditorToColumn(String columnName){
+		
+		int colindex  = sheet.getTable().getColumnModel().getColumnIndex(columnName);
 		TableColumn col = sheet.getTable().getColumnModel().getColumn(colindex);
 		col.setCellEditor(new MetaboliteCellEditor(this));
 

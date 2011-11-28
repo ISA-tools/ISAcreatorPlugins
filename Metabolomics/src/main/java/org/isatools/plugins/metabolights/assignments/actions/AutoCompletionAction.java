@@ -133,15 +133,32 @@ public class AutoCompletionAction extends AbstractAction{
 	}
 	public static Metabolite getMetabolite(String columnName, String value){
 		
-		// If it the description column
-		if (DESCRIPTION_COL_NAME.equals(columnName) || IDENTIFIER_COL_NAME.equals(columnName)){
-			return getMetaboliteFromEntrez(value, "CompleteSynonym");
-		} else if (FORMULA_COL_NAME.equals(columnName)){
-			return getMetaboliteFromEntrez(value, "All Fields");
-		}
-		return null;
+		String pubChemField = getPubChemFieldName(columnName);
+		
+		return getMetaboliteFromEntrez(value, pubChemField);
+		
+//		// If it the description column
+//		if (DESCRIPTION_COL_NAME.equals(columnName) || IDENTIFIER_COL_NAME.equals(columnName)){
+//			return getMetaboliteFromEntrez(value, "CompleteSynonym");
+//		} else if (FORMULA_COL_NAME.equals(columnName)){
+//			return getMetaboliteFromEntrez(value, "All Fields");
+//		}
+//		return null;
 		
 	}
+	public static String getPubChemFieldName(String columnName){
+		
+		if (DESCRIPTION_COL_NAME.equals(columnName)){
+			return RemoteInfo.getProperty(remoteProperties.PUBCHEMFIELD_FOR_DESCRIPTION, "CompleteSynonym");
+		}else if(FORMULA_COL_NAME.equals(columnName)){
+			return RemoteInfo.getProperty(remoteProperties.PUBCHEMFIELD_FOR_FORMULA, "All Fields");
+		}else if (IDENTIFIER_COL_NAME.equals(columnName)){
+			return RemoteInfo.getProperty(remoteProperties.PUBCHEMFIELD_FOR_ID, "CompleteSynonym");
+		}else{
+			return "All Fields";
+		}
+	}
+	
 	public static Metabolite getMetaboliteFromEntrez(String term , String field){
 		
        try
