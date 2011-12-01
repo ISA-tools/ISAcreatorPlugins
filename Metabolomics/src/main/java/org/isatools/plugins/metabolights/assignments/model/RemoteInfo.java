@@ -8,11 +8,30 @@ import java.util.Properties;
  
 public class RemoteInfo {
 	
+
+	
 	static Properties props = getRemoteInfo();
 	static public enum remoteProperties{
-		VERSION, DOWNLOADURL, PRIORITYIDPATTERNS,
-		PUBCHEMFIELD_FOR_DESCRIPTION, PUBCHEMFIELD_FOR_FORMULA, PUBCHEMFIELD_FOR_ID,
-		PUBCHEM_MAX_RECORD;
+		VERSION ("0.1"),
+		DOWNLOADURL("http://www.ebi.ac.uk/metabolights/downloadplugin"),
+		PRIORITYIDPATTERNS("^CHEBI:[0-9]+$~^HMDB[0-9]+$~^LM[A-Z]{2}[0-9]+$~^C[0-9]{5}$"),
+		ACCESSION_URLS("http://www.ebi.ac.uk/chebi/searchId.do?chebiId=" +
+					  "~http://www.hmdb.ca/metabolites/" +
+					  "~http://www.lipidmaps.org/data/LMSDRecord.php?LMID=" +
+					  "~http://www.genome.jp/dbget-bin/www_bget?cpd:"),
+		PUBCHEMFIELD_FOR_DESCRIPTION("CompleteSynonym"),
+		PUBCHEMFIELD_FOR_FORMULA("All Fields"),
+		PUBCHEMFIELD_FOR_ID("CompleteSynonym"),
+		PUBCHEM_MAX_RECORD("10");
+		
+		
+		String defaultValue;
+		private remoteProperties(String defaultValue){
+			this.defaultValue= defaultValue;
+		}
+		public String getDefaultValue(){
+			return this.defaultValue;
+		}
 		public String toString(){
 			return name().toString();
 		}
@@ -35,18 +54,23 @@ public class RemoteInfo {
         return null;
 
 	}
-	static public String getProperty(remoteProperties propertyName){
+	static private String getProperty(String propertyName){
 		
 		if (props == null) return null;
 		
-		return  props.getProperty(propertyName.toString());
+		return  props.getProperty(propertyName);
 		
 	}
-	static public String getProperty(remoteProperties propertyName, String defaultValue){
+	static public String getProperty(remoteProperties propertyName){
 		
-		String remoteValue = getProperty(propertyName);
+		String remoteValue = getProperty(propertyName.toString());
 		
-		return remoteValue==null?defaultValue:remoteValue;
+		return remoteValue==null?propertyName.getDefaultValue():remoteValue;
+	}
+	static public String[] getProperty(remoteProperties propertyName, String splitText){
+		String property = getProperty(propertyName);
+		
+		return property.split(splitText);
 	}
 	
 	

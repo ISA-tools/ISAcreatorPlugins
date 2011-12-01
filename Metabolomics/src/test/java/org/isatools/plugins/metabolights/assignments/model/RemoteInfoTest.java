@@ -11,7 +11,7 @@ public class RemoteInfoTest {
 	@Test
 	public void testRemoteInfoProperties(){
 		
-		assertEquals("Version should be same as EditorUI", EditorUI.PLUGIN_VERSION, RemoteInfo.getProperty(remoteProperties.VERSION));
+		assertEquals("Version should be same as EditorUI", remoteProperties.VERSION.getDefaultValue(), RemoteInfo.getProperty(remoteProperties.VERSION));
 		assertEquals("Donwload URL now is google", "http://www.google.com", RemoteInfo.getProperty(remoteProperties.DOWNLOADURL));
 		
 	}

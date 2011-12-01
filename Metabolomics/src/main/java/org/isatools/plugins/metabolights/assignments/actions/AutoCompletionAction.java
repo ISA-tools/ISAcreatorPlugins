@@ -149,11 +149,11 @@ public class AutoCompletionAction extends AbstractAction{
 	public static String getPubChemFieldName(String columnName){
 		
 		if (DESCRIPTION_COL_NAME.equals(columnName)){
-			return RemoteInfo.getProperty(remoteProperties.PUBCHEMFIELD_FOR_DESCRIPTION, "CompleteSynonym");
+			return RemoteInfo.getProperty(remoteProperties.PUBCHEMFIELD_FOR_DESCRIPTION);
 		}else if(FORMULA_COL_NAME.equals(columnName)){
-			return RemoteInfo.getProperty(remoteProperties.PUBCHEMFIELD_FOR_FORMULA, "All Fields");
+			return RemoteInfo.getProperty(remoteProperties.PUBCHEMFIELD_FOR_FORMULA);
 		}else if (IDENTIFIER_COL_NAME.equals(columnName)){
-			return RemoteInfo.getProperty(remoteProperties.PUBCHEMFIELD_FOR_ID, "CompleteSynonym");
+			return RemoteInfo.getProperty(remoteProperties.PUBCHEMFIELD_FOR_ID);
 		}else{
 			return "All Fields";
 		}
@@ -193,7 +193,7 @@ public class AutoCompletionAction extends AbstractAction{
            req.setTerm(modifiedTerm);
            
            // Get the first one
-           req.setRetMax(RemoteInfo.getProperty(remoteProperties.PUBCHEM_MAX_RECORD,"10"));
+           req.setRetMax(RemoteInfo.getProperty(remoteProperties.PUBCHEM_MAX_RECORD));
            EUtilsServiceStub.ESearchResult res = service.run_eSearch(req);
 
            if (res.getIdList() == null){
@@ -362,7 +362,7 @@ public class AutoCompletionAction extends AbstractAction{
 		
 		//Prioirity list of ids
 		//Get the remote ids...in a String
-		String remotePriorityPatterns = RemoteInfo.getProperty(remoteProperties.PRIORITYIDPATTERNS, "^CHEBI:[0-9]+$~^HMDB[0-9]+$~^LM[A-Z]{2}[0-9]+$~^C[0-9]{5}$");
+		String remotePriorityPatterns = RemoteInfo.getProperty(remoteProperties.PRIORITYIDPATTERNS);
 		
 		// Split into an array, use ~ as character separator.
 		String[] prioritylist = remotePriorityPatterns.split("~");//{"^CHEBI:[0-9]+$", "^HMDB[0-9]+$", "^LM[A-Z]{2}[0-9]+$", "^C[0-9]{5}$"};

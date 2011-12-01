@@ -39,7 +39,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 	
 	private static final long serialVersionUID = -5036524042579480467L;
     public static final float DESIRED_OPACITY = .94f;
-    public static final String PLUGIN_VERSION = "0.1";
+    //public static final String PLUGIN_VERSION = "0.1";
 
     private String currentCellValue;
     private String newCellValue;
@@ -66,7 +66,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
     A public method to return the version of this plugin, can be use by the ISAcreator to provide an "update plugin function"
      */
     public static String getPluginVersion() {
-        return PLUGIN_VERSION;
+        return remoteProperties.VERSION.getDefaultValue();
     }
     
     static {
@@ -248,13 +248,13 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
         
         if (remoteVersion == null) return;
         
-        if (!PLUGIN_VERSION.equals(remoteVersion)){
+        if (!getPluginVersion().equals(remoteVersion)){
         	openUrl (RemoteInfo.getProperty(remoteProperties.DOWNLOADURL));
         }else{
         	
         }
 	}
-	private void openUrl(String url){
+	public static void openUrl(String url){
 		if( !java.awt.Desktop.isDesktopSupported() ) {
 
             System.err.println( "Desktop is not supported (fatal)" );

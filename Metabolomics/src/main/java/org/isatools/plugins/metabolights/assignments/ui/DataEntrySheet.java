@@ -131,7 +131,15 @@ public class DataEntrySheet extends JPanel {
 		// Add a metabolite cell editor to Formula column
 		addMetaboliteCellEditorToColumn(AutoCompletionAction.FORMULA_COL_NAME);
 		
-		
+		// Add Link style cell to Identifiers
+		int colindex  = sheet.getTable().getColumnModel().getColumnIndex(AutoCompletionAction.IDENTIFIER_COL_NAME);
+		TableColumn col = sheet.getTable().getColumnModel().getColumn(colindex);
+
+		// non-editing state
+		MetaboliteLinkCellRenderer mlcr = new MetaboliteLinkCellRenderer(); 
+		col.setCellRenderer(mlcr); 
+		sheet.getTable().addMouseListener(mlcr);
+
 		
 	}
 	private void addMetaboliteCellEditorToColumn(String columnName){
