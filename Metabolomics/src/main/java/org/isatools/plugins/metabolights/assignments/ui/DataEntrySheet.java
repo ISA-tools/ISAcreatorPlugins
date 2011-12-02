@@ -439,6 +439,7 @@ public class DataEntrySheet extends JPanel {
         logger.info("Adding the new sheet");
         sheet = newSpreadsheet;
         addChangesListener();
+        addCustomCellEditors();
         add(getIsaCreatorInfo().addSpreadsheetSampleColumns(sheet),BorderLayout.CENTER);  //Add all missing sample columns to the spreadsheet
         validate();
         
