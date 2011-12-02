@@ -263,7 +263,7 @@
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
-                    <meminitial>256m</meminitial>
+                    <meminitial>512m</meminitial>
                     <maxmem>2024m</maxmem>
                 </configuration>
             </plugin>
@@ -278,22 +278,13 @@
                         <Bundle-Activator>org.isatools.plugins.metabolights.assignments.Activator</Bundle-Activator>
                         <Bundle-Vendor>ISAteam</Bundle-Vendor>
                         <Embed-Transitive>true</Embed-Transitive>
-                        <Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
+                        <Export-Package>
+                           org.isatools.plugins.metabolights.assignments.*,
+                           gov.nih.nlm.ncbi.*
+                        </Export-Package>
+                        <Private-Package>!*</Private-Package>
                     </instructions>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                  <execution>
-                    <id>copy-dependencies</id>
-                    <phase>package</phase>
-                    <goals>
-                      <goal>copy-dependencies</goal>
-                    </goals>
-                  </execution>
-                </executions>
             </plugin>
 
         </plugins>
