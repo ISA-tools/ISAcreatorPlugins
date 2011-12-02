@@ -279,10 +279,22 @@
                         <Bundle-Vendor>ISAteam</Bundle-Vendor>
                         <Embed-Transitive>true</Embed-Transitive>
                         <Export-Package>
-                           org.isatools.plugins.metabolights.assignments.*,
-                           gov.nih.nlm.ncbi.*
+                           org.isatools.plugins.metabolights.assignments.*
                         </Export-Package>
-                        <Private-Package>!*</Private-Package>
+                        <Private-Package>
+                            gov.nih.nlm.ncbi.*;-split-package:=merge-first
+                            ,org.apache.axiom.*;-split-package:=merge-first
+                            ,org.apache.axis2.*;-split-package:=merge-first
+                            ,javax.jws.*;-split-package:=merge-first
+                            ,javax.mail.*;-split-package:=merge-first
+                            ,org.apache.woden.*;-split-package:=merge-first
+                            ,org.springframework.*;-split-package:=merge-first
+                            ,org.apache.commons.*;-split-package:=merge-first
+                            ,org.apache.ws.commons.schema.*;-split-package:=merge-first
+                            ,javax.xml.ws.*;-split-package:=merge-first
+                            ,org.apache.neethi.*;-split-package:=merge-first
+                            ,org.apache.http.*;-split-package:=merge-first
+                        </Private-Package>
                     </instructions>
                 </configuration>
             </plugin>
