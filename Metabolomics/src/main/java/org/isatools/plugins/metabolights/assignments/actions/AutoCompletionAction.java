@@ -163,6 +163,17 @@ public class AutoCompletionAction extends AbstractAction{
 		
        try
        {
+    	   // Unknown metabolites return water when the search is perform in Entrez
+    	   // Use the black list property to avoid ant search
+    	   // This will return a String with items separeted by ~ : ~unknown~
+    	   String blackList = RemoteInfo.getProperty(remoteProperties.PUBCHEM_BLACKLIST);
+    	   
+    	   // If the term occurs along the blacklist
+    	   if (blackList.indexOf("~" + term.toLowerCase() +"~")!=-1){
+    		  return null;
+    	   }
+    	   
+    	   
     	   // If we have it cached
     	   if (OptionalMetabolitesList.getObject().areThereMetabolitesForTerm(term)){
     		   // Get the metabolites cached
@@ -263,7 +274,7 @@ public class AutoCompletionAction extends AbstractAction{
 		}
 		
 		// Replace any special character for  white space (is how pubchem likes it)
-		term = term.replace(":", " ");
+		// term = term.replace(":", " ");
 		
 		// Return the term.
 		return term;

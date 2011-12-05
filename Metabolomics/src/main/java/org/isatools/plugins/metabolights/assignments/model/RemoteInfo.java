@@ -22,7 +22,8 @@ public class RemoteInfo {
 		PUBCHEMFIELD_FOR_DESCRIPTION("CompleteSynonym"),
 		PUBCHEMFIELD_FOR_FORMULA("All Fields"),
 		PUBCHEMFIELD_FOR_ID("CompleteSynonym"),
-		PUBCHEM_MAX_RECORD("10");
+		PUBCHEM_MAX_RECORD("10"),
+		PUBCHEM_BLACKLIST("~unknown~");
 		
 		
 		String defaultValue;
