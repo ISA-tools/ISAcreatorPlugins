@@ -11,7 +11,14 @@ public class RemoteInfo {
 
 	
 	static Properties props = getRemoteInfo();
+	
+	
 	static public enum remoteProperties{
+		
+		// When starting a new version:
+		// 1.- Change the VERSION default value to the new version
+		// 2.- Create a new remoteProperty file --> remoteInfo2.properties
+		// 3.- Change the url to point to the new property file (reqUrl in getRemoteInfo method) 
 		VERSION ("0.1"),
 		DOWNLOADURL("http://www.ebi.ac.uk/metabolights/downloadplugin"),
 		PRIORITYIDPATTERNS("^CHEBI:[0-9]+$~^HMDB[0-9]+$~^LM[A-Z]{2}[0-9]+$~^C[0-9]{5}$"),

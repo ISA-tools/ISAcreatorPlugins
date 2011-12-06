@@ -224,9 +224,9 @@ public class DataEntrySheet extends JPanel {
     	file.setBackground(UIHelper.BG_COLOR);
     	
     	// Not available in the first load (without ISACreator) 
-    	if (!parentFrame.getAmIAlone()){
-    		file.setText(getFileName());
-    	}
+//    	if (!parentFrame.getAmIAlone()){
+//    		file.setText(getFileName());
+//    	}
     	
     	bottomPannel.add(file);
     	
@@ -445,7 +445,7 @@ public class DataEntrySheet extends JPanel {
         
         // To test
         //info.setText("The sample file identifier is: " + getIsaCreatorInfo().getCurrentStudy().getStudySampleFileIdentifier());
-        info.setText("The sample file identifier is: " + getIsaCreatorInfo().getCurrentStudySample().getIdentifier());
+        //info.setText("The sample file identifier is: " + getIsaCreatorInfo().getCurrentStudySample().getIdentifier());
     }
 
    	public boolean isColumnEmpty(String columnName){
