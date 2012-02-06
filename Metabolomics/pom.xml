@@ -315,5 +315,6 @@
 
     <properties>
     	<axis2.version>1.5.2</axis2.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 </project>
