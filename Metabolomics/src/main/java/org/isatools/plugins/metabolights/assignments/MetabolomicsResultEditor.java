@@ -51,6 +51,7 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     public MetabolomicsResultEditor() {
         super();
         ResourceInjector.get("metabolights-fileeditor-package.style").inject(this);
+        logger.info("MetabolimicsResultEditor constuctor invoked");
     }
 
     @Override
