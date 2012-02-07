@@ -97,7 +97,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
         setLayout(new BorderLayout());
         setBackground(UIHelper.BG_COLOR);
 
-        AWTUtilities.setWindowOpacity(this, DESIRED_OPACITY);
+        //AWTUtilities.setWindowOpacity(this, DESIRED_OPACITY);
 
         HUDTitleBar titlePanel = new HUDTitleBar(logo, logoInactive);
 
