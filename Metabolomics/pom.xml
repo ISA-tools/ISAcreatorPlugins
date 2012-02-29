@@ -291,9 +291,9 @@
                             ,org.springframework.*;-split-package:=merge-first
                             ,org.apache.commons.*;-split-package:=merge-first
                             ,org.apache.ws.commons.schema.*;-split-package:=merge-first
-                            ,javax.xml.ws.*;-split-package:=merge-first
                             ,org.apache.neethi.*;-split-package:=merge-first
                             ,org.apache.http.*;-split-package:=merge-first
+                            ,javax.wsdl.*;-split-package:=merge-first
                         </Private-Package>
                     </instructions>
                 </configuration>
