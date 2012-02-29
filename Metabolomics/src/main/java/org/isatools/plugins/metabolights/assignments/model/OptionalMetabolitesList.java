@@ -10,11 +10,13 @@ import java.util.Map;
  *
  */
 public class OptionalMetabolitesList {
+
 	private Map<String,Metabolite[]> metaboliteArrayMap = new HashMap<String,Metabolite[]>();
 	static private OptionalMetabolitesList singleton;
 	
 	// Make it a singleton...
 	private OptionalMetabolitesList(){}
+
 	static public OptionalMetabolitesList getObject(){
 		
 		if (singleton == null){
@@ -27,11 +29,13 @@ public class OptionalMetabolitesList {
 	public boolean areThereMetabolitesForTerm(String term){
 		return metaboliteArrayMap.containsKey(term.toLowerCase());
 	}
+
 	public Metabolite[] getMetabolitesForTerm (String term){
 		
 		return metaboliteArrayMap.get(term.toLowerCase());
 		
 	}
+
 	public void setMetabolitesForTerm(Metabolite[] metabolites, String term){
 		
 		metaboliteArrayMap.put(term.toLowerCase(), metabolites);

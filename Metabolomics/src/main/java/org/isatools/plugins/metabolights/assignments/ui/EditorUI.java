@@ -208,8 +208,6 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
     }
 
 	public void propertyChange(PropertyChangeEvent arg0) {
-		// TODO Auto-generated method stub
-
 		// For the progress bar
 		if (arg0.getSource() instanceof ProgressTrigger){
 			propertyChangeProgressTrigger(arg0, (ProgressTrigger) arg0.getSource());
@@ -217,6 +215,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 		}
 		
 	}
+
 	@SuppressWarnings("static-access")
 	private void propertyChangeProgressTrigger(PropertyChangeEvent arg0, ProgressTrigger pt){
 		
@@ -243,6 +242,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 			
 		}
 	}
+
 	private void checkVersion(){
         String remoteVersion = RemoteInfo.getProperty(remoteProperties.VERSION);
         
@@ -254,6 +254,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
         	
         }
 	}
+
 	public static void openUrl(String url){
 		if( !java.awt.Desktop.isDesktopSupported() ) {
 

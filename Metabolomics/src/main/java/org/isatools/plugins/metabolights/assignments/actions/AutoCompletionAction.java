@@ -9,7 +9,6 @@ import org.isatools.plugins.metabolights.assignments.model.RemoteInfo;
 import org.isatools.plugins.metabolights.assignments.model.RemoteInfo.remoteProperties;
 import org.isatools.plugins.metabolights.assignments.ui.ProgressTrigger;
 
-import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,7 +17,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 
-public class AutoCompletionAction extends AbstractAction{
+public class AutoCompletionAction extends AbstractAction {
 	
 	public static final String IDENTIFIER_COL_NAME = "identifier";
 	public static final String FORMULA_COL_NAME = "chemical_formula";
@@ -33,9 +32,11 @@ public class AutoCompletionAction extends AbstractAction{
 	public ProgressTrigger getProgressTrigger() {
 		return progressTrigger;
 	}
+
 	public void setProgressTrigger(ProgressTrigger progressTrigger) {
 		this.progressTrigger = progressTrigger;
 	}
+
 	public void actionPerformed(ActionEvent e) {
 		
 		//Get the object that has generated the event
@@ -53,7 +54,7 @@ public class AutoCompletionAction extends AbstractAction{
 
 		//If we have a progress trigger instance
 		if (progressTrigger != null) progressTrigger.triggerProgressStart("Looking up metabolites for " + currentCellValue);
-		
+
 		// Get the Metabolite object based on the column
 		Metabolite met = getMetabolite();
 
@@ -64,6 +65,7 @@ public class AutoCompletionAction extends AbstractAction{
 		if (progressTrigger != null) progressTrigger.triggerPregressEnd();
 
 	}
+
 	private void autoCompleteColumns(Metabolite met){
 		
 		// If metabolite is null there is nothing to fill
@@ -76,6 +78,7 @@ public class AutoCompletionAction extends AbstractAction{
 		table.validate();
 		
 	}
+
 	private void setColumn(String columnName,String value){
 		
 		
@@ -102,6 +105,7 @@ public class AutoCompletionAction extends AbstractAction{
 		
 		return (emptyCells>0);
 	}
+    
 	private boolean isColumnEmpty(String columnName){
 	
 		// Get the column index
@@ -117,25 +121,37 @@ public class AutoCompletionAction extends AbstractAction{
 		return false;
 		
 	}
+    
 	private int getColIndexByName(String columnName){
 		return table.getColumnModel().getColumnIndex(columnName);
 	}
-	
-	
+
 	// Get a metabolite instance based on the active cell
 	private Metabolite getMetabolite(){
-		
+
 		// Get the current column name
 		String columnName = table.getColumnName(source.getCol());
 		
 		return getMetabolite(columnName, currentCellValue);
 		
 	}
+
 	public static Metabolite getMetabolite(String columnName, String value){
-		
-		String pubChemField = getPubChemFieldName(columnName);
-		
-		return getMetaboliteFromEntrez(value, pubChemField);
+
+        Metabolite metabolite = null;
+		String term = null, pubChemField = getPubChemFieldName(columnName);
+
+        //loop through all "|" separated values
+        String[] values = splitValues(value,"\\|");
+        int size = values.length;
+        for (int i=0; i < size; i++){
+            String currentValue = values[i];
+            metabolite = getMetaboliteFromEntrez(currentValue, pubChemField);
+            if (metabolite != null ) //Break out if a Metabolite is found in PubChem
+                break;
+        }
+
+		return metabolite;
 		
 //		// If it the description column
 //		if (DESCRIPTION_COL_NAME.equals(columnName) || IDENTIFIER_COL_NAME.equals(columnName)){
@@ -146,63 +162,76 @@ public class AutoCompletionAction extends AbstractAction{
 //		return null;
 		
 	}
+
+    private static String[] splitValues(String inputString, String stringSeparator){
+        return inputString.split(stringSeparator);
+    }
+
 	public static String getPubChemFieldName(String columnName){
 		
 		if (DESCRIPTION_COL_NAME.equals(columnName)){
 			return RemoteInfo.getProperty(remoteProperties.PUBCHEMFIELD_FOR_DESCRIPTION);
-		}else if(FORMULA_COL_NAME.equals(columnName)){
+		} else if (FORMULA_COL_NAME.equals(columnName)){
 			return RemoteInfo.getProperty(remoteProperties.PUBCHEMFIELD_FOR_FORMULA);
-		}else if (IDENTIFIER_COL_NAME.equals(columnName)){
+		} else if (IDENTIFIER_COL_NAME.equals(columnName)){
 			return RemoteInfo.getProperty(remoteProperties.PUBCHEMFIELD_FOR_ID);
-		}else{
+		} else {
 			return "All Fields";
 		}
 	}
+    
+    private static Boolean isBlacklisted(String term){
+        
+        Boolean isBlacklisted = false;
+        // Unknown metabolites return water when the search is perform in Entrez
+        // Use the black list property to avoid ant search
+        // This will return a String with items separeted by ~ : ~unknown~
+        String blackList = RemoteInfo.getProperty(remoteProperties.PUBCHEM_BLACKLIST);
+
+        // If the term occurs along the blacklist
+        if (blackList.indexOf("~" + term.toLowerCase() +"~")!=-1)
+            isBlacklisted = true;
+
+        return isBlacklisted;
+    }
 	
 	public static Metabolite getMetaboliteFromEntrez(String term , String field){
-		
+
        try
        {
-    	   // Unknown metabolites return water when the search is perform in Entrez
-    	   // Use the black list property to avoid ant search
-    	   // This will return a String with items separeted by ~ : ~unknown~
-    	   String blackList = RemoteInfo.getProperty(remoteProperties.PUBCHEM_BLACKLIST);
-    	   
-    	   // If the term occurs along the blacklist
-    	   if (blackList.indexOf("~" + term.toLowerCase() +"~")!=-1){
-    		  return null;
-    	   }
-    	   
-    	   
+
+           if (isBlacklisted(term))
+               return null;
+
     	   // If we have it cached
     	   if (OptionalMetabolitesList.getObject().areThereMetabolitesForTerm(term)){
     		   // Get the metabolites cached
     		   Metabolite[] mets = OptionalMetabolitesList.getObject().getMetabolitesForTerm(term);
-    		   
+
     		   // If there isn't any
     		   if (mets == null) return null;
-    		   
+
     		   //return the first
     		   return mets[0];
-    		   
+
     	   }
-    	   
-    	   
+
+
     	   EUtilsServiceStub service = new EUtilsServiceStub();
-           
+
     	   // call NCBI ESearch utility
            // NOTE: search term should be URL encoded
            EUtilsServiceStub.ESearchRequest req = new EUtilsServiceStub.ESearchRequest();
            // Search only in PubChem Compound
            req.setDb("pccompound");
-           
+
            // prepare the term
            String modifiedTerm = prepareEntrezTerm(term);
-           
-           // Search on synonyms only 
+
+           // Search on synonyms only
            modifiedTerm = modifiedTerm + "[" + field + "]";
            req.setTerm(modifiedTerm);
-           
+
            // Get the first one
            req.setRetMax(RemoteInfo.getProperty(remoteProperties.PUBCHEM_MAX_RECORD));
            EUtilsServiceStub.ESearchResult res = service.run_eSearch(req);
@@ -211,19 +240,19 @@ public class AutoCompletionAction extends AbstractAction{
         	 // Set to null the cached
         	 OptionalMetabolitesList.getObject().setMetabolitesForTerm(null, term);
         	 return null;
-        	   
+
            }
-           
+
            if (res.getIdList().getId() == null){
-        	  
+
           	 // Set to null the cached
           	 OptionalMetabolitesList.getObject().setMetabolitesForTerm(null, term);
-          	return null; 
+          	return null;
            }
-           
+
            // Declare an array of metabolites
            Metabolite[] mets;
-           
+
            // Join id into one String separated by commas
            //String ids = org.apache.commons.lang.StringUtils.join(res.getIdList().getId(), ",");
 
@@ -234,17 +263,17 @@ public class AutoCompletionAction extends AbstractAction{
            for (String currentID : listOfIDs) {
         	   idsInString.append(",").append(currentID);
            }
-	   
+
            // Get the the id of the first element
            mets = getMetabolitesFromPubChem(idsInString.toString());
     	   //mets = getMetabolitesFromPubChem(ids);
-        	   
+
            // Add it to the cache
            OptionalMetabolitesList.getObject().setMetabolitesForTerm(mets, term);
-           
+
            // Return the first
            return mets[0];
-           
+
        }
        catch (Exception e) { 
     	   
@@ -401,7 +430,7 @@ public class AutoCompletionAction extends AbstractAction{
     				// If the index is the first item (hi-priority item)...stop searching
     				if (i==0){
     					return name;
-    				}else{
+    				} else {
     					
     					// If previous synonym found is of less priority...
     					if (priorityScore > i){
@@ -424,6 +453,7 @@ public class AutoCompletionAction extends AbstractAction{
     	return bestId;
 		
 	}
+
 	public static boolean matchRegEx(String text, String patternToSearch){
 		
 			Pattern pattern = Pattern.compile(patternToSearch);
