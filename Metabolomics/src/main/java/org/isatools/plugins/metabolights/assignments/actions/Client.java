@@ -59,6 +59,7 @@ public class Client {
         }
         catch (Exception e) { System.out.println(e.toString()); }
 	}
+
 	private static void queryPubChem(String term){
 		 // search in PubMed Central for stem cells in free fulltext articles
         try
@@ -87,6 +88,7 @@ public class Client {
         }
         catch (Exception e) { System.out.println(e.toString()); }
 	}
+
 	private static void querySumaryInPubChem(String id){
 		// retrieves document Summaries by list of primary IDs
         try

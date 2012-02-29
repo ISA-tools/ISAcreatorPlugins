@@ -1,7 +1,6 @@
 package org.isatools.plugins.metabolights.assignments.ui;
 
 
-import com.sun.awt.AWTUtilities;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.isatools.isacreator.common.UIHelper;
@@ -19,17 +18,11 @@ import org.isatools.plugins.metabolights.assignments.model.RemoteInfo.remoteProp
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
-
+import javax.swing.*;
 import javax.swing.border.EtchedBorder;
+import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.JComponent;
-
-import java.awt.BorderLayout;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Image;
-
 import java.io.IOException;
 
 @SuppressWarnings("restriction")
@@ -208,8 +201,6 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
     }
 
 	public void propertyChange(PropertyChangeEvent arg0) {
-		// TODO Auto-generated method stub
-
 		// For the progress bar
 		if (arg0.getSource() instanceof ProgressTrigger){
 			propertyChangeProgressTrigger(arg0, (ProgressTrigger) arg0.getSource());
@@ -217,6 +208,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 		}
 		
 	}
+
 	@SuppressWarnings("static-access")
 	private void propertyChangeProgressTrigger(PropertyChangeEvent arg0, ProgressTrigger pt){
 		
@@ -243,6 +235,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 			
 		}
 	}
+
 	private void checkVersion(){
         String remoteVersion = RemoteInfo.getProperty(remoteProperties.VERSION);
         
@@ -254,6 +247,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
         	
         }
 	}
+
 	public static void openUrl(String url){
 		if( !java.awt.Desktop.isDesktopSupported() ) {
 

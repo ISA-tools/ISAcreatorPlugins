@@ -7,11 +7,8 @@ import java.net.URL;
 import java.util.Properties;
  
 public class RemoteInfo {
-	
 
-	
 	static Properties props = getRemoteInfo();
-	
 	
 	static public enum remoteProperties{
 		
@@ -37,13 +34,17 @@ public class RemoteInfo {
 		private remoteProperties(String defaultValue){
 			this.defaultValue= defaultValue;
 		}
+
 		public String getDefaultValue(){
 			return this.defaultValue;
 		}
+
 		public String toString(){
 			return name().toString();
 		}
+
 	}
+
 	static Properties getRemoteInfo(){
 		String reqUrl = "https://raw.github.com/EBI-Metabolights/ISAcreatorPlugins/master/Metabolomics/remoteInfo.properties";
         try {
@@ -62,6 +63,7 @@ public class RemoteInfo {
         return null;
 
 	}
+
 	static private String getProperty(String propertyName){
 		
 		if (props == null) return null;
@@ -69,12 +71,14 @@ public class RemoteInfo {
 		return  props.getProperty(propertyName);
 		
 	}
+
 	static public String getProperty(remoteProperties propertyName){
 		
 		String remoteValue = getProperty(propertyName.toString());
 		
 		return remoteValue==null?propertyName.getDefaultValue():remoteValue;
 	}
+
 	static public String[] getProperty(remoteProperties propertyName, String splitText){
 		String property = getProperty(propertyName);
 		
