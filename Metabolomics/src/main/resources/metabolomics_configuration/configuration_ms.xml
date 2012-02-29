@@ -4,7 +4,7 @@
         <technology term-label="" term-accession="" source-abbreviation=""/>
         <field header="identifier" data-type="String" is-file-field="false" is-multiple-value="false" is-required="true" is-hidden="false">
             <description>
-                A list of comma separated possible identifiers for these small molecules. e.g. "KEGG:C000017,CHEBI:12345"
+                A list of | separated possible identifiers for these small molecules. e.g. "KEGG:C000017|CHEBI:12345"
             </description>
             <default-value></default-value>
         </field>
@@ -19,6 +19,10 @@
             <description>NMR/MS: The chemical formula of the identified compound</description>
             <default-value></default-value>
         </field>
+        <field header="description" data-type="String" is-file-field="false" is-multiple-value="false" is-required="true">
+            <description>NMR/MS: The small molecule's description/name.  Multiple values separated with | </description>
+            <default-value></default-value>
+        </field>
         <field header="chemical_shift" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false" is-hidden="true">
             <description>NMR: Chemical shift</description>
             <default-value></default-value>
@@ -27,15 +31,15 @@
             <description>NMR: Type of multiplets observed of the metabolite (e.g s, d, t, q, dd, ...)</description>
             <default-value></default-value>
         </field>
-        <field header="description" data-type="String" is-file-field="false" is-multiple-value="false" is-required="true">
-            <description>NMR/MS: The small molecule's description/name</description>
-            <default-value></default-value>
-        </field>
-        <field header="mass_to_charge" data-type="Double" is-file-field="false" is-multiple-value="false" is-required="false">
+        <field header="mass_to_charge" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
             <description>MS: The precursor's experimental mass to charge (m/z)</description>
             <default-value></default-value>
         </field>
-        <field header="charge" data-type="Double" is-file-field="false" is-multiple-value="false" is-required="false">
+        <field header="fragmentation" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false"  is-hidden="false">
+            <description>Fragmentation</description>
+            <default-value></default-value>
+        </field>
+        <field header="charge" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
             <description>MS: The precursor's charge</description>
             <default-value></default-value>
         </field>
