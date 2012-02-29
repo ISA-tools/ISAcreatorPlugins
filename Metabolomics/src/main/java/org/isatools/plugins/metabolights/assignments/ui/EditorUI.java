@@ -1,7 +1,6 @@
 package org.isatools.plugins.metabolights.assignments.ui;
 
 
-import com.sun.awt.AWTUtilities;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.isatools.isacreator.common.UIHelper;
@@ -19,17 +18,11 @@ import org.isatools.plugins.metabolights.assignments.model.RemoteInfo.remoteProp
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
-
+import javax.swing.*;
 import javax.swing.border.EtchedBorder;
+import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.JComponent;
-
-import java.awt.BorderLayout;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Image;
-
 import java.io.IOException;
 
 @SuppressWarnings("restriction")
@@ -97,7 +90,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
         setLayout(new BorderLayout());
         setBackground(UIHelper.BG_COLOR);
 
-        AWTUtilities.setWindowOpacity(this, DESIRED_OPACITY);
+        //AWTUtilities.setWindowOpacity(this, DESIRED_OPACITY);
 
         HUDTitleBar titlePanel = new HUDTitleBar(logo, logoInactive);
 
