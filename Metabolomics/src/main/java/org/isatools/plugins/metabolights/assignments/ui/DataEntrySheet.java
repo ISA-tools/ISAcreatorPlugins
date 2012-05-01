@@ -474,6 +474,9 @@ public class DataEntrySheet extends JPanel {
     	
 		try{
 			
+			
+			System.out.println("Importing sample data");
+			logger.info("Importing sample data");
 			// Get the study sample data
 			Assay studySample = isaCreatorInfo.getCurrentStudySample();
 	    	
