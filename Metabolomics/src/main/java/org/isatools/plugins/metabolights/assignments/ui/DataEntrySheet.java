@@ -471,44 +471,52 @@ public class DataEntrySheet extends JPanel {
      */
     public void importSampleData(){
     	
-		// Get the study sample data
-		Assay studySample = isaCreatorInfo.getCurrentStudySample();
     	
-    	// Check if we have to populate the sampledata
-    	if (haveToFillSampleData(studySample)){
+		try{
+			
+			// Get the study sample data
+			Assay studySample = isaCreatorInfo.getCurrentStudySample();
+	    	
+	    	// Check if we have to populate the sampledata
+	    	if (haveToFillSampleData(studySample)){
 
-    		String termSourceREF="", termAccessionNumber="", organism = "", taxid="";
-    		
-    		int column = studySample.getSpreadsheetUI().getTable().getSpreadsheetFunctions().getModelIndexForColumn(SPECIEFIELD);
-    	   	   		
-    		SpreadsheetCell cell = (SpreadsheetCell)studySample.getSpreadsheetUI().getTable().getTable().getValueAt(0, column); 
-    		
-    		String value = cell.toString();
+	    		String termSourceREF="", termAccessionNumber="", organism = "", taxid="";
+	    		
+	    		int column = studySample.getSpreadsheetUI().getTable().getSpreadsheetFunctions().getModelIndexForColumn(SPECIEFIELD);
+	    	   	   		
+	    		SpreadsheetCell cell = (SpreadsheetCell)studySample.getSpreadsheetUI().getTable().getTable().getValueAt(0, column); 
+	    		
+	    		String value = cell.toString();
 
-    		logger.info("Importing sample data to metabolights plugin: " + value);
-    		
-            OntologyTerm ontologyTerm = isaCreatorInfo.getOntologyTerm(value);
+	    		logger.info("Importing sample data to metabolights plugin: " + value);
+	    		
+	            OntologyTerm ontologyTerm = isaCreatorInfo.getOntologyTerm(value);
 
-            if (ontologyTerm != null){
-            	
-            	termSourceREF = ontologyTerm.getOntologySourceInformation().getSourceName();
-                termAccessionNumber = ontologyTerm.getOntologySourceAccession();
-                organism = ontologyTerm.getOntologyTermName();
-                taxid=termSourceREF + ":" + termAccessionNumber;
-  
-        		// Write sample data
-        	  	// Get the current assay
-            	Assay assay = isaCreatorInfo.getCurrentAssay();
-    			int taxidCol = getSheet().getSpreadsheetFunctions().getModelIndexForColumn("taxid");
-    			int speciesCol = getSheet().getSpreadsheetFunctions().getModelIndexForColumn("species");
+	            if (ontologyTerm != null){
+	            	
+	            	termSourceREF = ontologyTerm.getOntologySourceInformation().getSourceName();
+	                termAccessionNumber = ontologyTerm.getOntologySourceAccession();
+	                organism = ontologyTerm.getOntologyTermName();
+	                taxid=termSourceREF + ":" + termAccessionNumber;
+	  
+	        		// Write sample data
+	        	  	// Get the current assay
+	            	Assay assay = isaCreatorInfo.getCurrentAssay();
+	    			int taxidCol = getSheet().getSpreadsheetFunctions().getModelIndexForColumn("taxid");
+	    			int speciesCol = getSheet().getSpreadsheetFunctions().getModelIndexForColumn("species");
 
-    			int rows = getSheet().getTable().getRowCount();
-    			
-    			// Fill the whole columns....(TODO: why columnumber-2?).
-    			if (!taxid.equals("")) getSheet().getSpreadsheetFunctions().fill(new SpreadsheetCellRange(new int[]{0,rows}, new int[]{taxidCol}), taxid);
-    			if (!organism.equals("")) getSheet().getSpreadsheetFunctions().fill(new SpreadsheetCellRange(new int[]{0,rows}, new int[]{speciesCol}), organism);
-            }
-    	}
+	    			int rows = getSheet().getTable().getRowCount();
+	    			
+	    			// Fill the whole columns....(TODO: why columnumber-2?).
+	    			if (!taxid.equals("")) getSheet().getSpreadsheetFunctions().fill(new SpreadsheetCellRange(new int[]{0,rows}, new int[]{taxidCol}), taxid);
+	    			if (!organism.equals("")) getSheet().getSpreadsheetFunctions().fill(new SpreadsheetCellRange(new int[]{0,rows}, new int[]{speciesCol}), organism);
+	            }
+	    	}
+		
+		}catch (Exception e){
+			logger.error("Theres been an error while importing sample information into the maf file!!!.");
+			logger.error(e);
+		}
     	
     }
 
