@@ -275,7 +275,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <archive>
-                        <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+                        <manifestFile>MANIFEST.MF</manifestFile>
                     </archive>
                     <instructions>
                         <Bundle-Activator>org.isatools.plugins.metabolights.assignments.Activator</Bundle-Activator>

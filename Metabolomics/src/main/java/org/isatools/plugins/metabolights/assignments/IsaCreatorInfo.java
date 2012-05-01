@@ -207,7 +207,8 @@ public class IsaCreatorInfo {
     
     public OntologyTerm getOntologyTerm(String uniqueid){
         
-        return OntologySourceManager.getUserOntologyHistory().get(uniqueid);
+		return null; // Commented until ISACreator exports this package: OntologySourceManager.getUserOntologyHistory().get(uniqueid);
+    	
     }
    
     
