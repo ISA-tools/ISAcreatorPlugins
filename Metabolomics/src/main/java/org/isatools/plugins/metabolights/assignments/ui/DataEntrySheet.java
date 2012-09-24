@@ -2,7 +2,7 @@ package org.isatools.plugins.metabolights.assignments.ui;
 
 import org.isatools.isacreator.common.UIHelper;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
-import org.isatools.isacreator.spreadsheet.TableReferenceObject;
+import org.isatools.isacreator.spreadsheet.model.TableReferenceObject;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 

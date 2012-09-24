@@ -2,7 +2,7 @@ package org.isatools.plugins.metabolights.assignments.io;
 
 import org.apache.xmlbeans.XmlException;
 import org.isatools.isacreator.configuration.io.ConfigXMLParser;
-import org.isatools.isacreator.spreadsheet.TableReferenceObject;
+import org.isatools.isacreator.spreadsheet.model.TableReferenceObject;
 import org.isatools.isatab.configurator.schema.IsaTabConfigFileType;
 import org.isatools.isatab.configurator.schema.IsaTabConfigurationType;
 import org.isatools.isatab.configurator.schema.IsatabConfigFileDocument;

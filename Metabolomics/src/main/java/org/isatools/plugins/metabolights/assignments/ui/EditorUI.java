@@ -8,7 +8,7 @@ import org.isatools.isacreator.effects.AnimatableJFrame;
 import org.isatools.isacreator.effects.FooterPanel;
 import org.isatools.isacreator.effects.HUDTitleBar;
 import org.isatools.isacreator.gui.ISAcreator;
-import org.isatools.isacreator.spreadsheet.TableReferenceObject;
+import org.isatools.isacreator.spreadsheet.model.TableReferenceObject;
 import org.isatools.plugins.metabolights.assignments.MetabolomicsResultEditor;
 import org.isatools.plugins.metabolights.assignments.io.ConfigurationLoader;
 import org.jdesktop.fuse.InjectedResource;
