@@ -33,13 +33,22 @@
 
         <dependency>
             <groupId>org.isatools</groupId>
-            <artifactId>isacreator</artifactId>
-            <version>1.5.0</version>
+            <artifactId>ISAcreator</artifactId>
+            <version>1.7.0</version>
+
         </dependency>
 
     </dependencies>
     <build>
         <plugins>
+
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.felix</groupId>
@@ -66,7 +75,7 @@
 
         <repository>
             <id>oerc</id>
-            <url>http://frog.oerc.ox.ac.uk:8080/artifactory/repo/</url>
+            <url>http://frog.oerc.ox.ac.uk:8080/nexus-2.1.2/content/repositories/ISAtools/</url>
         </repository>
 
     </repositories>
