@@ -2,7 +2,7 @@ package org.isatools.plugins.metabolights.assignments.io;
 
 import org.isatools.isacreator.io.importisa.SpreadsheetImport;
 import org.isatools.isacreator.io.importisa.errorhandling.exceptions.MalformedInvestigationException;
-import org.isatools.isacreator.spreadsheet.TableReferenceObject;
+import org.isatools.isacreator.spreadsheet.model.TableReferenceObject;
 
 import java.io.IOException;
 
