@@ -18,8 +18,6 @@
  */
 package org.isatools.plugins.metabolights.assignments;
 
-import org.isatools.isacreator.plugins.host.service.PluginMenu;
-
 import java.util.Hashtable;
 
 import org.isatools.isacreator.plugins.host.service.PluginSpreadsheetWidget;

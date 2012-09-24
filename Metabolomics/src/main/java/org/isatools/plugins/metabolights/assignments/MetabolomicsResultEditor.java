@@ -1,16 +1,13 @@
 package org.isatools.plugins.metabolights.assignments;
 
 
-import org.isatools.isacreator.ontologyselectiontool.OntologySelectionTool;
 import org.isatools.isacreator.plugins.AbstractPluginSpreadsheetWidget;
 import org.isatools.isacreator.plugins.DefaultWindowListener;
 import org.isatools.isacreator.plugins.registries.SpreadsheetPluginRegistry;
 import org.isatools.plugins.metabolights.assignments.ui.EditorUI;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashSet;
