@@ -12,17 +12,13 @@ import org.isatools.plugins.metabolights.assignments.ui.EditorUI;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
-import java.awt.GraphicsEnvironment;
-import java.awt.Point;
-import java.awt.Rectangle;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 
 public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
 	
@@ -57,16 +53,16 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     @Override
     public void instantiateComponent() {
     	logger.info("instantiateComponent called.");
-    	instantiateComponent(MS);
+    	instantiateComponent(MS, getOriginalValue());
     }
     
-    public void instantiateComponent(String technologyType) {
+    public void instantiateComponent(String technologyType, String fileName) {
     	logger.info("Instantiating the metabolomics plugin");
         editorUI = new EditorUI();
         editorUI.setAmIAlone(!isIsaCreatorLoaded());
 
         if (isIsaCreatorLoaded())
-            editorUI.createGUI(technologyType);
+            editorUI.createGUI(technologyType, fileName);
 
         editorUI.setLocationRelativeTo(null);
         editorUI.setAlwaysOnTop(true);
@@ -119,10 +115,10 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
             //Is this NMR or MS? Load the appropriate xml file (differs where some columns are hidden)
             if (getTechnology().equalsIgnoreCase(NMR)){
             	logger.info("Plugin: Loading the NMR configuration file");
-            	instantiateComponent(NMR);
+            	instantiateComponent(NMR, getOriginalValue());
             } else {
             	logger.info("Plugin: Loading the MS configuration file");
-            	instantiateComponent(MS);    	
+            	instantiateComponent(MS, getOriginalValue());
             }
 
         } catch (Exception e) {

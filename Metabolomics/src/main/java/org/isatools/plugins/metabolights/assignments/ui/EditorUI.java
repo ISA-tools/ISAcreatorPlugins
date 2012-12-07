@@ -9,7 +9,7 @@ import org.isatools.isacreator.effects.FooterPanel;
 import org.isatools.isacreator.effects.HUDTitleBar;
 import org.isatools.isacreator.effects.InfiniteProgressPanel;
 import org.isatools.isacreator.gui.ISAcreator;
-import org.isatools.isacreator.spreadsheet.TableReferenceObject;
+import org.isatools.isacreator.spreadsheet.model.TableReferenceObject;
 import org.isatools.plugins.metabolights.assignments.IsaCreatorInfo;
 import org.isatools.plugins.metabolights.assignments.MetabolomicsResultEditor;
 import org.isatools.plugins.metabolights.assignments.io.ConfigurationLoader;
@@ -55,6 +55,16 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
         return isaCreatorInfo;
     }
 
+    private boolean version1File = false;
+
+    public boolean isVersion1File() {
+        return version1File;
+    }
+
+    private void setVersion1File(boolean version1File) {
+        this.version1File = version1File;
+    }
+
     /*
     A public method to return the version of this plugin, can be use by the ISAcreator to provide an "update plugin function"
      */
@@ -79,7 +89,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
         ResourceInjector.get("metabolights-fileeditor-package.style").inject(this);
     }
 
-    public void createGUI(String technologyType) {
+    public void createGUI(String technologyType, String fileName) {
 
         logger.info("Metabolomics plugin starting up");
 
@@ -99,7 +109,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 
         ((JComponent) getContentPane()).setBorder(new EtchedBorder(UIHelper.LIGHT_GREEN_COLOR, UIHelper.LIGHT_GREEN_COLOR));
 
-        createCentralPanel(technologyType);
+        createCentralPanel(technologyType, fileName);
 
         createSouthPanel();
 
@@ -109,18 +119,38 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
         
         pack();
     }
+
     // Configures the progress triggered.
     private void configureProgressTrigger(){
-    	
-    	progressTrigger.addPropertyChangeListener(this);
-    	
-    }
-    private void createCentralPanel(String technologyType) {
 
-        TableReferenceObject tableReferenceObject = loadConfiguration(technologyType);
+    	progressTrigger.addPropertyChangeListener(this);
+    }
+
+    private void createCentralPanel(String technologyType, String fileName) {
+
+        TableReferenceObject tableReferenceObject = loadConfiguration(technologyType, fileName);
         DataEntrySheet sheet = new DataEntrySheet(EditorUI.this,
                 getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject));  //Add sample columns to the table definition
+
+        //Check if we have a filename first
+        if ( fileName.length() >= 2 ){
+            String path = getIsaCreatorInfo().getFileLocation();     //Where the ISA archive is stored
+
+            //Do we need to add the path?
+            if (fileName.contains(path))
+                sheet.setFileName(fileName);
+            else
+                sheet.setFileName(path + "/" + fileName);
+
+            if (fileName.contains(".csv")){
+                setVersion1File(true);
+                sheet.setVersion1File(isVersion1File());     //Can in the next version test for the string "_v2_maf.tsv" in the filename
+            }
+
+        }
+
         sheet.createGUI();
+
         add(sheet, BorderLayout.CENTER);
         
         // Check if he ISACreator is available
@@ -172,21 +202,25 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
     
     public static void main(String[] args) {
         EditorUI ui = new EditorUI();
-        ui.createGUI(MetabolomicsResultEditor.MS);
+        ui.createGUI(MetabolomicsResultEditor.MS, null);
 
         ui.setVisible(true);
     }
 
-    private TableReferenceObject loadConfiguration(String techologyType) {
+    private TableReferenceObject loadConfiguration(String techologyType, String fileName) {
         ConfigurationLoader loader = new ConfigurationLoader();
 
         try {
-        	
-        	if (techologyType.equals(MetabolomicsResultEditor.MS)){
-        		return loader.loadConfigurationXML();
-        	} else {
-        		return loader.loadNMRConfigurationXML();
-        	}
+
+            if (fileName.contains(".csv") || isVersion1File()){           //TODO, should not have to test for the filename here, just the isVersionXXXFile methods
+                return loader.loadGenericConfig(1,techologyType);
+            } else {
+
+                if (techologyType.equals(MetabolomicsResultEditor.MS))
+                    return loader.loadConfigurationXML();
+                else
+                    return loader.loadNMRConfigurationXML();
+            }
 
 
         } catch (XmlException e) {

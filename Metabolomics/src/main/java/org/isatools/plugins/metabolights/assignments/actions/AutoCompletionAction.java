@@ -3,27 +3,30 @@ package org.isatools.plugins.metabolights.assignments.actions;
 import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub;
 import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub.DocSumType;
 import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub.ItemType;
+import org.apache.log4j.Logger;
 import org.isatools.plugins.metabolights.assignments.model.Metabolite;
 import org.isatools.plugins.metabolights.assignments.model.OptionalMetabolitesList;
 import org.isatools.plugins.metabolights.assignments.model.RemoteInfo;
 import org.isatools.plugins.metabolights.assignments.model.RemoteInfo.remoteProperties;
 import org.isatools.plugins.metabolights.assignments.ui.ProgressTrigger;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.AbstractAction;
-import javax.swing.JTable;
-import javax.swing.SwingUtilities;
-
 public class AutoCompletionAction extends AbstractAction {
-	
-	public static final String IDENTIFIER_COL_NAME = "identifier";
-	public static final String FORMULA_COL_NAME = "chemical_formula";
-	public static final String DESCRIPTION_COL_NAME = "description";
 
-	CellToAutoComplete source;
+    private static Logger logger = Logger.getLogger(AutoCompletionAction.class);
+	
+	public static final String IDENTIFIER_COL_NAME = "database_identifier";       //Changed from identifier
+	public static final String FORMULA_COL_NAME = "chemical_formula";
+	public static final String DESCRIPTION_COL_NAME = "metabolite_identification";   //Changed from identification
+    public static final String INCHI = "inchi";                  //mzTAB define the InChIKey, but this is not really useful so we adopt InChI instead
+    public static final String SMILES = "smiles";
+
+
+    CellToAutoComplete source;
 	JTable table;
 	String currentCellValue;
 	ProgressTrigger progressTrigger;
@@ -37,7 +40,7 @@ public class AutoCompletionAction extends AbstractAction {
 		this.progressTrigger = progressTrigger;
 	}
 
-	public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {
 		
 		//Get the object that has generated the event
 		source = (CellToAutoComplete) e.getSource();
@@ -70,11 +73,13 @@ public class AutoCompletionAction extends AbstractAction {
 		
 		// If metabolite is null there is nothing to fill
 		if (met == null) return;
-		
-		setColumn(DESCRIPTION_COL_NAME, met.getDescription() );
+
 		setColumn(FORMULA_COL_NAME, met.getFormula() );
-		setColumn(IDENTIFIER_COL_NAME, met.getIdentifier() );
-		
+        setColumn(DESCRIPTION_COL_NAME, met.getDescription() );
+        setColumn(IDENTIFIER_COL_NAME, met.getIdentifier() );
+        setColumn(INCHI, met.getInchi());
+        setColumn(SMILES, met.getSmiles());
+
 		table.validate();
 		
 	}
@@ -98,11 +103,13 @@ public class AutoCompletionAction extends AbstractAction {
 		if (source.getForce()) return true;
 		
 		int emptyCells = 0;
-		
-		if (isColumnEmpty(DESCRIPTION_COL_NAME)) emptyCells++;
-		if (isColumnEmpty(FORMULA_COL_NAME)) emptyCells++;
-		if (isColumnEmpty(IDENTIFIER_COL_NAME)) emptyCells++;
-		
+
+        if (isColumnEmpty(FORMULA_COL_NAME)) emptyCells++;
+        if (isColumnEmpty(DESCRIPTION_COL_NAME)) emptyCells++;
+        if (isColumnEmpty(IDENTIFIER_COL_NAME)) emptyCells++;
+        if (isColumnEmpty(SMILES)) emptyCells++;
+        if (isColumnEmpty(INCHI)) emptyCells++;
+
 		return (emptyCells>0);
 	}
     
@@ -168,7 +175,7 @@ public class AutoCompletionAction extends AbstractAction {
     }
 
 	public static String getPubChemFieldName(String columnName){
-		
+
 		if (DESCRIPTION_COL_NAME.equals(columnName)){
 			return RemoteInfo.getProperty(remoteProperties.PUBCHEMFIELD_FOR_DESCRIPTION);
 		} else if (FORMULA_COL_NAME.equals(columnName)){
@@ -217,7 +224,7 @@ public class AutoCompletionAction extends AbstractAction {
     	   }
 
 
-    	   EUtilsServiceStub service = new EUtilsServiceStub();
+           logger.info("call NCBI ESearch utility");
 
     	   // call NCBI ESearch utility
            // NOTE: search term should be URL encoded
@@ -232,6 +239,7 @@ public class AutoCompletionAction extends AbstractAction {
            modifiedTerm = modifiedTerm + "[" + field + "]";
            req.setTerm(modifiedTerm);
 
+           EUtilsServiceStub service = new EUtilsServiceStub();
            // Get the first one
            req.setRetMax(RemoteInfo.getProperty(remoteProperties.PUBCHEM_MAX_RECORD));
            EUtilsServiceStub.ESearchResult res = service.run_eSearch(req);
@@ -389,7 +397,12 @@ public class AutoCompletionAction extends AbstractAction {
 //		    		   
 //					   met.setDescription(it.getItem()[0].getItemContent());
 //				   }
-			   }
+			   } else if ("CanonicalSmiles".equals(name)){
+                   met.setSmiles(it.getItemContent());
+               } else if ("InChI".equals(name)){
+                   met.setInchi(it.getItemContent());
+               }
+
 		   }
 		   
 		   // If we don't have a ideal id
@@ -465,4 +478,5 @@ public class AutoCompletionAction extends AbstractAction {
 		
 		
 	}
+
 }

@@ -12,9 +12,8 @@ import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.model.Investigation;
 import org.isatools.isacreator.model.Study;
 import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
-import org.isatools.isacreator.ontologyselectiontool.OntologySourceManager;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
-import org.isatools.isacreator.spreadsheet.TableReferenceObject;
+import org.isatools.isacreator.spreadsheet.model.TableReferenceObject;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.File;
@@ -122,8 +121,12 @@ public class IsaCreatorInfo {
 
         Set<String> currentSet = new ListOrderedSet<String>();
 
-        if (getIsacreator() != null && getCurrentAssay() != null && columnNumber != null)
-           currentSet = SpreadsheetUtils.getDataInColumn(getCurrentAssay().getSpreadsheetUI().getTable(), columnNumber);
+        if (getIsacreator() != null && getCurrentAssay() != null && columnNumber != null){
+
+            Spreadsheet spreadsheet = getCurrentAssay().getSpreadsheetUI().getSpreadsheet();
+            currentSet = SpreadsheetUtils.getDataInColumn(spreadsheet, columnNumber);
+
+        }
 
        return currentSet;
 
@@ -195,7 +198,7 @@ public class IsaCreatorInfo {
                 String sampleName = (String) iter.next();
                    if (!newSheet.getSpreadsheetFunctions().checkColumnExists(sampleName) && sampleName.length() > 0){
                         logger.debug("Adding optional column to the spreadsheet:" + sampleName);
-                        newSheet.getSpreadsheetFunctions().addColumn(sampleName);
+                        newSheet.getSpreadsheetFunctions().addColumn(sampleName, true);
                    } else {
                        logger.debug("Sample column already exists in the spreadsheet:" + sampleName);
                    }

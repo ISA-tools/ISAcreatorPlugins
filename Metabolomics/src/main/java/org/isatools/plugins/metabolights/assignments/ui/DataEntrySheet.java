@@ -3,42 +3,26 @@ package org.isatools.plugins.metabolights.assignments.ui;
 import org.apache.log4j.Logger;
 import org.isatools.isacreator.apiutils.SpreadsheetUtils;
 import org.isatools.isacreator.common.UIHelper;
-import org.isatools.isacreator.effects.InfiniteProgressPanel;
 import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
-import org.isatools.isacreator.spreadsheet.CopyPasteObserver;
-import org.isatools.isacreator.spreadsheet.Spreadsheet;
-import org.isatools.isacreator.spreadsheet.SpreadsheetCell;
-import org.isatools.isacreator.spreadsheet.SpreadsheetCellRange;
-import org.isatools.isacreator.spreadsheet.SpreadsheetEvent;
-import org.isatools.isacreator.spreadsheet.TableReferenceObject;
+import org.isatools.isacreator.spreadsheet.*;
+import org.isatools.isacreator.spreadsheet.model.TableReferenceObject;
 import org.isatools.plugins.metabolights.assignments.IsaCreatorInfo;
+import org.isatools.plugins.metabolights.assignments.TableCellListener;
 import org.isatools.plugins.metabolights.assignments.actions.AutoCompletionAction;
 import org.isatools.plugins.metabolights.assignments.actions.CellToAutoComplete;
 import org.isatools.plugins.metabolights.assignments.actions.CopyPasteAdaptor;
 import org.isatools.plugins.metabolights.assignments.actions.SelectionRunner;
-import org.isatools.plugins.metabolights.assignments.TableCellListener;
+import org.isatools.plugins.metabolights.assignments.io.ConfigurationLoader;
 import org.isatools.plugins.metabolights.assignments.io.FileLoader;
 import org.isatools.plugins.metabolights.assignments.io.FileWriter;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.ImageIcon;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.table.TableColumn;
-
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 
@@ -58,7 +42,10 @@ public class DataEntrySheet extends JPanel {
 
     private Spreadsheet sheet;
     private EditorUI parentFrame;
+
     private TableReferenceObject tableReferenceObject;
+
+    private ConfigurationLoader configurationLoader;
 
     private String fileName;
     private JLabel info;
@@ -66,14 +53,35 @@ public class DataEntrySheet extends JPanel {
     private boolean autocomplete= true;
     private boolean forceAutoComplete=false;
     
-    
-
-	public static String TAXID = "taxid";
+    public static String TAXID = "taxid";
     public static String SPECIES = "species";
     public static String SPECIEFIELD = "Characteristics[organism]";
     private boolean forceSpecieImport = false;
 
-	private IsaCreatorInfo isaCreatorInfo;
+    private boolean version1File = false;
+
+    private IsaCreatorInfo isaCreatorInfo;
+
+
+    public TableReferenceObject getTableReferenceObject() {
+        // if (isVersion1File()) {   //Return old style filename
+        //     String technologyType = getIsaCreatorInfo().getCurrentAssay().getTechnologyType();
+        //     tableReferenceObject = getConfigurationLoader().loadGenericConfig(1,technologyType);
+        // }
+        return tableReferenceObject;
+    }
+
+    public void setTableReferenceObject(TableReferenceObject tableReferenceObject) {
+        this.tableReferenceObject = tableReferenceObject;
+    }
+
+    private boolean isVersion1File() {
+        return version1File;
+    }
+
+    public void setVersion1File(boolean version1File) {
+        this.version1File = version1File;
+    }
 	
 	public boolean isForceAutoComplete() {
 		return forceAutoComplete;
@@ -82,10 +90,17 @@ public class DataEntrySheet extends JPanel {
 	public void setForceAutoComplete(boolean forceAutoComplete) {
 		this.forceAutoComplete = forceAutoComplete;
 	}
+
     private IsaCreatorInfo getIsaCreatorInfo() {
         if (isaCreatorInfo == null)
             isaCreatorInfo = new IsaCreatorInfo();
         return isaCreatorInfo;
+    }
+
+    private ConfigurationLoader getConfigurationLoader() {
+        if (configurationLoader == null)
+            configurationLoader = new ConfigurationLoader();
+        return configurationLoader;
     }
 
     @InjectedResource
@@ -93,10 +108,10 @@ public class DataEntrySheet extends JPanel {
     					okIcon,	okIconOver, importSpecieIcon, importSpecieIconOver,
     					getIdIcon, getIdIconOver, selectedIcon, unSelectedIcon;
 
-    public DataEntrySheet(EditorUI parentFrame, TableReferenceObject tableReferenceObject) {
+    public DataEntrySheet(EditorUI parentFrame, TableReferenceObject referenceObject) {
         ResourceInjector.get("metabolights-fileeditor-package.style").inject(this);
         this.parentFrame = parentFrame;
-        this.tableReferenceObject = tableReferenceObject;
+        setTableReferenceObject(referenceObject);
         setLayout(new BorderLayout());
         setBackground(UIHelper.BG_COLOR);
     }
@@ -104,13 +119,25 @@ public class DataEntrySheet extends JPanel {
     public Spreadsheet getSheet(){
     	return sheet;
     }
-    
-    public TableReferenceObject getTableReferenceObject() {
-		return tableReferenceObject;
-	}
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getFileName(){
+        // if we do not have the property already set or of the file is just the base directory
+        if (this.fileName == null || this.fileName.endsWith("/")){    //TODO, use isDirectory()
+            calculateFileName();     //Use the new style tsv file
+        }
+
+        return fileName;
+    }
+
+
 
 	public void createGUI() {
-        sheet = new Spreadsheet(parentFrame, getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject), "");  // Add the sample columns to the definition
+
+        sheet = new Spreadsheet(parentFrame, getIsaCreatorInfo().addTableRefSampleColumns(getTableReferenceObject()), "");  // Add the sample columns to the definition
         createTopPanel();
         add(getIsaCreatorInfo().addSpreadsheetSampleColumns(sheet), BorderLayout.CENTER);  // Add the sample columns to the spreadsheet
         createBottomPanel();
@@ -118,22 +145,26 @@ public class DataEntrySheet extends JPanel {
         // Add a listener to the changes of the table
         addChangesListener();
         
-        // Add custom cell editors
-        addCustomCellEditors();
+        // Add custom cell editors only if the latest fileformat is active
+        if (!isVersion1File())
+            addCustomCellEditors();
     }
 	
 	private void addCustomCellEditors(){
 
 		// Add a metabolite cell editor to Description column
-		addMetaboliteCellEditorToColumn(AutoCompletionAction.DESCRIPTION_COL_NAME);
-
+        addMetaboliteCellEditorToColumn(AutoCompletionAction.DESCRIPTION_COL_NAME);
 		
 		// Add a metabolite cell editor to Formula column
 		addMetaboliteCellEditorToColumn(AutoCompletionAction.FORMULA_COL_NAME);
-		
-		// Add Link style cell to Identifiers
-		int colindex  = sheet.getTable().getColumnModel().getColumnIndex(AutoCompletionAction.IDENTIFIER_COL_NAME);
-		TableColumn col = sheet.getTable().getColumnModel().getColumn(colindex);
+
+        int colindex = 0;
+
+        // Add Link style cell to Identifiers
+        colindex  = sheet.getTable().getColumnModel().getColumnIndex(AutoCompletionAction.IDENTIFIER_COL_NAME);
+
+
+        TableColumn col = sheet.getTable().getColumnModel().getColumn(colindex);
 
 		// non-editing state
 		MetaboliteLinkCellRenderer mlcr = new MetaboliteLinkCellRenderer(); 
@@ -142,6 +173,7 @@ public class DataEntrySheet extends JPanel {
 
 		
 	}
+
 	private void addMetaboliteCellEditorToColumn(String columnName){
 		
 		int colindex  = sheet.getTable().getColumnModel().getColumnIndex(columnName);
@@ -152,13 +184,16 @@ public class DataEntrySheet extends JPanel {
 		col.setCellRenderer(new MetaboliteCellRenderer()); 
 		
 	}
+
     public void addChangesListener(){
     	Action action = new AbstractAction()
     	{
     		public void actionPerformed(ActionEvent e)
     	    {
-    			
-    			if (!autocomplete) return;
+
+                if ( isVersion1File() ) return;  //TODO, determine if this should be supported.  Quick fix, only new versions of the id file can use the NCBI PubChem lookup
+
+                if ( !autocomplete ) return;  //Have the user turned off the autocomplete
     			
     	        TableCellListener tcl = (TableCellListener)e.getSource();
 
@@ -167,7 +202,7 @@ public class DataEntrySheet extends JPanel {
                 
                 // Add a progress trigger to the action
                 aca.setProgressTrigger(parentFrame.getProgressTrigger());
-                
+
                 aca.actionPerformed(new ActionEvent(new CellToAutoComplete(tcl.getTable(), tcl.getRow(), tcl.getColumn(), forceAutoComplete),1,"CELL_CHANGED"));
                 
                 // Force will be true after selecting a metabolite from the list of the MetaboliteCellEditor,
@@ -261,6 +296,7 @@ public class DataEntrySheet extends JPanel {
 
     	
     }
+
     public void createTopPanel() {
         
     	// Create the top container
@@ -276,8 +312,8 @@ public class DataEntrySheet extends JPanel {
 
         // Add a checkbox for activate/de-activate auto-completion.
         final JCheckBox autocompleteCheck = new JCheckBox();
-        autocompleteCheck.setText("Deactivate Metabolite search:");
-        autocompleteCheck.setToolTipText("Activate autocomplete if you want to have related cells autocompleted after a cell is edited.");
+        autocompleteCheck.setText("Automatic metabolite search:");
+        autocompleteCheck.setToolTipText("Activate automatic metabolite search if you want to have related cells updated after a cell is edited");
         autocompleteCheck.setIcon(unSelectedIcon);
         autocompleteCheck.setSelectedIcon(selectedIcon);
         autocompleteCheck.setSelected(autocomplete);
@@ -288,11 +324,17 @@ public class DataEntrySheet extends JPanel {
 			public void itemStateChanged(ItemEvent arg0) {
 				// Change the autocomplete variable.
         		autocomplete = autocompleteCheck.isSelected();
-        		
-        		autocompleteCheck.setText(autocomplete?"Deactivate Metabolite search:":"Activate Metabolite search:");
+        		//autocompleteCheck.setText(autocomplete?"Deactivate Metabolite search:":"Activate Metabolite search:");
 			}
-        });
-        
+         });
+
+        if (isVersion1File()){     //True if version 1, false if any new version
+            autocompleteCheck.setToolTipText(" NB! ONLY works with newer versions of the metabolite identification file. Please contact metabolights-help@ebi.ac.uk if you want an updated version for your study");
+            autocompleteCheck.setEnabled(false);
+        }
+
+
+
         // Add the check box to the container
         buttonContainer.add(Box.createHorizontalStrut(5));
     	buttonContainer.add (autocompleteCheck);
@@ -361,15 +403,7 @@ public class DataEntrySheet extends JPanel {
       	topContainer.add(buttonContainer, BorderLayout.EAST);
         add(topContainer, BorderLayout.NORTH);
     }
-   	
-     private String getFileName(){
 
-    	// if we do not have the property already set
-    	if (fileName == null){
-    		calculateFileName();
-    	}
-    	return fileName;
-    }
     @SuppressWarnings("static-access")
 	private void calculateFileName(){
     	
@@ -383,17 +417,18 @@ public class DataEntrySheet extends JPanel {
     		
     		// Remove the extension
     		assayName = assayName.substring(0, assayName.length()-4);
-    		
-    		// Add a asigmentfile sufix
-    		assayName = assayName + "_maf.csv";
-    		
+
+            //Make sure the filename starts with m_ not a_ (a_ = Assay, s_ = Study, i_ Investigation, so we adopt m_ = metabolite)
+            assayName = assayName.replaceFirst("a_","m_") + "_v2_maf.tsv";
+
     		// Compose the final file name
 			fileName = path + (new File(".")).separator + assayName;
     		
-    		
     	} else {
+
     		fileName = parentFrame.getCurrentCellValue();
     	}
+
     }
 
     private void saveFile(){
@@ -420,8 +455,13 @@ public class DataEntrySheet extends JPanel {
             logger.info("Trying to load the metabolite assignment file: " + fn);
 
             FileLoader fl = new FileLoader();
-        	tableReferenceObject = fl.loadFile(getFileName(), tableReferenceObject);
-            Spreadsheet loadedSheet = new Spreadsheet(parentFrame, getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject),"");   //To map the columns that we load from the file
+
+            try {
+                setTableReferenceObject(fl.loadFile(fn, getTableReferenceObject()));
+            } catch (Exception e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+            Spreadsheet loadedSheet = new Spreadsheet(parentFrame, getIsaCreatorInfo().addTableRefSampleColumns(getTableReferenceObject()),"");   //To map the columns that we load from the file
         	updateSpreadsheet(getIsaCreatorInfo().addSpreadsheetSampleColumns(loadedSheet));  // Load the existing spreadsheet and add any new sample columns
         }
 
@@ -439,7 +479,10 @@ public class DataEntrySheet extends JPanel {
         logger.info("Adding the new sheet");
         sheet = newSpreadsheet;
         addChangesListener();
-        addCustomCellEditors();
+
+        if (!isVersion1File())  //Only add if new TSV fileformat is present
+            addCustomCellEditors();
+
         add(getIsaCreatorInfo().addSpreadsheetSampleColumns(sheet),BorderLayout.CENTER);  //Add all missing sample columns to the spreadsheet
         validate();
         
@@ -470,10 +513,8 @@ public class DataEntrySheet extends JPanel {
      *  species --> "Characteristics[organism]"	
      */
     public void importSampleData(){
-    	
-    	
+
 		try{
-			
 			
 			System.out.println("Importing sample data");
 			logger.info("Importing sample data");
@@ -485,9 +526,9 @@ public class DataEntrySheet extends JPanel {
 
 	    		String termSourceREF="", termAccessionNumber="", organism = "", taxid="";
 	    		
-	    		int column = studySample.getSpreadsheetUI().getTable().getSpreadsheetFunctions().getModelIndexForColumn(SPECIEFIELD);
+	    		int column = studySample.getSpreadsheetUI().getSpreadsheet().getSpreadsheetFunctions().getModelIndexForColumn(SPECIEFIELD);
 	    	   	   		
-	    		SpreadsheetCell cell = (SpreadsheetCell)studySample.getSpreadsheetUI().getTable().getTable().getValueAt(0, column); 
+	    		SpreadsheetCell cell = (SpreadsheetCell) studySample.getSpreadsheetUI().getSpreadsheet().getTable().getValueAt(0, column);
 	    		
 	    		String value = cell.toString();
 
@@ -542,9 +583,9 @@ public class DataEntrySheet extends JPanel {
 
         String value = null;
     	
-		int column = studySample.getSpreadsheetUI().getTable().getSpreadsheetFunctions().getModelIndexForColumn(SPECIEFIELD);
+		int column = studySample.getSpreadsheetUI().getSpreadsheet().getSpreadsheetFunctions().getModelIndexForColumn(SPECIEFIELD);
 
-		SpreadsheetCell cell = (SpreadsheetCell)studySample.getSpreadsheetUI().getTable().getTable().getValueAt(0, column);
+		SpreadsheetCell cell = (SpreadsheetCell)studySample.getSpreadsheetUI().getSpreadsheet().getTable().getValueAt(0, column);
 
         if (cell != null)
 		    value = cell.toString();
