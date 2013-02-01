@@ -47,7 +47,8 @@ public class DataEntrySheet extends JPanel {
 
     private ConfigurationLoader configurationLoader;
 
-    private String fileName;
+    private String fileName = null;
+    private String fileNameNoPath = null;
     private JLabel info;
     
     private boolean autocomplete= true;
@@ -274,7 +275,9 @@ public class DataEntrySheet extends JPanel {
             	SpreadsheetUtils.stopCellEditingInTable(sheet.getTable());
             	
             	saveFile();
-            	parentFrame.setCurrentCellValue(fileName);
+                if (parentFrame.getCurrentCellValue().isEmpty())
+            	    parentFrame.setCurrentCellValue(fileNameNoPath);         //fileName
+
             	parentFrame.confirm();
             }
             @Override
@@ -422,11 +425,13 @@ public class DataEntrySheet extends JPanel {
             assayName = assayName.replaceFirst("a_","m_") + "_v2_maf.tsv";
 
     		// Compose the final file name
-			fileName = path + (new File(".")).separator + assayName;
+			fileName = path + (new File(".")).separator + assayName;   //Problem with file separators and the File class, we could use "/"
+            fileNameNoPath = assayName;                             //Do we need the path?
     		
     	} else {
 
     		fileName = parentFrame.getCurrentCellValue();
+            fileNameNoPath = fileName;
     	}
 
     }
@@ -437,7 +442,9 @@ public class DataEntrySheet extends JPanel {
         FileWriter fw = new FileWriter();
         
         try {
-			fw.writeFile(getFileName(), sheet);
+            System.out.println("file separator check before writing file: " +System.getProperty("file.separator"));
+            fw.writeFile(getFileName(), sheet);
+
 		} catch (FileNotFoundException e) {
             logger.error(e.getMessage().toString());
 			e.printStackTrace();
