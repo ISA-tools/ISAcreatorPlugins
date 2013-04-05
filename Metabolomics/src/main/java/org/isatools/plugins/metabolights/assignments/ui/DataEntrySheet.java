@@ -540,6 +540,7 @@ public class DataEntrySheet extends JPanel {
 	    		String value = cell.toString();
 
 	    		logger.info("Importing sample data to metabolights plugin: " + value);
+                System.out.println("Importing sample data to metabolights plugin: " + value);
 	    		
 	            OntologyTerm ontologyTerm = isaCreatorInfo.getOntologyTerm(value);
 

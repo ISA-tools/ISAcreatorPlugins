@@ -11,6 +11,7 @@ import org.isatools.isacreator.gui.ISAcreator;
 import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.model.Investigation;
 import org.isatools.isacreator.model.Study;
+import org.isatools.isacreator.ontologymanager.OntologyManager;
 import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
 import org.isatools.isacreator.spreadsheet.Spreadsheet;
 import org.isatools.isacreator.spreadsheet.model.TableReferenceObject;
@@ -209,8 +210,9 @@ public class IsaCreatorInfo {
     }
     
     public OntologyTerm getOntologyTerm(String uniqueid){
-        
-		return null; // Commented until ISACreator exports this package: OntologySourceManager.getUserOntologyHistory().get(uniqueid);
+
+        OntologyTerm ontologyTerm = OntologyManager.getUserOntologyHistory().get(uniqueid);
+		return ontologyTerm;
     	
     }
    
