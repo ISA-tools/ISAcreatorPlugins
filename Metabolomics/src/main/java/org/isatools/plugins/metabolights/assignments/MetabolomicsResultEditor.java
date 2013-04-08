@@ -1,43 +1,76 @@
 package org.isatools.plugins.metabolights.assignments;
 
 
-import org.isatools.isacreator.ontologyselectiontool.OntologySelectionTool;
+import org.apache.log4j.Logger;
+import org.isatools.isacreator.gui.ISAcreator;
+import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.plugins.AbstractPluginSpreadsheetWidget;
 import org.isatools.isacreator.plugins.DefaultWindowListener;
 import org.isatools.isacreator.plugins.registries.SpreadsheetPluginRegistry;
+import org.isatools.plugins.metabolights.assignments.io.ConfigurationLoader;
 import org.isatools.plugins.metabolights.assignments.ui.EditorUI;
+import org.jdesktop.fuse.InjectedResource;
+import org.jdesktop.fuse.ResourceInjector;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Set;
 
 public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
-
-    public static int WIDTH = 700;
+	
+	private static final long serialVersionUID = 1699770979608557533L;
+	public static final String NMR = "NMR spectroscopy";
+	public static final String MS = "mass spectrometry";
+	
+	private static Logger logger = Logger.getLogger(MetabolomicsResultEditor.class);
+	
+	public static int WIDTH = 700;
     public static int HEIGHT = 400;
+    private IsaCreatorInfo isaCreatorInfo;
 
-    EditorUI editorUI;
+    private EditorUI editorUI;
+    private ConfigurationLoader configurationLoader;
+    
+    @InjectedResource
+    private ImageIcon logo;
+
+    public ConfigurationLoader getConfigurationLoader() {
+        if (configurationLoader == null)
+            configurationLoader = new ConfigurationLoader();
+        return configurationLoader;
+    }
 
     public MetabolomicsResultEditor() {
         super();
+        ResourceInjector.get("metabolights-fileeditor-package.style").inject(this);
+        logger.info("MetabolomicsResultEditor constructor invoked");
     }
 
     @Override
     public void instantiateComponent() {
+    	logger.info("instantiateComponent called.");
+    	instantiateComponent(MS, getOriginalValue());
+    }
+    
+    public void instantiateComponent(String technologyType, String fileName) {
+    	logger.info("Instantiating the metabolomics plugin");
         editorUI = new EditorUI();
-        editorUI.createGUI();
+        editorUI.setAmIAlone(!isIsaCreatorLoaded());
+
+        if (isIsaCreatorLoaded())
+            editorUI.createGUI(technologyType, fileName);
+
         editorUI.setLocationRelativeTo(null);
         editorUI.setAlwaysOnTop(true);
 
         editorUI.addPropertyChangeListener("confirm",
                 new PropertyChangeListener() {
                     public void propertyChange(PropertyChangeEvent evt) {
-                        System.out.println("Cell editing confirmed");
+                        logger.info("Cell editing confirmed");
                         setCellValue(getCellValue());
                         stopCellEditing();
                     }
@@ -45,7 +78,7 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
         editorUI.addPropertyChangeListener("cancel",
                 new PropertyChangeListener() {
                     public void propertyChange(PropertyChangeEvent evt) {
-                        System.out.println("Cell editing cancelled");
+                        logger.info("Cell editing cancelled");
                         setCellValue(getOriginalValue());
                         cancelCellEditing();
                     }
@@ -54,7 +87,7 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
         editorUI.addWindowListener(new DefaultWindowListener() {
 
             public void windowDeactivated(WindowEvent event) {
-                System.out.println("Cell editing cancelled");
+                logger.info("Cell editing cancelled");
                 setCellValue(editorUI.getNewCellValue());
                 cancelCellEditing();
             }
@@ -68,9 +101,34 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
 
     @Override
     public void showComponent() {
-        System.out.println("Original value of cell is " + getOriginalValue());
+       	
+    	logger.info("Plugin: Checking which configuration file to load");
+
+    	
+    	// Check if the component can't be shown
+    	if (!canComponentBeShown()){
+            displayMessage("You must save your study once before your can assign metabolites");
+    		return;
+    	}
+    	
+        try {
+            //Is this NMR or MS? Load the appropriate xml file (differs where some columns are hidden)
+            if (getTechnology().equalsIgnoreCase(NMR)){
+            	logger.info("Plugin: Loading the NMR configuration file");
+            	instantiateComponent(NMR, getOriginalValue());
+            } else {
+            	logger.info("Plugin: Loading the MS configuration file");
+            	instantiateComponent(MS, getOriginalValue());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();  
+        } 
+        
+        logger.info("Original value of cell is " + getOriginalValue());
         editorUI.setCurrentCellValue(getOriginalValue());
-        editorUI.setVisible(true);
+        editorUI.setVisible(true);    
+
     }
 
     @Override
@@ -104,15 +162,76 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     }
 
     public void deregisterCellEditor() {
-        SpreadsheetPluginRegistry.registerPlugin(this);
+        SpreadsheetPluginRegistry.deregisterPlugin(this);
     }
 
     public Set<String> targetColumns() {
         Set<String> targetColumns = new HashSet<String>();
         targetColumns.add("Metabolite Assignment File");
-        targetColumns.add("Sample Name");
+        //targetColumns.add("Sample Name");
         return targetColumns;
     }
+
+
+    public IsaCreatorInfo getIsaCreatorInfo() {
+        if (isaCreatorInfo == null)
+            isaCreatorInfo = new IsaCreatorInfo();
+        return isaCreatorInfo;
+    }
+
+    private Assay getAssay(){
+
+        Assay assay = getIsaCreatorInfo().getCurrentAssay();
+
+        if (assay == null)
+            return new Assay();
+
+        return assay;
+    }
+
+    private String getTechnology(){
+           //Get the current assay
+        Assay assay = getAssay();
+        logger.info("The current Assay is "+assay.getIdentifier());
+
+        //Get the Technology type from the assay NMR or MS
+        String technology = assay.getTechnologyType();
+        logger.info("The current Assay Technology type is "+technology);
+
+        return technology;
+    }
+
+    private boolean isIsaCreatorLoaded(){
+    	return (getIsaCreatorInfo().getIsacreator() != null);
+    }
+
+    private boolean canComponentBeShown(){
+    	// If IsaCreator is not available...
+    	if (!isIsaCreatorLoaded()){
+    		return false;
+    	// If the data has not been saved yet,...
+    	} else if (getIsaCreatorInfo().getFileLocation() == null){
+    		return false;
+    	} else {
+    		return true;
+    	}
+    }
+
+    public void displayMessage(String message) {
+        final ISAcreator currentInstance = getIsaCreatorInfo().getIsacreator();
+            JOptionPane pane = new JOptionPane(message, JOptionPane.WARNING_MESSAGE);
+            pane.setIcon(logo);
+            pane.addPropertyChangeListener(new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent event) {
+                    if (event.getPropertyName().equals(JOptionPane.VALUE_PROPERTY)) {
+                        currentInstance.hideSheet();
+                    }
+                }
+            });
+
+            currentInstance.showJDialogAsSheet(pane.createDialog("MetaboLights Plugin"));
+    }
+
 
 
 }

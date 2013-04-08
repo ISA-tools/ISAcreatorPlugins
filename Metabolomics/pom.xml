@@ -1,74 +1,638 @@
-<!--
- Licensed to the Apache Software Foundation (ASF) under one
- or more contributor license agreements.  See the NOTICE file
- distributed with this work for additional information
- regarding copyright ownership.  The ASF licenses this file
- to you under the Apache License, Version 2.0 (the
- "License"); you may not use this file except in compliance
- with the License.  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing,
- software distributed under the License is distributed on an
- "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- KIND, either express or implied.  See the License for the
- specific language governing permissions and limitations
- under the License.
--->
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <packaging>bundle</packaging>
     <name>Plugin to provide ability to edit small molecule description data in ISAcreator.</name>
-    <description>Test</description>
+    <description>Plugin to provide ability to edit small molecule description data in ISAcreator.</description>
     <groupId>org.isatools.plugins.metabolights</groupId>
     <artifactId>metabolomics</artifactId>
-    <version>0.1</version>
+    <version>1.6.2</version>
+
+    <properties>
+        <axis2.definition>org.apache.axis2</axis2.definition>
+        <axis2.version>1.5.2</axis2.version>
+        <axiom.version>1.2.12</axiom.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.felix</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <version>1.4.0</version>
+            <artifactId>org.apache.felix.main</artifactId>
+            <version>1.8.0</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>org.apache.felix.shell</artifactId>
+                    <groupId>org.apache.felix</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
+        <dependency>
+        	<groupId>commons-httpclient</groupId>
+        	<artifactId>commons-httpclient</artifactId>
+        	<version>3.1</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+        	<exclusions>
+        		<exclusion>
+        			<artifactId>commons-logging</artifactId>
+        			<groupId>commons-logging</groupId>
+        		</exclusion>
+                <exclusion>
+                    <artifactId>commons-codec</artifactId>
+                    <groupId>commons-codec</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>        
+        <dependency>
+            <groupId>gov.nih.nlm.ncbi</groupId>
+            <artifactId>ncbi-eutils-axis2</artifactId>
+            <version>2.0</version>
+            <type>jar</type>
+        </dependency>
         <dependency>
             <groupId>org.isatools</groupId>
-            <artifactId>isacreator</artifactId>
-            <version>1.5.0</version>
+            <artifactId>ISAcreator</artifactId>
+            <version>1.6</version>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>axis</artifactId>
+            		<groupId>axis</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>commons-io</artifactId>
+            		<groupId>org.apache.commons</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>xalan</artifactId>
+            		<groupId>xalan</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>axis2</artifactId>
+            		<groupId>org.apache.axis2</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>commons-lang</artifactId>
+            		<groupId>commons-lang</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>jsr181-api</artifactId>
+            		<groupId>javax.jws</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>jsr181</artifactId>
+            		<groupId>javax.jws</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>jsr250-api</artifactId>
+            		<groupId>javax.annotation</groupId>
+            	</exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+        	<groupId>commons-codec</groupId>
+        	<artifactId>commons-codec</artifactId>
+        	<version>1.3</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+        </dependency>
+        <dependency>
+        	<groupId>xalan</groupId>
+        	<artifactId>xalan</artifactId>
+        	<version>2.7.0</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+        </dependency>
+        <dependency>
+        	<groupId>bcel</groupId>
+        	<artifactId>bcel</artifactId>
+        	<version>5.1</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+        </dependency>
+        <dependency>
+        	<groupId>${axis2.definition}</groupId>
+        	<artifactId>axis2-adb</artifactId>
+        	<version>${axis2.version}</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>XmlSchema</artifactId>
+                    <groupId>org.apache.ws.commons.schema</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axis2-kernel</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+        	<groupId>${axis2.definition}</groupId>
+        	<artifactId>axis2-clustering</artifactId>
+        	<version>${axis2.version}</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>axis2-kernel</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+        	<groupId>${axis2.definition}</groupId>
+        	<artifactId>axis2-transport-http</artifactId>
+        	<version>${axis2.version}</version>
+        	<type>bundle</type>
+        	<scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>axis2-kernel</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+        	<groupId>${axis2.definition}</groupId>
+        	<artifactId>axis2-corba</artifactId>
+        	<version>${axis2.version}</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>axis2-kernel</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axis2-adb</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axis2-metadata</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+        	<groupId>${axis2.definition}</groupId>
+        	<artifactId>axis2-fastinfoset</artifactId>
+        	<version>${axis2.version}</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>wstx-asl</artifactId>
+                    <groupId>org.codehaus.woodstox</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>xml-apis</artifactId>
+                    <groupId>xml-apis</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axis2-codegen</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axis2-kernel</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axis2-java2wsdl</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axis2-adb</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axiom-impl</artifactId>
+                    <groupId>org.apache.ws.commons.axiom</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>xercesImpl</artifactId>
+                    <groupId>xerces</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axiom-api</artifactId>
+                    <groupId>org.apache.ws.commons.axiom</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+        	<groupId>${axis2.definition}</groupId>
+        	<artifactId>axis2-java2wsdl</artifactId>
+        	<version>${axis2.version}</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>axis2-kernel</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+        	<groupId>${axis2.definition}</groupId>
+        	<artifactId>axis2-metadata</artifactId>
+        	<version>${axis2.version}</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>axis2-kernel</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axis2-saaj</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>stax-api</artifactId>
+                    <groupId>javax.xml.stream</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+         <dependency>
+        	<groupId>${axis2.definition}</groupId>
+        	<artifactId>axis2-xmlbeans</artifactId>
+        	<version>${axis2.version}</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+             <exclusions>
+                 <exclusion>
+                     <artifactId>axis2-codegen</artifactId>
+                     <groupId>org.apache.axis2</groupId>
+                 </exclusion>
+             </exclusions>
+         </dependency>
+        <dependency>
+            <groupId>${axis2.definition}</groupId>
+            <artifactId>axis2-kernel</artifactId>
+            <version>${axis2.version}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>XmlSchema</artifactId>
+                    <groupId>org.apache.ws.commons.schema</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>woden-api</artifactId>
+                    <groupId>org.apache.woden</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axiom-api</artifactId>
+                    <groupId>org.apache.ws.commons.axiom</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axiom-impl</artifactId>
+                    <groupId>org.apache.ws.commons.axiom</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+        	<groupId>${axis2.definition}</groupId>
+        	<artifactId>axis2-jibx</artifactId>
+        	<version>${axis2.version}</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>axis2-kernel</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axis2-codegen</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jibx-run</artifactId>
+                    <groupId>org.jibx</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>bcel</artifactId>
+                    <groupId>bcel</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+        	<groupId>${axis2.definition}</groupId>
+        	<artifactId>axis2-jaxws</artifactId>
+        	<version>${axis2.version}</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>axis2-kernel</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axis2-transport-http</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axis2-metadata</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+        	<groupId>${axis2.definition}</groupId>
+        	<artifactId>axis2-jaxbri</artifactId>
+        	<version>${axis2.version}</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>axis2-codegen</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+        	<groupId>${axis2.definition}</groupId>
+        	<artifactId>axis2-json</artifactId>
+        	<version>${axis2.version}</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>axis2-kernel</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axis2-transport-http</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>      
+        <dependency>
+        	<groupId>${axis2.definition}</groupId>
+        	<artifactId>axis2-spring</artifactId>
+        	<version>${axis2.version}</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axis2-kernel</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-core</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+        	<groupId>${axis2.definition}</groupId>
+        	<artifactId>axis2-soapmonitor-servlet</artifactId>
+        	<version>${axis2.version}</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+        	<groupId>${axis2.definition}</groupId>
+        	<artifactId>axis2-mtompolicy</artifactId>
+        	<version>${axis2.version}</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>axis2-kernel</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+        	<groupId>${axis2.definition}</groupId>
+        	<artifactId>axis2-ant-plugin</artifactId>
+        	<version>${axis2.version}</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>axis2-codegen</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axis2-kernel</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axis2-adb</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axis2-java2wsdl</artifactId>
+                    <groupId>org.apache.axis2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>axis</artifactId>
+                    <groupId>org.apache.axis</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+        	<groupId>org.codehaus.woodstox</groupId>
+        	<artifactId>wstx-asl</artifactId>
+        	<version>3.2.9</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+        </dependency>
+        <dependency>
+        	<groupId>jalopy</groupId>
+        	<artifactId>jalopy</artifactId>
+        	<version>1.5rc3</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+        </dependency>
+        <dependency>
+        	<groupId>com.sun.xml.bind</groupId>
+        	<artifactId>jaxb-xjc</artifactId>
+        	<version>2.1.7</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+        </dependency>
+        <dependency>
+        	<groupId>commons-collections</groupId>
+        	<artifactId>commons-collections</artifactId>
+        	<version>3.2.1</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+        </dependency>
+        <dependency>
+        	<groupId>commons-codec</groupId>
+        	<artifactId>commons-codec</artifactId>
+        	<version>1.3</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-impl</artifactId>
+            <version>${axiom.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
+
     </dependencies>
+
     <build>
         <plugins>
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                    <meminitial>512m</meminitial>
+                    <maxmem>2048m</maxmem>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.2.0</version>
                 <extensions>true</extensions>
-
                 <configuration>
+                    <archive>
+                        <manifestFile>MANIFEST.MF</manifestFile>
+                    </archive>
                     <instructions>
-                        <Import-Package>*</Import-Package>
-                        <Export-Package>org.isatools.plugins.metabolights.assignments
-                        </Export-Package>
                         <Bundle-Activator>org.isatools.plugins.metabolights.assignments.Activator</Bundle-Activator>
-                        <Bundle-Vendor>ISAteam</Bundle-Vendor>
+                        <Bundle-Vendor>MetaboLights Team</Bundle-Vendor>
+                        <Embed-Transitive>true</Embed-Transitive>
+                        <Export-Package>
+                           org.isatools.plugins.metabolights.assignments.*
+                        </Export-Package>
+                        <Private-Package>
+                             gov.nih.nlm.ncbi.www.soap.eutils.*;-split-package:=merge-first
+                            ,org.apache.axiom.om.*;-split-package:=merge-first
+                            ,org.apache.axiom.soap.*;-split-package:=merge-first
+                            ,org.apache.axiom.*;-split-package:=merge-first
+                            ,org.apache.axis2.*;-split-package:=merge-first
+                            ,javax.jws.*;-split-package:=merge-first
+                            ,javax.mail.*;-split-package:=merge-first
+                            ,org.apache.woden.*;-split-package:=merge-first
+                            ,org.springframework.*;-split-package:=merge-first
+                            ,org.apache.commons.*;-split-package:=merge-first
+                            ,org.apache.ws.commons.schema.*;-split-package:=merge-first
+                            ,org.apache.neethi.*;-split-package:=merge-first
+                            ,org.apache.http.*;-split-package:=merge-first
+                            ,javax.wsdl.*;-split-package:=merge-first
+                        </Private-Package>
                     </instructions>
-                 </configuration>
-
+                </configuration>
             </plugin>
 
         </plugins>
     </build>
 
     <repositories>
-
         <repository>
             <id>oerc</id>
             <url>http://frog.oerc.ox.ac.uk:8080/artifactory/repo/</url>
         </repository>
-
+        <repository>
+            <id>wso2</id>
+            <url>http://dist.wso2.org/qarepo/</url>
+        </repository>
     </repositories>
-</project>
 
+</project>
