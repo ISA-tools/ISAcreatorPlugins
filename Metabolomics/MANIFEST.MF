@@ -4,11 +4,9 @@ Export-Package: org.isatools.plugins.metabolights.assignments.model,
  org.isatools.plugins.metabolights.assignments.actions,
  org.isatools.plugins.metabolights.assignments
 Tool: Bnd-1.15.0
-Bundle-Name: Plugin to provide ability to edit small molecule
- description data in ISAcreator.
-Bundle-Vendor: ISAteam
+Bundle-Name: Metabolights Plugin.
+Bundle-Vendor: EBI Metabolights Team
 Bundle-Version: 0.3.0.SNAPSHOT
-Bnd-LastModified: 1328548139519
 Embed-Transitive: true
 Bundle-Activator: org.isatools.plugins.metabolights.assignments.
  Activator
@@ -20,6 +18,8 @@ Import-Package: org.osgi.framework;version="[1.4,2)",
  uk.ac.ebi.utils.xml,org.isatools.isacreator.ontologymanager.common,
  org.isatools.isacreator.ontologymanager,
  org.isatools.isacreator.io.importisa,
+ org.isatools.isacreator.api.utils,
+ org.isatools.isacreator.managers,
  org.isatools.isacreator.plugins.registries,
  org.isatools.isacreator.plugins.host.service,
  org.isatools.isacreator.configuration.io,

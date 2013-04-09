@@ -48,12 +48,11 @@
             <groupId>gov.nih.nlm.ncbi</groupId>
             <artifactId>ncbi-eutils-axis2</artifactId>
             <version>2.0</version>
-            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.isatools</groupId>
             <artifactId>ISAcreator</artifactId>
-            <version>1.6</version>
+            <version>1.7.1</version>
             <exclusions>
             	<exclusion>
             		<artifactId>axis</artifactId>
@@ -110,6 +109,13 @@
         	<type>jar</type>
         	<scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+        </dependency>
+
         <dependency>
         	<groupId>${axis2.definition}</groupId>
         	<artifactId>axis2-adb</artifactId>
@@ -627,7 +633,7 @@
     <repositories>
         <repository>
             <id>oerc</id>
-            <url>http://frog.oerc.ox.ac.uk:8080/artifactory/repo/</url>
+            <url>http://frog.oerc.ox.ac.uk:8080/nexus-2.1.2/content/repositories/releases/</url>
         </repository>
         <repository>
             <id>wso2</id>

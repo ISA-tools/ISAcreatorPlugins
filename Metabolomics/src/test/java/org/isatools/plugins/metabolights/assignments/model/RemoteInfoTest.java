@@ -1,10 +1,11 @@
 package org.isatools.plugins.metabolights.assignments.model;
 
-import static org.junit.Assert.*;
+
 
 import org.isatools.plugins.metabolights.assignments.model.RemoteInfo.remoteProperties;
-import org.isatools.plugins.metabolights.assignments.ui.EditorUI;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 
 public class RemoteInfoTest {

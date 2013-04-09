@@ -2,12 +2,13 @@ package org.isatools.plugins.metabolights.assignments;
 
 import org.apache.commons.collections15.set.ListOrderedSet;
 import org.apache.log4j.Logger;
-import org.isatools.isacreator.apiutils.SpreadsheetUtils;
+import org.isatools.isacreator.api.utils.SpreadsheetUtils;
 import org.isatools.isacreator.configuration.DataTypes;
 import org.isatools.isacreator.configuration.FieldObject;
-import org.isatools.isacreator.gui.ApplicationManager;
+import org.isatools.isacreator.gui.AssaySpreadsheet;
 import org.isatools.isacreator.gui.DataEntryEnvironment;
 import org.isatools.isacreator.gui.ISAcreator;
+import org.isatools.isacreator.managers.ApplicationManager;
 import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.model.Investigation;
 import org.isatools.isacreator.model.Study;
@@ -32,12 +33,12 @@ import java.util.Set;
  * Time: 09:14
  */
 public class IsaCreatorInfo {
-	
-	private static Logger logger = Logger.getLogger(IsaCreatorInfo.class);
+
+    private static Logger logger = Logger.getLogger(IsaCreatorInfo.class);
 
     private ISAcreator isacreator;
 
-    public IsaCreatorInfo(){
+    public IsaCreatorInfo() {
     }
 
     public ISAcreator getIsacreator() {
@@ -47,44 +48,38 @@ public class IsaCreatorInfo {
         return isacreator;
     }
 
-    private DataEntryEnvironment getISACreatorEnvironment(){
+    private DataEntryEnvironment getISACreatorEnvironment() {
         return getIsacreator().getDataEntryEnvironment();
     }
 
-    private DefaultMutableTreeNode getISANode(){
-        DefaultMutableTreeNode selectedNode = getISACreatorEnvironment().getSelectedNodeInOverviewTree();
-        return selectedNode;
-    }
+    public Assay getCurrentAssay() {
 
-    private Assay getAssay(Object object){
-
-        Assay assay = new Assay();
-
-        if (object instanceof Assay)
-            assay = (Assay) object;
-
-        logger.debug("Current Assay is '" + assay.getIdentifier() + "', technology is " + assay.getTechnologyType() + ", platform is " + assay.getAssayPlatform());
-        return assay;
+        if (ApplicationManager.getScreenInView() instanceof Assay) {
+            return (Assay) ApplicationManager.getScreenInView();
+        }
+        return null;
 
     }
-
     /*
     Returns the current Assay, from the ISAcreator object.  This is the assay you are working on
-     */
-    public Assay getCurrentAssay(){
 
-        Object userObject = getISANode().getUserObject();
-        return getAssay(userObject);
+     */
+    public AssaySpreadsheet getCurrentAssaySpreadsheet() {
+
+        if (ApplicationManager.getScreenInView() instanceof Assay) {
+            return (AssaySpreadsheet) ApplicationManager.getUserInterfaceForISASection((Assay) ApplicationManager.getScreenInView());
+        }
+        return null;
 
     }
 
     /*
     Returns the current investigation, with assasy etc
      */
-    public Investigation getCurrentInvestigation(){
+    public Investigation getCurrentInvestigation() {
 
         Investigation investigation = getISACreatorEnvironment().getInvestigation();
-        logger.debug("Investigation id is '"+ investigation.getInvestigationId() + "' title is " + investigation.getInvestigationTitle() + ", configuration used "+ investigation.getLastConfigurationUsed());
+        logger.debug("Investigation id is '" + investigation.getInvestigationId() + "' title is " + investigation.getInvestigationTitle() + ", configuration used " + investigation.getLastConfigurationUsed());
         return investigation;
 
     }
@@ -92,22 +87,20 @@ public class IsaCreatorInfo {
     /*
     Returns a list of sample name from the assay spreadsheet in ISAcreator (GUI)
      */
-    public List<String> getSampleColumns(){
+    public List<String> getSampleColumns() {
 
         List<String> sampleData = new ArrayList<String>();
 
-        if (getIsacreator() != null && getCurrentAssay() != null){
+        if (getIsacreator() != null && getCurrentAssaySpreadsheet() != null) {
 
-           Set<String> sampleRows = getCurrentColumnValues(1); //Column 1 is the sample column on the assay
+            Set<String> sampleRows = getCurrentColumnValues(1); //Column 1 is the sample column on the assay
 
-           if (sampleRows != null){  //Make sure we have some data
-               Iterator iterator = sampleRows.iterator();
-               while (iterator.hasNext()){
-                   String assayName = (String) iterator.next();
-                   if (assayName != null)
+            if (sampleRows != null) {  //Make sure we have some data
+                for (String assayName : sampleRows) {
+                    if (assayName != null)
                         sampleData.add(assayName);
-               }
-           }
+                }
+            }
 
         }
 
@@ -118,64 +111,63 @@ public class IsaCreatorInfo {
     /*
     This method will return the current data in the Assay column you request
      */
-    public Set<String> getCurrentColumnValues(Integer columnNumber){
+    public Set<String> getCurrentColumnValues(Integer columnNumber) {
 
         Set<String> currentSet = new ListOrderedSet<String>();
 
-        if (getIsacreator() != null && getCurrentAssay() != null && columnNumber != null){
+        if (getIsacreator() != null && getCurrentAssaySpreadsheet() != null && columnNumber != null) {
 
-            Spreadsheet spreadsheet = getCurrentAssay().getSpreadsheetUI().getSpreadsheet();
+            Spreadsheet spreadsheet = getCurrentAssaySpreadsheet().getSpreadsheet();
             currentSet = SpreadsheetUtils.getDataInColumn(spreadsheet, columnNumber);
 
         }
 
-       return currentSet;
+        return currentSet;
 
     }
-
 
 
     public String getFileLocation() {
         File file = new File(".");
 
-        if (getIsacreator() == null )
+        if (getIsacreator() == null)
             try {
                 return file.getCanonicalPath();
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            // Get the reference
-            String ref = getCurrentInvestigation().getReference();
-            
-            // If it has been saved
-            if (ref != null){
-            	// Get the get the parent folder...
-            	file = new File(getCurrentInvestigation().getReference());
-                return file.getParentFile().getPath();
-            }
-            
-            // Otherwise return null
-            return null;
-        
+        // Get the reference
+        String ref = getCurrentInvestigation().getReference();
+
+        // If it has been saved
+        if (ref != null) {
+            // Get the get the parent folder...
+            file = new File(getCurrentInvestigation().getReference());
+            return file.getParentFile().getPath();
+        }
+
+        // Otherwise return null
+        return null;
+
     }
 
     /*
     Add all missing sample columns to the spreadsheet *DEFINITION*
      */
-    public TableReferenceObject addTableRefSampleColumns(TableReferenceObject tableReferenceObject){
+    public TableReferenceObject addTableRefSampleColumns(TableReferenceObject tableReferenceObject) {
 
-        if (getIsacreator() != null){
+        if (getIsacreator() != null) {
             List<String> assaySampleList = getSampleColumns();
             Iterator iterator = assaySampleList.iterator();
-            while (iterator.hasNext()){
+            while (iterator.hasNext()) {
                 String sampleName = (String) iterator.next();
-                if (sampleName != null && sampleName.length() > 0){ //Add the sample name, but there are lots of empty rows so need to test first
+                if (sampleName != null && sampleName.length() > 0) { //Add the sample name, but there are lots of empty rows so need to test first
                     FieldObject fieldObject = new FieldObject(sampleName, "Sample description", DataTypes.STRING, "", false, false, false);   //New column to add to the definition
 
                     if (tableReferenceObject != null)
-                        if (tableReferenceObject.getFieldByName(sampleName) == null){
-                            logger.debug("Adding optional column to the spreadsheet definition: " +sampleName);
+                        if (tableReferenceObject.getFieldByName(sampleName) == null) {
+                            logger.debug("Adding optional column to the spreadsheet definition: " + sampleName);
                             tableReferenceObject.addField(fieldObject);
                         }
 
@@ -190,39 +182,40 @@ public class IsaCreatorInfo {
     /*
     Add all missing sample columns to the spreadsheet, the DEFINITION must be defined first
      */
-    public Spreadsheet addSpreadsheetSampleColumns(Spreadsheet newSheet){
+    public Spreadsheet addSpreadsheetSampleColumns(Spreadsheet newSheet) {
 
-         if (getIsacreator() != null){
-             List<String> assaySampleList = getSampleColumns();
-             Iterator iter = assaySampleList.iterator();
-             while (iter.hasNext()){
+        if (getIsacreator() != null) {
+            List<String> assaySampleList = getSampleColumns();
+            Iterator iter = assaySampleList.iterator();
+            while (iter.hasNext()) {
                 String sampleName = (String) iter.next();
-                   if (!newSheet.getSpreadsheetFunctions().checkColumnExists(sampleName) && sampleName.length() > 0){
-                        logger.debug("Adding optional column to the spreadsheet:" + sampleName);
-                        newSheet.getSpreadsheetFunctions().addColumn(sampleName, true);
-                   } else {
-                       logger.debug("Sample column already exists in the spreadsheet:" + sampleName);
-                   }
-             }
+                if (!newSheet.getSpreadsheetFunctions().checkColumnExists(sampleName) && sampleName.length() > 0) {
+                    logger.debug("Adding optional column to the spreadsheet:" + sampleName);
+                    newSheet.getSpreadsheetFunctions().addColumn(sampleName, true);
+                } else {
+                    logger.debug("Sample column already exists in the spreadsheet:" + sampleName);
+                }
+            }
         }
 
         return newSheet;
     }
-    
-    public OntologyTerm getOntologyTerm(String uniqueid){
 
-        OntologyTerm ontologyTerm = OntologyManager.getUserOntologyHistory().get(uniqueid);
-		return ontologyTerm;
-    	
+    public OntologyTerm getOntologyTerm(String uniqueid) {
+
+        OntologyTerm ontologyTerm = OntologyManager.getOntologySelectionHistory().get(uniqueid);
+        return ontologyTerm;
+
     }
-   
-    
+
+
     /**
-     *  Gets as study object properly casted.
+     * Gets as study object properly casted.
+     *
      * @param object
      * @return
      */
-    private Study getStudy(Object object){
+    private Study getStudy(Object object) {
 
         Study study = new Study();
 
@@ -238,26 +231,28 @@ public class IsaCreatorInfo {
     /**
      * Return current study
      */
-    public Study getCurrentStudy(){
+    public Study getCurrentStudy() {
 
-    	Object userObject = getISAStudyNode().getUserObject();
+        Object userObject = getISAStudyNode().getUserObject();
         return getStudy(userObject);
 
     }
+
     /**
      * Returns the study node
      */
-    private DefaultMutableTreeNode getISAStudyNode(){
+    private DefaultMutableTreeNode getISAStudyNode() {
         DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) getISACreatorEnvironment().getSelectedNodeInOverviewTree().getParent().getParent();
         return selectedNode;
     }
-    
+
     /**
      * Returns an asssay with the study sample.
+     *
      * @param object
      * @return
      */
-    private Assay getStudySample(Object object){
+    private Assay getStudySample(Object object) {
 
         Assay studySample = new Assay();
 
@@ -273,21 +268,21 @@ public class IsaCreatorInfo {
     /**
      * Return current study sample
      */
-    public Assay getCurrentStudySample(){
+    public Assay getCurrentStudySample() {
 
-    	Object userObject = getISAStudySampleNode().getUserObject();
+        Object userObject = getISAStudySampleNode().getUserObject();
         return getStudySample(userObject);
 
     }
+
     /**
      * Returns the study sample node
      */
-    private DefaultMutableTreeNode getISAStudySampleNode(){
+    private DefaultMutableTreeNode getISAStudySampleNode() {
         DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) getISACreatorEnvironment().getSelectedNodeInOverviewTree().getParent();
         return selectedNode;
     }
 
-    
 
 }
 

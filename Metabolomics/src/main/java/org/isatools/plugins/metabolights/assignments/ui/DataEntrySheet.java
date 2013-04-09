@@ -1,8 +1,10 @@
 package org.isatools.plugins.metabolights.assignments.ui;
 
 import org.apache.log4j.Logger;
-import org.isatools.isacreator.apiutils.SpreadsheetUtils;
+import org.isatools.isacreator.api.utils.SpreadsheetUtils;
 import org.isatools.isacreator.common.UIHelper;
+import org.isatools.isacreator.gui.AssaySpreadsheet;
+import org.isatools.isacreator.managers.ApplicationManager;
 import org.isatools.isacreator.model.Assay;
 import org.isatools.isacreator.ontologymanager.common.OntologyTerm;
 import org.isatools.isacreator.spreadsheet.*;
@@ -66,7 +68,7 @@ public class DataEntrySheet extends JPanel {
 
     public TableReferenceObject getTableReferenceObject() {
         // if (isVersion1File()) {   //Return old style filename
-        //     String technologyType = getIsaCreatorInfo().getCurrentAssay().getTechnologyType();
+        //     String technologyType = getIsaCreatorInfo().getCurrentAssaySpreadsheet().getTechnologyType();
         //     tableReferenceObject = getConfigurationLoader().loadGenericConfig(1,technologyType);
         // }
         return tableReferenceObject;
@@ -416,7 +418,7 @@ public class DataEntrySheet extends JPanel {
     		String path = getIsaCreatorInfo().getFileLocation();
     		
     		// Get the assay name
-    		String assayName = getIsaCreatorInfo().getCurrentAssay().getIdentifier();
+    		String assayName = getIsaCreatorInfo().getCurrentAssaySpreadsheet().getName();
     		
     		// Remove the extension
     		assayName = assayName.substring(0, assayName.length()-4);
@@ -527,15 +529,18 @@ public class DataEntrySheet extends JPanel {
 			logger.info("Importing sample data");
 			// Get the study sample data
 			Assay studySample = isaCreatorInfo.getCurrentStudySample();
+
+
+            AssaySpreadsheet assaySpreadsheet = (AssaySpreadsheet) ApplicationManager.getUserInterfaceForISASection(studySample);
 	    	
 	    	// Check if we have to populate the sampledata
-	    	if (haveToFillSampleData(studySample)){
+	    	if (haveToFillSampleData(assaySpreadsheet)){
 
 	    		String termSourceREF="", termAccessionNumber="", organism = "", taxid="";
 	    		
-	    		int column = studySample.getSpreadsheetUI().getSpreadsheet().getSpreadsheetFunctions().getModelIndexForColumn(SPECIEFIELD);
+	    		int column = assaySpreadsheet.getSpreadsheet().getSpreadsheetFunctions().getModelIndexForColumn(SPECIEFIELD);
 	    	   	   		
-	    		SpreadsheetCell cell = (SpreadsheetCell) studySample.getSpreadsheetUI().getSpreadsheet().getTable().getValueAt(0, column);
+	    		SpreadsheetCell cell = (SpreadsheetCell) assaySpreadsheet.getSpreadsheet().getTable().getValueAt(0, column);
 	    		
 	    		String value = cell.toString();
 
@@ -547,13 +552,13 @@ public class DataEntrySheet extends JPanel {
 	            if (ontologyTerm != null){
 	            	
 	            	termSourceREF = ontologyTerm.getOntologySourceInformation().getSourceName();
-	                termAccessionNumber = ontologyTerm.getOntologySourceAccession();
+	                termAccessionNumber = ontologyTerm.getOntologyTermAccession();
 	                organism = ontologyTerm.getOntologyTermName();
 	                taxid=termSourceREF + ":" + termAccessionNumber;
 	  
 	        		// Write sample data
 	        	  	// Get the current assay
-	            	Assay assay = isaCreatorInfo.getCurrentAssay();
+	            	AssaySpreadsheet assay = isaCreatorInfo.getCurrentAssaySpreadsheet();
 	    			int taxidCol = getSheet().getSpreadsheetFunctions().getModelIndexForColumn("taxid");
 	    			int speciesCol = getSheet().getSpreadsheetFunctions().getModelIndexForColumn("species");
 
@@ -572,7 +577,7 @@ public class DataEntrySheet extends JPanel {
     	
     }
 
-    public boolean haveToFillSampleData(Assay studySample){
+    public boolean haveToFillSampleData(AssaySpreadsheet studySample){
     	
     	// Check if there is already sample data in the spreadsheet (target)
     	boolean dataInTarget = !isColumnEmpty(TAXID);
@@ -587,13 +592,13 @@ public class DataEntrySheet extends JPanel {
     	return (dataInSource && !dataInTarget);
     }
 
-    private boolean isThereSampleData(Assay studySample){
+    private boolean isThereSampleData(AssaySpreadsheet studySample){
 
         String value = null;
     	
-		int column = studySample.getSpreadsheetUI().getSpreadsheet().getSpreadsheetFunctions().getModelIndexForColumn(SPECIEFIELD);
+		int column = studySample.getSpreadsheet().getSpreadsheetFunctions().getModelIndexForColumn(SPECIEFIELD);
 
-		SpreadsheetCell cell = (SpreadsheetCell)studySample.getSpreadsheetUI().getSpreadsheet().getTable().getValueAt(0, column);
+		SpreadsheetCell cell = (SpreadsheetCell)studySample.getSpreadsheet().getTable().getValueAt(0, column);
 
         if (cell != null)
 		    value = cell.toString();
