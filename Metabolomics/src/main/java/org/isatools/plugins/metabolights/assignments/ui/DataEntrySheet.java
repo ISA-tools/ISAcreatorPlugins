@@ -416,10 +416,11 @@ public class DataEntrySheet extends JPanel {
     	if (parentFrame.getCurrentCellValue() == null){
     		
     		String path = getIsaCreatorInfo().getFileLocation();
-    		
-    		// Get the assay name
-    		String assayName = getIsaCreatorInfo().getCurrentAssaySpreadsheet().getName();
-    		
+
+            // Get the assay name
+            String assayName = getIsaCreatorInfo().getCurrentAssay().getAssayReference();
+    		//String assayName = getIsaCreatorInfo().getCurrentAssaySpreadsheet().getName();     //Not getting the assay file name
+
     		// Remove the extension
     		assayName = assayName.substring(0, assayName.length()-4);
 

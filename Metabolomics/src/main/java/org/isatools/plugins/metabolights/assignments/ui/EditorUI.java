@@ -32,7 +32,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 	
 	private static final long serialVersionUID = -5036524042579480467L;
     public static final float DESIRED_OPACITY = .94f;
-    //public static final String PLUGIN_VERSION = "0.1";
+    public static final String PLUGIN_VERSION = "1.7";
 
     private String currentCellValue;
     private String newCellValue;
