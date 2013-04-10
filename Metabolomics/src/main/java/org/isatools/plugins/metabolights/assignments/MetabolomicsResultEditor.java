@@ -53,7 +53,8 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     @Override
     public void instantiateComponent() {
     	logger.info("instantiateComponent called.");
-    	instantiateComponent(MS, getOriginalValue());
+    	//instantiateComponent(MS, getOriginalValue());
+        instantiateComponent(null, getOriginalValue());      //Should not have to send any technology parameters here
     }
     
     public void instantiateComponent(String technologyType, String fileName) {
@@ -189,7 +190,7 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
         return assay;
     }
 
-    private String getTechnology(){
+    private String getTechnology(){            //TODO, always returns MS, but NMR on new assay
            //Get the current assay
         Assay assay = getAssay();
         logger.info("The current Assay is "+assay.getIdentifier());
@@ -198,6 +199,12 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
         String technology = assay.getTechnologyType();
         logger.info("The current Assay Technology type is "+technology);
 
+        if (technology.contains(":")) {//Ontology reference, like "OBI:NMR spectroscopy"
+
+            String[] localTechnology = technology.split(":");
+            technology = localTechnology[1];     //Discard the first entry
+
+        }
         return technology;
     }
 

@@ -6,7 +6,7 @@
     <description>Plugin to provide ability to edit small molecule description data in ISAcreator.</description>
     <groupId>org.isatools.plugins.metabolights</groupId>
     <artifactId>metabolomics</artifactId>
-    <version>1.6.2</version>
+    <version>1.7.0-SNAPSHOT</version>
 
     <properties>
         <axis2.definition>org.apache.axis2</axis2.definition>
