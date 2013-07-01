@@ -66,10 +66,22 @@ public class IsaCreatorInfo {
      */
     public AssaySpreadsheet getCurrentAssaySpreadsheet() {
 
+        System.out.println("Current screen in view: " + ApplicationManager.getScreenInView());
         if (ApplicationManager.getScreenInView() instanceof Assay) {
+            System.out.println("Is an assay instance...");
             return (AssaySpreadsheet) ApplicationManager.getUserInterfaceForISASection((Assay) ApplicationManager.getScreenInView());
         }
         return null;
+
+    }
+
+    public String getCurrentAssaySpreadsheetName() {
+
+        Object screenInView = ApplicationManager.getScreenInView();
+        if (screenInView instanceof Assay) {
+            return screenInView.toString();
+        }
+        return "";
 
     }
 

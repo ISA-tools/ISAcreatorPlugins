@@ -27,28 +27,29 @@ import java.io.IOException;
 
 @SuppressWarnings("restriction")
 public class EditorUI extends AnimatableJFrame implements PropertyChangeListener {
-	
-	private static Logger logger = Logger.getLogger(EditorUI.class);
-	
-	private static final long serialVersionUID = -5036524042579480467L;
+
+    private static Logger logger = Logger.getLogger(EditorUI.class);
+
+    private static final long serialVersionUID = -5036524042579480467L;
     public static final float DESIRED_OPACITY = .94f;
     //public static final String PLUGIN_VERSION = "0.1";
 
     private String currentCellValue;
     private String newCellValue;
-    
+
     // True when running alone without ISACreator
     private boolean amIAlone = true;
 
     private IsaCreatorInfo isaCreatorInfo;
-    
+
     // Progress trigger
     private ProgressTrigger progressTrigger = new ProgressTrigger();
-	private static InfiniteProgressPanel progressIndicator;
+    private static InfiniteProgressPanel progressIndicator;
 
-	public ProgressTrigger getProgressTrigger() {
-		return progressTrigger;
-	}
+    public ProgressTrigger getProgressTrigger() {
+        return progressTrigger;
+    }
+
     private IsaCreatorInfo getIsaCreatorInfo() {
         if (isaCreatorInfo == null)
             isaCreatorInfo = new IsaCreatorInfo();
@@ -71,7 +72,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
     public static String getPluginVersion() {
         return remoteProperties.VERSION.getDefaultValue();
     }
-    
+
     static {
         ResourceInjector.addModule("org.jdesktop.fuse.swing.SwingModule");
 
@@ -114,16 +115,16 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
         createSouthPanel();
 
         configureProgressTrigger();
-        
+
         checkVersion();
-        
+
         pack();
     }
 
     // Configures the progress triggered.
-    private void configureProgressTrigger(){
+    private void configureProgressTrigger() {
 
-    	progressTrigger.addPropertyChangeListener(this);
+        progressTrigger.addPropertyChangeListener(this);
     }
 
     private void createCentralPanel(String technologyType, String fileName) {
@@ -133,7 +134,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
                 getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject));  //Add sample columns to the table definition
 
         //Check if we have a filename first
-        if ( fileName.length() >= 2 ){
+        if (fileName.length() >= 2) {
             String path = getIsaCreatorInfo().getFileLocation();     //Where the ISA archive is stored
 
             //Do we need to add the path?
@@ -142,7 +143,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
             else
                 sheet.setFileName(path + "/" + fileName);
 
-            if (fileName.contains(".csv")){
+            if (fileName.contains(".csv")) {
                 setVersion1File(true);
                 sheet.setVersion1File(isVersion1File());     //Can in the next version test for the string "_v2_maf.tsv" in the filename
             }
@@ -152,23 +153,23 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
         sheet.createGUI();
 
         add(sheet, BorderLayout.CENTER);
-        
+
         // Check if he ISACreator is available
         if (!amIAlone) {
-        	
-        	// If so, try to load the file (if exists)
-        	sheet.loadFile();
-        	
-        	// Fill sample data....
-        	sheet.importSampleData();
+
+            // If so, try to load the file (if exists)
+            sheet.loadFile();
+
+            // Fill sample data....
+            sheet.importSampleData();
         }
 
     }
-    
-    public void confirm(){
-    	setVisible(false);
-    	firePropertyChange("confirm", "1", "2");
-    	
+
+    public void confirm() {
+        setVisible(false);
+        firePropertyChange("confirm", "1", "2");
+
     }
 
     /**
@@ -184,22 +185,22 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
         this.newCellValue = currentCellValue;
     }
 
-    public String getCurrentCellValue(){
-    	return this.currentCellValue;
+    public String getCurrentCellValue() {
+        return this.currentCellValue;
     }
 
     public String getNewCellValue() {
         return newCellValue;
     }
 
-    public boolean getAmIAlone(){
-    	return amIAlone;
+    public boolean getAmIAlone() {
+        return amIAlone;
     }
 
-    public void setAmIAlone(boolean amIAlone){
-    	this.amIAlone = amIAlone;
+    public void setAmIAlone(boolean amIAlone) {
+        this.amIAlone = amIAlone;
     }
-    
+
     public static void main(String[] args) {
         EditorUI ui = new EditorUI();
         ui.createGUI(MetabolomicsResultEditor.MS, null);
@@ -212,8 +213,8 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 
         try {
 
-            if (fileName.contains(".csv") || isVersion1File()){           //TODO, should not have to test for the filename here, just the isVersionXXXFile methods
-                return loader.loadGenericConfig(1,techologyType);
+            if (fileName.contains(".csv") || isVersion1File()) {
+                return loader.loadGenericConfig(1, techologyType);
             } else {
 
                 if (techologyType.equals(MetabolomicsResultEditor.MS))
@@ -234,78 +235,65 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
         }
     }
 
-	public void propertyChange(PropertyChangeEvent arg0) {
-		// For the progress bar
-		if (arg0.getSource() instanceof ProgressTrigger){
-			propertyChangeProgressTrigger(arg0, (ProgressTrigger) arg0.getSource());
-			
-		}
-		
-	}
+    public void propertyChange(PropertyChangeEvent arg0) {
+        // For the progress bar
+        if (arg0.getSource() instanceof ProgressTrigger) {
+            propertyChangeProgressTrigger(arg0, (ProgressTrigger) arg0.getSource());
 
-	@SuppressWarnings("static-access")
-	private void propertyChangeProgressTrigger(PropertyChangeEvent arg0, ProgressTrigger pt){
-		
-		// If the process is starting
-		if (arg0.getPropertyName().equals(pt.PROGRESS_START)){
-			 
-//			progressIndicator = new InfiniteProgressPanel(pt.getProcessDescription());
-//			
-//			          
-//			progressIndicator.setSize(new Dimension(
-//											getWidth(),
-//											getHeight()));
-//			setGlassPane(progressIndicator);
-//	        progressIndicator.start();
-//	        validate();
-
-			// At this point activate the wait cursor
-			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			
-		} else if (arg0.getPropertyName().equals(pt.PROGRESS_END)){
-//			progressIndicator.stop();
-			// Deactivate the wait cursor
-			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			
-		}
-	}
-
-	private void checkVersion(){
-        String remoteVersion = RemoteInfo.getProperty(remoteProperties.VERSION);
-        
-        if (remoteVersion == null) return;
-        
-        if (!getPluginVersion().equals(remoteVersion)){
-        	openUrl (RemoteInfo.getProperty(remoteProperties.DOWNLOADURL));
-        }else{
-        	
         }
-	}
 
-	public static void openUrl(String url){
-		if( !java.awt.Desktop.isDesktopSupported() ) {
+    }
 
-            System.err.println( "Desktop is not supported (fatal)" );
+    @SuppressWarnings("static-access")
+    private void propertyChangeProgressTrigger(PropertyChangeEvent arg0, ProgressTrigger pt) {
+
+        // If the process is starting
+        if (arg0.getPropertyName().equals(pt.PROGRESS_START)) {
+            // At this point activate the wait cursor
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
+        } else if (arg0.getPropertyName().equals(pt.PROGRESS_END)) {
+            // Deactivate the wait cursor
+            setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+
+        }
+    }
+
+    private void checkVersion() {
+        String remoteVersion = RemoteInfo.getProperty(remoteProperties.VERSION);
+
+        if (remoteVersion == null) return;
+
+        if (!getPluginVersion().equals(remoteVersion)) {
+            openUrl(RemoteInfo.getProperty(remoteProperties.DOWNLOADURL));
+        } else {
+
+        }
+    }
+
+    public static void openUrl(String url) {
+        if (!java.awt.Desktop.isDesktopSupported()) {
+
+            System.err.println("Desktop is not supported (fatal)");
             return;
         }
 
         java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
 
-        if( !desktop.isSupported( java.awt.Desktop.Action.BROWSE ) ) {
+        if (!desktop.isSupported(java.awt.Desktop.Action.BROWSE)) {
 
-            System.err.println( "Desktop doesn't support the browse action (fatal)" );
+            System.err.println("Desktop doesn't support the browse action (fatal)");
             return;
         }
 
         try {
 
-            java.net.URI uri = new java.net.URI( url);
-            desktop.browse( uri );
-        }
-        catch ( Exception e ) {
+            java.net.URI uri = new java.net.URI(url);
+            desktop.browse(uri);
+        } catch (Exception e) {
 
-            System.err.println( e.getMessage() );
+            System.err.println(e.getMessage());
         }
-        
-	}
+
+    }
 }

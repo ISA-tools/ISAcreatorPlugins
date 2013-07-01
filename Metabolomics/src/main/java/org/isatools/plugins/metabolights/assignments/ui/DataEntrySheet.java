@@ -67,10 +67,6 @@ public class DataEntrySheet extends JPanel {
 
 
     public TableReferenceObject getTableReferenceObject() {
-        // if (isVersion1File()) {   //Return old style filename
-        //     String technologyType = getIsaCreatorInfo().getCurrentAssaySpreadsheet().getTechnologyType();
-        //     tableReferenceObject = getConfigurationLoader().loadGenericConfig(1,technologyType);
-        // }
         return tableReferenceObject;
     }
 
@@ -418,9 +414,10 @@ public class DataEntrySheet extends JPanel {
     		String path = getIsaCreatorInfo().getFileLocation();
     		
     		// Get the assay name
-    		String assayName = getIsaCreatorInfo().getCurrentAssaySpreadsheet().getName();
-    		
-    		// Remove the extension
+    		String assayName = getIsaCreatorInfo().getCurrentAssaySpreadsheetName();
+
+            System.out.println("Current assay name is " + assayName);
+            // Remove the extension
     		assayName = assayName.substring(0, assayName.length()-4);
 
             //Make sure the filename starts with m_ not a_ (a_ = Assay, s_ = Study, i_ Investigation, so we adopt m_ = metabolite)
@@ -557,8 +554,6 @@ public class DataEntrySheet extends JPanel {
 	                taxid=termSourceREF + ":" + termAccessionNumber;
 	  
 	        		// Write sample data
-	        	  	// Get the current assay
-	            	AssaySpreadsheet assay = isaCreatorInfo.getCurrentAssaySpreadsheet();
 	    			int taxidCol = getSheet().getSpreadsheetFunctions().getModelIndexForColumn("taxid");
 	    			int speciesCol = getSheet().getSpreadsheetFunctions().getModelIndexForColumn("species");
 
