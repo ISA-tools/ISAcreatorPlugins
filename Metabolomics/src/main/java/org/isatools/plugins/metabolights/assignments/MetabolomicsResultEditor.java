@@ -70,7 +70,7 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
         editorUI.setLocationRelativeTo(null);
         editorUI.setAlwaysOnTop(true);
 
-        editorUI    .addPropertyChangeListener("confirm",
+        editorUI.addPropertyChangeListener("confirm",
                 new PropertyChangeListener() {
                     public void propertyChange(PropertyChangeEvent evt) {
                         logger.info("Cell editing confirmed");
