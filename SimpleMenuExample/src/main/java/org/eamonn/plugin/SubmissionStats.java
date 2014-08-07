@@ -1,7 +1,7 @@
 package org.eamonn.plugin;
 
 import org.apache.log4j.Logger;
-import org.isatools.isacreator.gui.ApplicationManager;
+import org.isatools.isacreator.managers.ApplicationManager;
 import org.isatools.isacreator.gui.ISAcreator;
 import org.isatools.isacreator.plugins.host.service.PluginMenu;
 import java.awt.event.ActionEvent;

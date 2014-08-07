@@ -24,6 +24,7 @@
     <groupId>org.eamonn</groupId>
     <artifactId>plugin</artifactId>
     <version>1.0.0</version>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.felix</groupId>
@@ -33,9 +34,10 @@
         <dependency>
             <groupId>org.isatools</groupId>
             <artifactId>isacreator</artifactId>
-            <version>1.5.0</version>
+            <version>1.7.7</version>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
