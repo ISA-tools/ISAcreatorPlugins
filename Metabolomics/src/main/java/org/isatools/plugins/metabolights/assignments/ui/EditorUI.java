@@ -27,21 +27,21 @@ import java.io.IOException;
 
 @SuppressWarnings("restriction")
 public class EditorUI extends AnimatableJFrame implements PropertyChangeListener {
-	
+
 	private static Logger logger = Logger.getLogger(EditorUI.class);
-	
+
 	private static final long serialVersionUID = -5036524042579480467L;
     public static final float DESIRED_OPACITY = .94f;
     public static final String PLUGIN_VERSION = "1.7";
 
     private String currentCellValue;
     private String newCellValue;
-    
+
     // True when running alone without ISACreator
     private boolean amIAlone = true;
 
     private IsaCreatorInfo isaCreatorInfo;
-    
+
     // Progress trigger
     private ProgressTrigger progressTrigger = new ProgressTrigger();
 	private static InfiniteProgressPanel progressIndicator;
@@ -71,7 +71,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
     public static String getPluginVersion() {
         return remoteProperties.VERSION.getDefaultValue();
     }
-    
+
     static {
         ResourceInjector.addModule("org.jdesktop.fuse.swing.SwingModule");
 
@@ -114,9 +114,9 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
         createSouthPanel();
 
         configureProgressTrigger();
-        
+
         checkVersion();
-        
+
         pack();
     }
 
@@ -152,23 +152,23 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
         sheet.createGUI();
 
         add(sheet, BorderLayout.CENTER);
-        
+
         // Check if he ISACreator is available
         if (!amIAlone) {
-        	
+
         	// If so, try to load the file (if exists)
         	sheet.loadFile();
-        	
+
         	// Fill sample data....
         	sheet.importSampleData();
         }
 
     }
-    
+
     public void confirm(){
     	setVisible(false);
     	firePropertyChange("confirm", "1", "2");
-    	
+
     }
 
     /**
@@ -199,7 +199,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
     public void setAmIAlone(boolean amIAlone){
     	this.amIAlone = amIAlone;
     }
-    
+
     public static void main(String[] args) {
         EditorUI ui = new EditorUI();
         ui.createGUI(MetabolomicsResultEditor.MS, null);
@@ -238,20 +238,20 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 		// For the progress bar
 		if (arg0.getSource() instanceof ProgressTrigger){
 			propertyChangeProgressTrigger(arg0, (ProgressTrigger) arg0.getSource());
-			
+
 		}
-		
+
 	}
 
 	@SuppressWarnings("static-access")
 	private void propertyChangeProgressTrigger(PropertyChangeEvent arg0, ProgressTrigger pt){
-		
+
 		// If the process is starting
 		if (arg0.getPropertyName().equals(pt.PROGRESS_START)){
-			 
+
 //			progressIndicator = new InfiniteProgressPanel(pt.getProcessDescription());
-//			
-//			          
+//
+//
 //			progressIndicator.setSize(new Dimension(
 //											getWidth(),
 //											getHeight()));
@@ -261,24 +261,24 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 
 			// At this point activate the wait cursor
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			
+
 		} else if (arg0.getPropertyName().equals(pt.PROGRESS_END)){
 //			progressIndicator.stop();
 			// Deactivate the wait cursor
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			
+
 		}
 	}
 
 	private void checkVersion(){
         String remoteVersion = RemoteInfo.getProperty(remoteProperties.VERSION);
-        
+
         if (remoteVersion == null) return;
-        
+
         if (!getPluginVersion().equals(remoteVersion)){
         	openUrl (RemoteInfo.getProperty(remoteProperties.DOWNLOADURL));
         }else{
-        	
+
         }
 	}
 
@@ -306,6 +306,6 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 
             System.err.println( e.getMessage() );
         }
-        
+
 	}
 }

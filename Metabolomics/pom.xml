@@ -6,7 +6,7 @@
     <description>Plugin to provide ability to edit small molecule description data in ISAcreator.</description>
     <groupId>org.isatools.plugins.metabolights</groupId>
     <artifactId>metabolomics</artifactId>
-    <version>1.7.7-SNAPSHOT</version>
+    <version>1.7.8-SNAPSHOT</version>
 
     <properties>
         <axis2.definition>org.apache.axis2</axis2.definition>
@@ -23,11 +23,10 @@
         </dependency>
 
 
-
         <dependency>
             <groupId>org.isatools</groupId>
             <artifactId>ISAcreator</artifactId>
-            <version>1.7.7-SNAPSHOT</version>
+            <version>1.7.7</version>
             <exclusions>
                 <exclusion>
                     <artifactId>axis</artifactId>
@@ -676,6 +675,7 @@
                             ,org.apache.neethi.*;-split-package:=merge-first
                             ,org.apache.http.*;-split-package:=merge-first
                             ,javax.wsdl.*;-split-package:=merge-first
+                            ,au.com.bytecode.opencsv.*;-split-package:=merge-first
                         </Private-Package>
                     </instructions>
                 </configuration>

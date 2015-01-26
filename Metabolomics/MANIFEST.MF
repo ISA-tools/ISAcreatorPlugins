@@ -6,7 +6,7 @@ Export-Package: org.isatools.plugins.metabolights.assignments.model,
 Tool: Bnd-1.15.0
 Bundle-Name: Metabolights Plugin.
 Bundle-Vendor: EBI Metabolights Team
-Bundle-Version: 1.7.0.SNAPSHOT
+Bundle-Version: 1.7.8.SNAPSHOT
 Embed-Transitive: true
 Bundle-Activator: org.isatools.plugins.metabolights.assignments.
  Activator

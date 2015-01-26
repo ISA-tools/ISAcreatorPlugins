@@ -1,5 +1,6 @@
 package org.isatools.plugins.metabolights.assignments;
 
+import au.com.bytecode.opencsv.CSVReader;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import org.apache.log4j.Logger;
 import org.isatools.isacreator.api.utils.SpreadsheetUtils;
@@ -18,12 +19,8 @@ import org.isatools.isacreator.spreadsheet.Spreadsheet;
 import org.isatools.isacreator.spreadsheet.model.TableReferenceObject;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
 
 /**
@@ -85,15 +82,21 @@ public class IsaCreatorInfo {
     }
 
     /*
-    Returns a list of sample name from the assay spreadsheet in ISAcreator (GUI)
+    Returns a list of sample names from the assay spreadsheet in ISAcreator (GUI)
      */
     public List<String> getSampleColumns() {
 
         List<String> sampleData = new ArrayList<String>();
 
+
         if (getIsacreator() != null && getCurrentAssaySpreadsheet() != null) {
 
-            Set<String> sampleRows = getCurrentColumnValues(1); //Column 1 is the sample column on the assay
+            Set<String> sampleRows = getColumnOnHeaderName("Sample Name");
+            //TODO, Try to use the assay name first, in the file this is "MS Assay Name" or "NMR Assay Name", so " Assay Name" should be fine
+
+            if (sampleRows == null)                  //If there are no MS/NMR Assay Name, use Sample Name instead
+                sampleRows = getCurrentColumnValues(1); //Column 1 is the default sample column on the assay
+                // TODO, fix as the sample name can have been moved after creation of the file!
 
             if (sampleRows != null) {  //Make sure we have some data
                 for (String assayName : sampleRows) {
@@ -126,6 +129,20 @@ public class IsaCreatorInfo {
 
     }
 
+    public  Set<String> getColumnOnHeaderName(String columnHeader){
+
+
+        Set<String> currentSet = new ListOrderedSet<String>();
+
+        if (getIsacreator() != null && getCurrentAssaySpreadsheet() != null && columnHeader != null) {
+
+            Spreadsheet spreadsheet = getCurrentAssaySpreadsheet().getSpreadsheet();
+            currentSet = SpreadsheetUtils.findValuesForColumnInSpreadsheet(spreadsheet, columnHeader);
+        }
+
+        return currentSet;
+
+    }
 
     public String getFileLocation() {
         File file = new File(".");
@@ -159,6 +176,7 @@ public class IsaCreatorInfo {
 
         if (getIsacreator() != null) {
             List<String> assaySampleList = getSampleColumns();
+
             Iterator iterator = assaySampleList.iterator();
             while (iterator.hasNext()) {
                 String sampleName = (String) iterator.next();
@@ -179,19 +197,72 @@ public class IsaCreatorInfo {
 
     }
 
+    public TableReferenceObject addDataFromFile(String fileName) {
+
+        int count = 0;
+        String[] nextLine;
+        String[] colHeaders = null;
+        TableReferenceObject tro = null;
+
+        if (getIsacreator() != null) {
+
+            if (fileName != null)
+                tro = new TableReferenceObject(fileName);
+
+            try {
+
+                CSVReader reader = new CSVReader(new FileReader(fileName), '\t');
+
+                while ((nextLine = reader.readNext()) != null) {
+                    if (count == 0) {
+                        colHeaders = nextLine;
+
+
+                        Vector<String> preDefinedHeaders = new Vector<String>();
+                        preDefinedHeaders.add("Row No.");
+
+                        for (String h : nextLine) {
+                            preDefinedHeaders.add(h);
+                        }
+
+                        if (preDefinedHeaders.size() > 0) {
+                            tro.setPreDefinedHeaders(preDefinedHeaders);
+                        }
+
+                        count++;
+                    } else {
+                        tro.addRowData(colHeaders, nextLine);
+                    }
+                }
+
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return tro;
+
+    }
+
+
     /*
     Add all missing sample columns to the spreadsheet, the DEFINITION must be defined first
      */
     public Spreadsheet addSpreadsheetSampleColumns(Spreadsheet newSheet) {
 
         if (getIsacreator() != null) {
-            List<String> assaySampleList = getSampleColumns();
+            List<String> assaySampleList = getSampleColumns();      //From ISAcreator Assay sheet
+
             Iterator iter = assaySampleList.iterator();
             while (iter.hasNext()) {
                 String sampleName = (String) iter.next();
                 if (!newSheet.getSpreadsheetFunctions().checkColumnExists(sampleName) && sampleName.length() > 0) {
                     logger.debug("Adding optional column to the spreadsheet:" + sampleName);
                     newSheet.getSpreadsheetFunctions().addColumn(sampleName, true);
+
                 } else {
                     logger.debug("Sample column already exists in the spreadsheet:" + sampleName);
                 }

@@ -37,7 +37,7 @@ import java.io.FileNotFoundException;
  *         Time: 16:24
  */
 public class DataEntrySheet extends JPanel {
-	
+
 	private static final long serialVersionUID = -7317091603657433515L;
 
 	private static Logger logger = Logger.getLogger(DataEntrySheet.class);
@@ -52,10 +52,10 @@ public class DataEntrySheet extends JPanel {
     private String fileName = null;
     private String fileNameNoPath = null;
     private JLabel info;
-    
+
     private boolean autocomplete= true;
     private boolean forceAutoComplete=false;
-    
+
     public static String TAXID = "taxid";
     public static String SPECIES = "species";
     public static String SPECIEFIELD = "Characteristics[organism]";
@@ -85,7 +85,7 @@ public class DataEntrySheet extends JPanel {
     public void setVersion1File(boolean version1File) {
         this.version1File = version1File;
     }
-	
+
 	public boolean isForceAutoComplete() {
 		return forceAutoComplete;
 	}
@@ -107,7 +107,7 @@ public class DataEntrySheet extends JPanel {
     }
 
     @InjectedResource
-    private ImageIcon saveIcon, saveIconOver, loadIcon, loadIconOver, 
+    private ImageIcon saveIcon, saveIconOver, loadIcon, loadIconOver,
     					okIcon,	okIconOver, importSpecieIcon, importSpecieIconOver,
     					getIdIcon, getIdIconOver, selectedIcon, unSelectedIcon;
 
@@ -144,20 +144,20 @@ public class DataEntrySheet extends JPanel {
         createTopPanel();
         add(getIsaCreatorInfo().addSpreadsheetSampleColumns(sheet), BorderLayout.CENTER);  // Add the sample columns to the spreadsheet
         createBottomPanel();
-        
+
         // Add a listener to the changes of the table
         addChangesListener();
-        
+
         // Add custom cell editors only if the latest fileformat is active
         if (!isVersion1File())
             addCustomCellEditors();
     }
-	
+
 	private void addCustomCellEditors(){
 
 		// Add a metabolite cell editor to Description column
         addMetaboliteCellEditorToColumn(AutoCompletionAction.DESCRIPTION_COL_NAME);
-		
+
 		// Add a metabolite cell editor to Formula column
 		addMetaboliteCellEditorToColumn(AutoCompletionAction.FORMULA_COL_NAME);
 
@@ -170,22 +170,23 @@ public class DataEntrySheet extends JPanel {
         TableColumn col = sheet.getTable().getColumnModel().getColumn(colindex);
 
 		// non-editing state
-		MetaboliteLinkCellRenderer mlcr = new MetaboliteLinkCellRenderer(); 
-		col.setCellRenderer(mlcr); 
+		MetaboliteLinkCellRenderer mlcr = new MetaboliteLinkCellRenderer();
+		col.setCellRenderer(mlcr);
 		sheet.getTable().addMouseListener(mlcr);
 
-		
+
 	}
 
 	private void addMetaboliteCellEditorToColumn(String columnName){
-		
+
+        System.out.println("Debug - trying to get column index for "+columnName);
 		int colindex  = sheet.getTable().getColumnModel().getColumnIndex(columnName);
 		TableColumn col = sheet.getTable().getColumnModel().getColumn(colindex);
 		col.setCellEditor(new MetaboliteCellEditor(this));
 
 		// non-editing state
-		col.setCellRenderer(new MetaboliteCellRenderer()); 
-		
+		col.setCellRenderer(new MetaboliteCellRenderer());
+
 	}
 
     public void addChangesListener(){
@@ -197,85 +198,85 @@ public class DataEntrySheet extends JPanel {
                 if ( isVersion1File() ) return;  //TODO, determine if this should be supported.  Quick fix, only new versions of the id file can use the NCBI PubChem lookup
 
                 if ( !autocomplete ) return;  //Have the user turned off the autocomplete
-    			
+
     	        TableCellListener tcl = (TableCellListener)e.getSource();
 
     	        // Create an auto-completion action and invoke the actionperformed method
                 AutoCompletionAction aca = new AutoCompletionAction();
-                
+
                 // Add a progress trigger to the action
                 aca.setProgressTrigger(parentFrame.getProgressTrigger());
 
                 aca.actionPerformed(new ActionEvent(new CellToAutoComplete(tcl.getTable(), tcl.getRow(), tcl.getColumn(), forceAutoComplete),1,"CELL_CHANGED"));
-                
+
                 // Force will be true after selecting a metabolite from the list of the MetaboliteCellEditor,
                 // In this case we only want to force it once
                 forceAutoComplete = false;
-                
+
                 // Repaint the table
                 sheet.getTable().repaint();
-                
+
     	    }
     	};
 
     	TableCellListener tcl = new TableCellListener(sheet.getTable(), action);
     	//sheet.getTable().setBackground(Color.RED);
-    	
+
     	// Add copypaste actionListener
     	new CopyPasteAdaptor(sheet);
-    	
+
     	// Listen to Paste events...
     	sheet.registerCopyPasteObserver(new CopyPasteObserver() {
             public void notifyOfEvent(SpreadsheetEvent event) {
-				
+
             	//                if(event == SpreadsheetEvent.COPY) {
 				//                    System.out.println("Copy event recorded");
-				//                    
+				//
             	//                }
-                
+
             	// If event is paste
                 if(event == SpreadsheetEvent.PASTE) {
                 	// If autocomplete deactivated...exit
                 	if (!autocomplete) return;
-                	
+
                 	//Auto-complete
                     Action getIds = new SelectionRunner(sheet.getTable(), new AutoCompletionAction(),parentFrame.getProgressTrigger());
-                    
+
                     getIds.actionPerformed(null);
-                    
+
                     sheet.getTable().repaint();
-                    
+
                 }
             }
         });
-    	
+
     }
-    
+
     public void createBottomPanel(){
     	JPanel bottomPannel = new JPanel(new BorderLayout());
     	bottomPannel.setBackground(UIHelper.BG_COLOR);
-    	
+
     	Box buttonContainer = Box.createHorizontalBox();
     	buttonContainer.setBackground(UIHelper.BG_COLOR);
-    	
+
     	JLabel file = new JLabel();
     	file.setBackground(UIHelper.BG_COLOR);
-    	
-    	// Not available in the first load (without ISACreator) 
+
+    	// Not available in the first load (without ISACreator)
 //    	if (!parentFrame.getAmIAlone()){
 //    		file.setText(getFileName());
 //    	}
-    	
+
     	bottomPannel.add(file);
-    	
+
     	final JLabel okButton = new JLabel(okIcon);
         okButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
-                
+
             	// Try to force to save the current cell if it is in "edition mode".
             	SpreadsheetUtils.stopCellEditingInTable(sheet.getTable());
-            	
+
             	saveFile();
                 if (parentFrame.getCurrentCellValue().isEmpty())
             	    parentFrame.setCurrentCellValue(fileNameNoPath);         //fileName
@@ -292,18 +293,18 @@ public class DataEntrySheet extends JPanel {
                 okButton.setIcon(okIconOver);
             }
         });
-        
+
         buttonContainer.add(okButton);
 
         bottomPannel.add(buttonContainer, BorderLayout.EAST);
 
         add(bottomPannel, BorderLayout.SOUTH);
 
-    	
+
     }
 
     public void createTopPanel() {
-        
+
     	// Create the top container
     	JPanel topContainer = new JPanel(new BorderLayout());
         topContainer.setBackground(UIHelper.BG_COLOR);
@@ -323,7 +324,7 @@ public class DataEntrySheet extends JPanel {
         autocompleteCheck.setSelectedIcon(selectedIcon);
         autocompleteCheck.setSelected(autocomplete);
         autocompleteCheck.setHorizontalTextPosition(SwingConstants.LEFT);
-              
+
         // Add a listener to the state changed
         autocompleteCheck.addItemListener(new ItemListener(){
 			public void itemStateChanged(ItemEvent arg0) {
@@ -344,7 +345,7 @@ public class DataEntrySheet extends JPanel {
         buttonContainer.add(Box.createHorizontalStrut(5));
     	buttonContainer.add (autocompleteCheck);
 
-        
+
         // Add a button to resolve IDs based on descriptions.
         final JLabel getIdButton = new JLabel(getIdIcon);
         getIdButton.setToolTipText("Autocomplete other columns based on the current column looking up in PubChem.");
@@ -352,11 +353,11 @@ public class DataEntrySheet extends JPanel {
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
                 getIdButton.setIcon(getIdIcon);
-                
+
                 Action getIds = new SelectionRunner(sheet.getTable(), new AutoCompletionAction(),parentFrame.getProgressTrigger());
-               
+
                 getIds.actionPerformed(null);
-                
+
                 sheet.getTable().repaint();
 
             }
@@ -371,19 +372,19 @@ public class DataEntrySheet extends JPanel {
                 getIdButton.setIcon(getIdIconOver);
             }
         });
-                        
+
         // Add the button to the container...
         buttonContainer.add(Box.createHorizontalStrut(5));
     	buttonContainer.add (getIdButton);
 
-        
+
         final JLabel importSpecieButton = new JLabel(importSpecieIcon);
         importSpecieButton.setToolTipText("Fill the columns [taxid] and [species] based on the data entered in the study sample.");
         importSpecieButton.addMouseListener(new MouseAdapter() {
           @Override
           public void mousePressed(MouseEvent mouseEvent) {
               importSpecieButton.setIcon(importSpecieIcon);
-              
+
               //addChangesListener3();
               forceSpecieImport = true;
               importSampleData();
@@ -400,21 +401,21 @@ public class DataEntrySheet extends JPanel {
               importSpecieButton.setIcon(importSpecieIconOver);
           }
       });
-      
+
       	buttonContainer.add(Box.createHorizontalStrut(5));
       	buttonContainer.add (importSpecieButton);
-        
-      	
+
+
       	topContainer.add(buttonContainer, BorderLayout.EAST);
         add(topContainer, BorderLayout.NORTH);
     }
 
     @SuppressWarnings("static-access")
 	private void calculateFileName(){
-    	
+
     	// Check if the current cell has any value
     	if (parentFrame.getCurrentCellValue() == null){
-    		
+
     		String path = getIsaCreatorInfo().getFileLocation();
 
             // Get the assay name
@@ -430,7 +431,7 @@ public class DataEntrySheet extends JPanel {
     		// Compose the final file name
 			fileName = path + (new File(".")).separator + assayName;   //Problem with file separators and the File class, we could use "/"
             fileNameNoPath = assayName;                             //Do we need the path?
-    		
+
     	} else {
 
     		fileName = parentFrame.getCurrentCellValue();
@@ -441,9 +442,9 @@ public class DataEntrySheet extends JPanel {
 
     private void saveFile(){
         logger.info("Saving the file");
-        
+
         FileWriter fw = new FileWriter();
-        
+
         try {
             System.out.println("file separator check before writing file: " +System.getProperty("file.separator"));
             fw.writeFile(getFileName(), sheet);
@@ -457,17 +458,22 @@ public class DataEntrySheet extends JPanel {
     public void loadFile(){
     	logger.info("Loading file");
 
-        String fn = getFileName();
-        File file = new File(fn);
-        
+        String fileName = getFileName();
+        File file = new File(fileName);
+
         // If the file exists...
         if (file.exists()){
-            logger.info("Trying to load the metabolite assignment file: " + fn);
+            logger.info("Trying to load the metabolite assignment file: " + fileName);
 
             FileLoader fl = new FileLoader();
 
             try {
-                setTableReferenceObject(fl.loadFile(fn, getTableReferenceObject()));
+
+                //TableReferenceObject tro = getIsaCreatorInfo().addDataFromFile(fileName);
+
+                //setTableReferenceObject(fl.loadFile(fileName, getTableReferenceObject()));
+                setTableReferenceObject(getIsaCreatorInfo().addDataFromFile(fileName));
+                //TODO, just load the maf file, don't bother with the ISAcrator validations
             } catch (Exception e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
@@ -480,12 +486,12 @@ public class DataEntrySheet extends JPanel {
     private void updateSpreadsheet(Spreadsheet newSpreadsheet){
 
         logger.info("Removing existing spreadsheet");
-        
+
         // If we have a previous sheet
         if (sheet != null){
         	remove(sheet);
         }
-        
+
         logger.info("Adding the new sheet");
         sheet = newSpreadsheet;
         addChangesListener();
@@ -495,7 +501,7 @@ public class DataEntrySheet extends JPanel {
 
         add(getIsaCreatorInfo().addSpreadsheetSampleColumns(sheet),BorderLayout.CENTER);  //Add all missing sample columns to the spreadsheet
         validate();
-        
+
         // To test
         //info.setText("The sample file identifier is: " + getIsaCreatorInfo().getCurrentStudy().getStudySampleFileIdentifier());
         //info.setText("The sample file identifier is: " + getIsaCreatorInfo().getCurrentStudySample().getIdentifier());
@@ -503,29 +509,39 @@ public class DataEntrySheet extends JPanel {
 
    	public boolean isColumnEmpty(String columnName){
    		int column = sheet.getSpreadsheetFunctions().getModelIndexForColumn(columnName);
-   		
+
    		return isColumnEmpty(column);
    	}
 
     private boolean isColumnEmpty(int column){
-    	
+
     	SpreadsheetCell value = (SpreadsheetCell) sheet.getTable().getValueAt(0, column);
     	return (value.isEmpty());
+    }
+
+    private String getDataFromAssayCell(AssaySpreadsheet assaySpreadsheet, int column, Integer rowNum){
+
+        if (rowNum == null)
+            rowNum = 0;
+
+        SpreadsheetCell cell = (SpreadsheetCell) assaySpreadsheet.getSpreadsheet().getTable().getValueAt(rowNum, column);
+        return cell.toString();
+
     }
 
     /**
      * Fill sample columns of our configuration (taxid & species) based on Study Sample data
      * taxid should be a taxon identifier based on an ontology
-     * species, the human readable equivalent. 
+     * species, the human readable equivalent.
      * IN the Study sample we have: "Characteristics[organism]"	"Term Source REF"	"Term Accession Number"
      * So:
      *  taxid --> "Term Source REF" + "Term Accession Number"
-     *  species --> "Characteristics[organism]"	
+     *  species --> "Characteristics[organism]"
      */
     public void importSampleData(){
 
 		try{
-			
+
 			System.out.println("Importing sample data");
 			logger.info("Importing sample data");
 			// Get the study sample data
@@ -533,30 +549,31 @@ public class DataEntrySheet extends JPanel {
 
 
             AssaySpreadsheet assaySpreadsheet = (AssaySpreadsheet) ApplicationManager.getUserInterfaceForISASection(studySample);
-	    	
+
 	    	// Check if we have to populate the sampledata
 	    	if (haveToFillSampleData(assaySpreadsheet)){
 
 	    		String termSourceREF="", termAccessionNumber="", organism = "", taxid="";
-	    		
+
 	    		int column = assaySpreadsheet.getSpreadsheet().getSpreadsheetFunctions().getModelIndexForColumn(SPECIEFIELD);
-	    	   	   		
-	    		SpreadsheetCell cell = (SpreadsheetCell) assaySpreadsheet.getSpreadsheet().getTable().getValueAt(0, column);
-	    		
-	    		String value = cell.toString();
+
+	    		//SpreadsheetCell cell = (SpreadsheetCell) assaySpreadsheet.getSpreadsheet().getTable().getValueAt(0, column);
+	    		//String value = cell.toString();
+                String value = getDataFromAssayCell(assaySpreadsheet,column,0);
+
 
 	    		logger.info("Importing sample data to metabolights plugin: " + value);
                 System.out.println("Importing sample data to metabolights plugin: " + value);
-	    		
+
 	            OntologyTerm ontologyTerm = isaCreatorInfo.getOntologyTerm(value);
 
 	            if (ontologyTerm != null){
-	            	
+
 	            	termSourceREF = ontologyTerm.getOntologySourceInformation().getSourceName();
 	                termAccessionNumber = ontologyTerm.getOntologyTermAccession();
 	                organism = ontologyTerm.getOntologyTermName();
 	                taxid=termSourceREF + ":" + termAccessionNumber;
-	  
+
 	        		// Write sample data
 	        	  	// Get the current assay
 	            	AssaySpreadsheet assay = isaCreatorInfo.getCurrentAssaySpreadsheet();
@@ -564,46 +581,46 @@ public class DataEntrySheet extends JPanel {
 	    			int speciesCol = getSheet().getSpreadsheetFunctions().getModelIndexForColumn("species");
 
 	    			int rows = getSheet().getTable().getRowCount();
-	    			
-	    			// Fill the whole columns....(TODO: why columnumber-2?).
+
+	    			// Fill the whole column....(TODO: why columnumber-2?).
 	    			if (!taxid.equals("")) getSheet().getSpreadsheetFunctions().fill(new SpreadsheetCellRange(new int[]{0,rows}, new int[]{taxidCol}), taxid);
 	    			if (!organism.equals("")) getSheet().getSpreadsheetFunctions().fill(new SpreadsheetCellRange(new int[]{0,rows}, new int[]{speciesCol}), organism);
 	            }
 	    	}
-		
-		}catch (Exception e){
+
+		} catch (Exception e){
 			logger.error("Theres been an error while importing sample information into the maf file!!!.");
 			logger.error(e);
 		}
-    	
+
     }
 
     public boolean haveToFillSampleData(AssaySpreadsheet studySample){
-    	
+
     	// Check if there is already sample data in the spreadsheet (target)
     	boolean dataInTarget = !isColumnEmpty(TAXID);
-    	
+
     	// If import is forced, let change dataInTarget to false
     	if (forceSpecieImport) dataInTarget = false;
-    	
+
     	// Check if there is data in the study sample assay (source)
     	boolean dataInSource = isThereSampleData(studySample);
-    	
-    	
+
+
     	return (dataInSource && !dataInTarget);
     }
 
     private boolean isThereSampleData(AssaySpreadsheet studySample){
 
         String value = null;
-    	
+
 		int column = studySample.getSpreadsheet().getSpreadsheetFunctions().getModelIndexForColumn(SPECIEFIELD);
 
 		SpreadsheetCell cell = (SpreadsheetCell)studySample.getSpreadsheet().getTable().getValueAt(0, column);
 
         if (cell != null)
 		    value = cell.toString();
-    	
+
     	return !(value == null || value.equals(""));
     }
 
