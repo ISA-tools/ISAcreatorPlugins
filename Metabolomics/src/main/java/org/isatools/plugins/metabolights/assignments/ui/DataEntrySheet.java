@@ -229,10 +229,6 @@ public class DataEntrySheet extends JPanel {
     	sheet.registerCopyPasteObserver(new CopyPasteObserver() {
             public void notifyOfEvent(SpreadsheetEvent event) {
 
-            	//                if(event == SpreadsheetEvent.COPY) {
-				//                    System.out.println("Copy event recorded");
-				//
-            	//                }
 
             	// If event is paste
                 if(event == SpreadsheetEvent.PASTE) {
@@ -469,11 +465,9 @@ public class DataEntrySheet extends JPanel {
 
             try {
 
-                //TableReferenceObject tro = getIsaCreatorInfo().addDataFromFile(fileName);
-
                 //setTableReferenceObject(fl.loadFile(fileName, getTableReferenceObject()));
                 setTableReferenceObject(getIsaCreatorInfo().addDataFromFile(fileName));
-                //TODO, just load the maf file, don't bother with the ISAcrator validations
+                //Just load the maf file, don't bother with the ISAcrator validations when reading the file
             } catch (Exception e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
@@ -502,9 +496,6 @@ public class DataEntrySheet extends JPanel {
         add(getIsaCreatorInfo().addSpreadsheetSampleColumns(sheet),BorderLayout.CENTER);  //Add all missing sample columns to the spreadsheet
         validate();
 
-        // To test
-        //info.setText("The sample file identifier is: " + getIsaCreatorInfo().getCurrentStudy().getStudySampleFileIdentifier());
-        //info.setText("The sample file identifier is: " + getIsaCreatorInfo().getCurrentStudySample().getIdentifier());
     }
 
    	public boolean isColumnEmpty(String columnName){

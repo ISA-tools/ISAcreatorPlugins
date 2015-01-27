@@ -91,12 +91,14 @@ public class IsaCreatorInfo {
 
         if (getIsacreator() != null && getCurrentAssaySpreadsheet() != null) {
 
-            Set<String> sampleRows = getColumnOnHeaderName("Sample Name");
-            //TODO, Try to use the assay name first, in the file this is "MS Assay Name" or "NMR Assay Name", so " Assay Name" should be fine
+            Set<String> sampleRows = getColumnOnHeaderName("Assay Name");
+            //Try to use the assay name first, in the file this is "MS Assay Name" or "NMR Assay Name", so " Assay Name" should be fine
 
-            if (sampleRows == null)                  //If there are no MS/NMR Assay Name, use Sample Name instead
-                sampleRows = getCurrentColumnValues(1); //Column 1 is the default sample column on the assay
-                // TODO, fix as the sample name can have been moved after creation of the file!
+            if (sampleRows == null)
+                sampleRows = getColumnOnHeaderName("Sample Name");   //No MS/NMR Assay Name column in the Assay, use the sample name
+
+            if (sampleRows == null)                     // If there are no MS/NMR Assay Name and no Sample Name
+                sampleRows = getCurrentColumnValues(1); // Try Column 1 as this is the default sample column on the assay
 
             if (sampleRows != null) {  //Make sure we have some data
                 for (String assayName : sampleRows) {
