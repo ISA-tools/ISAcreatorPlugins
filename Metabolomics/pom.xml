@@ -705,13 +705,19 @@
 
     <repositories>
         <repository>
-            <id>oerc</id>
-            <url>http://frog.oerc.ox.ac.uk:8080/nexus-2.1.2/content/repositories/releases/</url>
+            <id>chebi-repo</id>
+            <name>ChEBI Internal Repository</name>
+            <url>scp://prod.ebi.ac.uk/ebi/sp/pro1/chebi/maven2_repo</url>
         </repository>
         <repository>
             <id>wso2</id>
             <url>http://dist.wso2.org/qarepo/</url>
         </repository>
+        <repository>
+            <id>oerc</id>
+            <url>http://frog.oerc.ox.ac.uk:8080/nexus-2.1.2/content/repositories/releases/</url>
+        </repository>
+
     </repositories>
 
 </project>
