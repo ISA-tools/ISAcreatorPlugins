@@ -9,27 +9,6 @@ import org.junit.Test;
 public class AutoCompletionActionTest {
 
     @Test
-    public void testGetMetaboliteFromEntrez() {
-
-        // http://pubchem.ncbi.nlm.nih.gov/summary/summary.cgi?cid=985&loc=ec_rcs
-        // Palmitic acid: CHEBI:15756, LMFA01010001, C00249
-        Metabolite met = AutoCompletionAction.getMetaboliteFromEntrez("Palmitic Acid", "CompleteSynonym");
-
-        assertEquals("CHEBI:15756", met.getIdentifier());
-        assertEquals("C16H32O2", met.getFormula());
-        assertEquals("Hexadecanoic acid", met.getDescription());
-
-        // Ganacaonin F (Not in CHEBI, but in LipidMaps)
-        //http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pccompound&id=5317482
-        met = AutoCompletionAction.getMetaboliteFromEntrez("5317482", "uid");
-
-        assertEquals("LMPK12090043", met.getIdentifier());
-        assertEquals("C21H16O6", met.getFormula());
-        assertEquals("Gancaonin F", met.getDescription());
-
-    }
-
-    @Test
     public void testGetMetaboliteFromMetaboLightWS() {
 
         // search by compound name
@@ -38,11 +17,11 @@ public class AutoCompletionActionTest {
         // Palmitic acid found in chebi
         assertEquals("CHEBI:15756", met.getIdentifier());
         assertEquals("C16H32O2", met.getFormula());
-        assertEquals("Hexadecanoic acid", met.getDescription());
+        assertEquals("hexadecanoic acid", met.getDescription());
 
         // S-lactoyl-glutathione (Not in CHEBI, but in Chemspider)
         // Example: http://www.ebi.ac.uk/metabolights/webservice/genericcompoundsearch/name/S-lactoyl-glutathione
-        met = AutoCompletionAction.getMetaboliteFromEntrez(AutoCompletionAction.DESCRIPTION_COL_NAME, "S-lactoyl-glutathione");
+        met = AutoCompletionAction.getMetaboliteFromMetaboLightWS(AutoCompletionAction.DESCRIPTION_COL_NAME, "S-lactoyl-glutathione");
 
         assertEquals("CSID 389032", met.getIdentifier());
         assertEquals("C13H21N3O8S", met.getFormula());
@@ -50,30 +29,23 @@ public class AutoCompletionActionTest {
 
         // search by database id (At the moment only ChEBI is searchable by id)
         // Example: http://www.ebi.ac.uk/metabolights/webservice/genericcompoundsearch/databaseid/CHEBI:48669
-        met = AutoCompletionAction.getMetaboliteFromEntrez(AutoCompletionAction.IDENTIFIER_COL_NAME, "CHEBI:48669");
+        met = AutoCompletionAction.getMetaboliteFromMetaboLightWS(AutoCompletionAction.IDENTIFIER_COL_NAME, "CHEBI:48669");
         assertEquals("NC[C@H]1CC[C@@H](CC1)C(O)=O", met.getSmiles());
         assertEquals("C8H15NO2", met.getFormula());
         assertEquals("tranexamic acid", met.getDescription());
 
         //search by smiles
         // Example: http://www.ebi.ac.uk/metabolights/webservice/genericcompoundsearch/smiles
+        met = AutoCompletionAction.getMetaboliteFromMetaboLightWS(AutoCompletionAction.SMILES, "NC[C@H]1CC[C@@H](CC1)C(O)=O");
+        assertEquals("CHEBI:48669", met.getIdentifier());
 
         //search by inchi
         //Example: http://www.ebi.ac.uk/metabolights/webservice/genericcompoundsearch/inchi
+        met = AutoCompletionAction.getMetaboliteFromMetaboLightWS(AutoCompletionAction.INCHI, "InChI=1S/C8H15NO2/c9-5-6-1-3-7(4-2-6)8(10)11/h6-7H,1-5,9H2,(H,10,11)/t6-,7-");
+        assertEquals("CHEBI:48669", met.getIdentifier());
 
     }
 
-    @Test
-    public void testsGetMetaboliteFromPubChem() {
-
-        // http://pubchem.ncbi.nlm.nih.gov/summary/summary.cgi?cid=985&loc=ec_rcs
-        // Palmitic acid: CHEBI:15756, LMFA01010001, C00249
-        Metabolite[] mets = AutoCompletionAction.getMetabolitesFromPubChem("985");
-        Metabolite met = mets[0];
-        assertEquals("CHEBI:15756", met.getIdentifier());
-        assertEquals("C16H32O2", met.getFormula());
-        assertEquals("Hexadecanoic acid", met.getDescription());
-    }
 
     @Test
     public void testMatchRegEx() {
