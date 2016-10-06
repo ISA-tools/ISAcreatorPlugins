@@ -2,6 +2,7 @@ package org.isatools.plugins.metabolights.assignments.model;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Properties;
@@ -16,10 +17,11 @@ public class RemoteInfo {
 		// 1.- Change the VERSION default value to the new version
 		// 2.- Create a new remoteProperty file --> remoteInfo2.properties
 		// 3.- Change the url to point to the new property file (reqUrl in getRemoteInfo method) 
-		VERSION ("0.1"),
-		DOWNLOADURL("http://www.ebi.ac.uk/metabolights/downloadplugin"),
-		PRIORITYIDPATTERNS("^CHEBI:[0-9]+$~^HMDB[0-9]+$~^LM[A-Z]{2}[0-9]+$~^C[0-9]{5}$"),
+		VERSION ("0.2"),
+		DOWNLOADURL("http://www.ebi.ac.uk/metabolights/?message=Please%20download%20a%20new%20version%20of%20the%20plugin%20from%20ftp://ftp.ebi.ac.uk/pub/databases/metabolights/submissionTool/plugin/"),
+		PRIORITYIDPATTERNS("^CHEBI:[0-9]+$~^CSID\\s[0-9]+$~^HMDB[0-9]+$~^LM[A-Z]{2}[0-9]+$~^C[0-9]{5}$"),
 		ACCESSION_URLS("http://www.ebi.ac.uk/chebi/searchId.do?chebiId=" +
+				      "~http://www.chemspider.com/Chemical-Structure." +
 					  "~http://www.hmdb.ca/metabolites/" +
 					  "~http://www.lipidmaps.org/data/LMSDRecord.php?LMID=" +
 					  "~http://www.genome.jp/dbget-bin/www_bget?cpd:"),
@@ -47,7 +49,7 @@ public class RemoteInfo {
 
 	static Properties getRemoteInfo(){
 		String reqUrl = "https://raw.github.com/EBI-Metabolights/ISAcreatorPlugins/master/Metabolomics/remoteInfo.properties";
-        try {
+		try {
         	
         	Properties props = new Properties();
             URL url = new URL(reqUrl.toString());
