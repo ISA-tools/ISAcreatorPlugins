@@ -117,7 +117,13 @@ import org.isatools.plugins.metabolights.assignments.model.RemoteInfo.remoteProp
     				if (!url.isEmpty()){
     					
     					// Append the id at the end...
-    					url = url + value;
+    					if(value.contains("CSID")){
+							String[] split = value.split(" ");
+							url = url + split[1] + ".html";
+
+						}   else{
+							url = url + value;
+						}
     					
     					// TODO: Editor has a static method, but this method should be better placed in an Utils class or similar..
     					EditorUI.openUrl(url);
