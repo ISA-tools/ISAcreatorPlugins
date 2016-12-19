@@ -161,22 +161,38 @@ public class AutoCompletionAction extends AbstractAction {
         String[] values = splitValues(value, "\\|");
         int size = values.length;
         List<Metabolite> eachPipeEntry = new ArrayList<Metabolite>();
-        for (int i = 0; i < size; i++) {
-            String currentValue = values[i];
-            String response = queryMetaboLightWS(currentValue, metabolightsWSpath);
-            List<Metabolite> metabolites = parseMetabolitesInfoFrom(response);
-            if (metabolites.size() != 0) {
-                eachPipeEntry.add(metabolites.get(0));
+        try {
+            for (int i = 0; i < size; i++) {
+                String currentValue = values[i];
+                if (containsUnknown(currentValue)) {
+                    Metabolite metabolite = new Metabolite();
+                    metabolite.setDescription("unknown");
+                    eachPipeEntry.add(metabolite);
+                } else {
+                    String response = queryMetaboLightWS(currentValue, metabolightsWSpath);
+                    List<Metabolite> metabolites = parseMetabolitesInfoFrom(response);
+                    if (metabolites.size() != 0) {
+                        eachPipeEntry.add(metabolites.get(0));
+                    } else {
+                        eachPipeEntry.add(new Metabolite());
+                    }
+                }
             }
-            else{
-                eachPipeEntry.add(new Metabolite());
-            }
+        }catch(Exception e){
+          logger.info("Something went wrong while querying: " + value, e);
         }
 
         return combineInfoFrom(eachPipeEntry);
 
     }
 
+    private static boolean containsUnknown(String searchTerm) {
+        if (searchTerm.toLowerCase().contains("unknown") || searchTerm.toLowerCase().contains("unidentified")) {
+            logger.info("Ignoring " + searchTerm);
+            return true;
+        }
+        return false;
+    }
 
     public static String getMetaboLightsWSSearchPath(String columnName) {
 
@@ -219,6 +235,7 @@ public class AutoCompletionAction extends AbstractAction {
 
         } catch (JSONException e) {
             e.printStackTrace();
+            logger.error("Something went wrong while parsing searchResponse: " + searchResponse , e);
             return new ArrayList<Metabolite>();
         }
     }
@@ -254,6 +271,7 @@ public class AutoCompletionAction extends AbstractAction {
             metabolite.setDescription(get(obj, "name"));
 
         } catch (Exception e) {
+            logger.error("Something went wrong while parsing :" + o , e);
             e.printStackTrace();
         }
         return metabolite;
