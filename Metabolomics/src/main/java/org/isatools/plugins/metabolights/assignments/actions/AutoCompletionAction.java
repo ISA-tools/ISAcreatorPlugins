@@ -1,14 +1,7 @@
 package org.isatools.plugins.metabolights.assignments.actions;
 
-import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub;
-import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub.DocSumType;
-import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceStub.ItemType;
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.isatools.plugins.metabolights.assignments.model.Metabolite;
-import org.isatools.plugins.metabolights.assignments.model.OptionalMetabolitesList;
-import org.isatools.plugins.metabolights.assignments.model.RemoteInfo;
-import org.isatools.plugins.metabolights.assignments.model.RemoteInfo.remoteProperties;
 import org.isatools.plugins.metabolights.assignments.ui.ProgressTrigger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,8 +9,6 @@ import org.json.JSONObject;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -214,11 +205,11 @@ public class AutoCompletionAction extends AbstractAction {
         String response = "", getURL = "";
         currentValue = currentValue.trim();
         if (metabolightsWSpath.equals("inchi") || metabolightsWSpath.equals("smiles")) {
-            getURL = "http://www.ebi.ac.uk/metabolights/webservice/genericcompoundsearch/" + metabolightsWSpath;
+            getURL = "https://www.ebi.ac.uk/metabolights/webservice/genericcompoundsearch/" + metabolightsWSpath;
             response = Client.executeRequest(getURL, "POST", currentValue);
 
         } else {
-            getURL = "http://www.ebi.ac.uk/metabolights/webservice/genericcompoundsearch/" + metabolightsWSpath + "/" + Client.encoded(currentValue);
+            getURL = "https://www.ebi.ac.uk/metabolights/webservice/genericcompoundsearch/" + metabolightsWSpath + "/" + Client.encoded(currentValue);
             response = Client.executeRequest(getURL, "GET", "");
         }
         return response;

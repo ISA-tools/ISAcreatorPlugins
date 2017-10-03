@@ -6,7 +6,7 @@
     <description>Plugin to provide ability to edit small molecule description data in ISAcreator.</description>
     <groupId>org.isatools.plugins.metabolights</groupId>
     <artifactId>metabolomics</artifactId>
-    <version>1.7.9</version>
+    <version>1.8</version>
 
     <properties>
         <axis2.definition>org.apache.axis2</axis2.definition>
@@ -21,8 +21,6 @@
             <artifactId>ncbi-eutils-axis2</artifactId>
             <version>2.0</version>
         </dependency>
-
-
         <dependency>
             <groupId>org.isatools</groupId>
             <artifactId>ISAcreator</artifactId>
@@ -98,7 +96,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
         	<groupId>commons-codec</groupId>
         	<artifactId>commons-codec</artifactId>
@@ -120,13 +117,11 @@
         	<type>jar</type>
         	<scope>compile</scope>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.8.2</version>
         </dependency>
-
         <dependency>
         	<groupId>${axis2.definition}</groupId>
         	<artifactId>axis2-adb</artifactId>
@@ -723,7 +718,12 @@
             <id>oerc</id>
             <url>http://frog.oerc.ox.ac.uk:8080/nexus-2.1.2/content/repositories/releases/</url>
         </repository>
-
+        <repository>
+            <id>codehaus-mule-repo</id>
+            <name>codehaus-mule-repo</name>
+            <url>http://repository-master.mulesoft.org/nexus/content/groups/public/</url>
+            <layout>default</layout>
+        </repository>
     </repositories>
 
 </project>
