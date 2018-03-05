@@ -6,7 +6,7 @@ Export-Package: org.isatools.plugins.metabolights.assignments.model,
 Tool: Bnd-1.15.0
 Bundle-Name: Metabolights Plugin.
 Bundle-Vendor: EBI Metabolights Team
-Bundle-Version: 1.7.8.SNAPSHOT
+Bundle-Version: 1.9
 Embed-Transitive: true
 Bundle-Activator: org.isatools.plugins.metabolights.assignments.
  Activator
@@ -36,13 +36,9 @@ Import-Package: org.osgi.framework,
  com.explodingpixels.macwidgets,org.isatools.isacreator.io.im
  portisa.errorhandling.exceptions,javax.swing,javax.swing.border,
  javax.swing.event,javax.swing.table,javax.swing.text,
- javax.swing.tree,org.w3c.dom,org.xml.sax,javax.xml.bind,
- javax.xml.bind.annotation,javax.xml.bind.annotation.adapters,
- javax.xml.bind.attachment,javax.xml.bind.util,javax.xml.datatype,
- javax.xml.namespace,javax.xml.parsers,
- javax.xml.soap,javax.xml.stream,
- javax.xml.stream.util,javax.xml.transform,
+ javax.swing.tree,org.w3c.dom,org.xml.sax,javax.xml.datatype,
+ javax.xml.namespace,javax.xml.parsers,javax.xml.transform,
  javax.xml.transform.dom,javax.xml.transform.sax,
- javax.xml.transform.stream,javax.xml.validation,javax.activation
+ javax.xml.transform.stream,javax.xml.validation
 Bundle-SymbolicName: org.isatools.plugins.metabolights.metabolomics
 

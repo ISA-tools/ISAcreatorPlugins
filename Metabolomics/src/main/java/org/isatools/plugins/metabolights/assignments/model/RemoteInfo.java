@@ -16,7 +16,7 @@ public class RemoteInfo {
 		// 1.- Change the VERSION default value to the new version
 		// 2.- Create a new remoteProperty file --> remoteInfo2.properties
 		// 3.- Change the url to point to the new property file (reqUrl in getRemoteInfo method)
-		VERSION ("0.4"),
+		VERSION ("0.5"),
 		DOWNLOADURL("https://www.ebi.ac.uk/metabolights/?message=Please%20download%20a%20new%20version%20of%20the%20plugin%20from%20ftp://ftp.ebi.ac.uk/pub/databases/metabolights/submissionTool/plugin/"),
 		PRIORITYIDPATTERNS("^CHEBI:[0-9]+$~^CSID\\s[0-9]+$~^HMDB[0-9]+$~^LM[A-Z]{2}[0-9]+$~^C[0-9]{5}$"),
 		ACCESSION_URLS("https://www.ebi.ac.uk/chebi/searchId.do?chebiId=" +
