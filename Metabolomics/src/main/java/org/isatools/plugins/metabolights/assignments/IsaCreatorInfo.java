@@ -88,7 +88,6 @@ public class IsaCreatorInfo {
 
         List<String> sampleData = new ArrayList<String>();
 
-
         if (getIsacreator() != null && getCurrentAssaySpreadsheet() != null) {
 
             Set<String> sampleRows = getColumnOnHeaderName("Assay Name");
@@ -106,7 +105,6 @@ public class IsaCreatorInfo {
                         sampleData.add(assayName);
                 }
             }
-
         }
 
         return sampleData;
@@ -132,7 +130,6 @@ public class IsaCreatorInfo {
     }
 
     public  Set<String> getColumnOnHeaderName(String columnHeader){
-
 
         Set<String> currentSet = new ListOrderedSet<String>();
 
@@ -212,7 +209,6 @@ public class IsaCreatorInfo {
                 tro = new TableReferenceObject(fileName);
 
             try {
-
                 CSVReader reader = new CSVReader(new FileReader(fileName), '\t');
 
                 while ((nextLine = reader.readNext()) != null) {
@@ -237,7 +233,6 @@ public class IsaCreatorInfo {
                     }
                 }
 
-
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -256,6 +251,7 @@ public class IsaCreatorInfo {
     public Spreadsheet addSpreadsheetSampleColumns(Spreadsheet newSheet) {
 
         if (getIsacreator() != null) {
+            System.out.println("Now, time to add the extra sample columns from the assas sheet");
             List<String> assaySampleList = getSampleColumns();      //From ISAcreator Assay sheet
 
             Iterator iter = assaySampleList.iterator();
@@ -266,7 +262,7 @@ public class IsaCreatorInfo {
                     newSheet.getSpreadsheetFunctions().addColumn(sampleName, true);
 
                 } else {
-                    logger.debug("Sample column already exists in the spreadsheet:" + sampleName);
+                    logger.debug("Sample column already exists in the spreadsheet : " + sampleName);
                 }
             }
         }

@@ -84,16 +84,11 @@ public class AutoCompletionAction extends AbstractAction {
     }
 
     private void setColumn(String columnName, String value) {
-
-
         // Only set the value if empty...
         if (isColumnEmpty(columnName) || source.getForce()) {
-
             int colIndex = getColIndexByName(columnName);
-
             table.setValueAt(value, source.getRow(), colIndex);
         }
-
     }
 
     private boolean isThereAnythingToAutocomplete() {
@@ -148,7 +143,14 @@ public class AutoCompletionAction extends AbstractAction {
 
     public static Metabolite getMetaboliteFromMetaboLightWS(String columnName, String value) {
 
+        if (columnName == null || columnName == "") {
+            return null;
+        }
+
         String metabolightsWSpath = getMetaboLightsWSSearchPath(columnName);
+        if (metabolightsWSpath == "") {
+            return null;
+        }
         String[] values = splitValues(value, "\\|");
         int size = values.length;
         List<Metabolite> eachPipeEntry = new ArrayList<Metabolite>();
@@ -169,7 +171,7 @@ public class AutoCompletionAction extends AbstractAction {
                     }
                 }
             }
-        }catch(Exception e){
+        } catch(Exception e){
           logger.info("Something went wrong while querying: " + value, e);
         }
 

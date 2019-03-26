@@ -9,6 +9,8 @@ import org.isatools.isatab.configurator.schema.IsatabConfigFileDocument;
 
 import java.io.IOException;
 
+import static org.isatools.plugins.metabolights.assignments.MetabolomicsResultEditor.*;
+
 /**
  * Created by the ISA team
  *
@@ -18,12 +20,13 @@ import java.io.IOException;
  *         Time: 19:08
  */
 public class ConfigurationLoader {
-	
+
 	private static Logger logger = Logger.getLogger(ConfigurationLoader.class);
 
     private static final String BASEFILE ="/metabolomics_configuration/configuration_";
-    private static final String MS_CONFIGURATION  = "ms";
-    private static final String NMR_CONFIGURATION = "nmr";
+    private static final String SIRM  = "SIRM_";
+    public static final String NMR_CONFIGURATION = "nmr";
+    public static final String MS_CONFIGURATION  = "ms";
     private static final String FILEEXT = ".xml";
 
 
@@ -34,6 +37,16 @@ public class ConfigurationLoader {
     public TableReferenceObject loadConfigurationXML() throws XmlException, IOException {
         logger.info("Load MS config file");
         return loadConfigurationXML(BASEFILE + MS_CONFIGURATION + FILEEXT);
+    }
+
+    public TableReferenceObject loadSIRMConfigurationXML(String technologyType, String measurementType) throws XmlException, IOException {
+        logger.info("Load config file for " + technologyType + " and measurement Type " + measurementType);
+
+        //New SIRM configs
+        if (measurementType.equalsIgnoreCase(ISOTOM) || measurementType.equalsIgnoreCase(ISOTOP))
+            return loadConfigurationXML(BASEFILE + SIRM + technologyType + FILEEXT);
+
+        return loadConfigurationXML(BASEFILE + SIRM + technologyType + FILEEXT);
     }
 
     public TableReferenceObject loadNMRConfigurationXML() throws XmlException, IOException {
@@ -68,7 +81,7 @@ public class ConfigurationLoader {
 
     private TableReferenceObject loadConfigurationXML(String configFile) throws XmlException, IOException {
 
-    	logger.info("Plugin: Loading configuration file "+configFile);
+    	System.out.println("Plugin: Loading XML configuration file "+configFile);
 
         //Load the current settings file
         IsatabConfigFileDocument configurationFile = IsatabConfigFileDocument.Factory.parse(

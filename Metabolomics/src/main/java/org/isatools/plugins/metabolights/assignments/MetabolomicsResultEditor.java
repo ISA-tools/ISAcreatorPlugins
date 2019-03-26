@@ -21,22 +21,40 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
-	
+
 	private static final long serialVersionUID = 1699770979608557533L;
 	public static final String NMR = "NMR spectroscopy";
 	public static final String MS = "mass spectrometry";
-	
-	private static Logger logger = Logger.getLogger(MetabolomicsResultEditor.class);
-	
+    public static final String ISOTOP = "isotopologue distribution analysis";    //MS
+    public static final String ISOTOM = "isotopomer distribution analysis";      //NMR
+    private static String meassurement = null;
+
+    private static Logger logger = Logger.getLogger(MetabolomicsResultEditor.class);
+
 	public static int WIDTH = 700;
     public static int HEIGHT = 400;
-    private IsaCreatorInfo isaCreatorInfo;
+    private static IsaCreatorInfo isaCreatorInfo;
 
     private EditorUI editorUI;
     private ConfigurationLoader configurationLoader;
-    
+
     @InjectedResource
     private ImageIcon logo;
+
+    public static String getMeasurement() {
+
+        if (meassurement == null) {
+            //Get the current assay
+            Assay assay = getAssay();
+
+            //Get the Meassurement
+            meassurement = assay.getMeasurementEndpoint();
+            System.out.println(" - Assay Measurement Endpoint was null, now it is: "+meassurement);
+        }
+
+        return meassurement;
+    }
+
 
     public ConfigurationLoader getConfigurationLoader() {
         if (configurationLoader == null)
@@ -56,13 +74,13 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     	//instantiateComponent(MS, getOriginalValue());
         instantiateComponent(null, getOriginalValue());      //Should not have to send any technology parameters here
     }
-    
+
     public void instantiateComponent(String technologyType, String fileName) {
-    	logger.info("Instantiating the metabolomics plugin");
+        System.out.println("Instantiating the metabolomics plugin for " + technologyType + " using file " + fileName);
         editorUI = new EditorUI();
         editorUI.setAmIAlone(!isIsaCreatorLoaded());
 
-        logger.info("metabolomics plugin alone?" + editorUI.getAmIAlone());
+        System.out.println("Is the metabolomics plugin alone? " + editorUI.getAmIAlone());
 
         if (isIsaCreatorLoaded() && technologyType != null && fileName != null)
             editorUI.createGUI(technologyType, fileName);
@@ -104,33 +122,55 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
 
     @Override
     public void showComponent() {
-       	
+
     	logger.info("Plugin: Checking which configuration file to load");
 
-    	
+
     	// Check if the component can't be shown
     	if (!canComponentBeShown()){
             displayMessage("You must save your study once before your can assign metabolites");
     		return;
     	}
-    	
+
         try {
+
             //Is this NMR or MS? Load the appropriate xml file (differs where some columns are hidden)
-            if (getTechnology().equalsIgnoreCase(NMR)){
-            	logger.info("Plugin: Loading the NMR configuration file");
+
+            //New SIRM config files
+            System.out.println(" -- What is the Measurement type? " + getMeasurement());
+            System.out.println(" -- What is the Technology type? " + getTechnology());
+
+            if (getMeasurement().equalsIgnoreCase(ISOTOM) || getMeasurement().equalsIgnoreCase(ISOTOP)){
+
+                System.out.println(" -- Loading SIRM configs");
+                if (getTechnology().contains(MS)){
+                    System.out.println("Plugin: Loading the MS Isotopologue configuration file");
+                    instantiateComponent(ISOTOP, getOriginalValue());
+                } else if (getTechnology().contains(NMR)) {
+                    System.out.println("Plugin: Loading the NMR Isotopomer configuration file");
+                    instantiateComponent(ISOTOM, getOriginalValue());
+                }
+            }
+
+            // Ok, so we have standard MS or NMR
+            if (getTechnology().contains(NMR)){
+                System.out.println("Plugin: Loading the standard NMR configuration file");
             	instantiateComponent(NMR, getOriginalValue());
             } else {
-            	logger.info("Plugin: Loading the MS configuration file");
+                System.out.println("Plugin: Loading the standard MS configuration file");
             	instantiateComponent(MS, getOriginalValue());
             }
 
+
+
+
         } catch (Exception e) {
-            e.printStackTrace();  
-        } 
-        
+            e.printStackTrace();
+        }
+
         logger.info("Original value of cell is " + getOriginalValue());
         editorUI.setCurrentCellValue(getOriginalValue());
-        editorUI.setVisible(true);    
+        editorUI.setVisible(true);
 
     }
 
@@ -171,18 +211,17 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
     public Set<String> targetColumns() {
         Set<String> targetColumns = new HashSet<String>();
         targetColumns.add("Metabolite Assignment File");
-        //targetColumns.add("Sample Name");
         return targetColumns;
     }
 
 
-    public IsaCreatorInfo getIsaCreatorInfo() {
+    public static IsaCreatorInfo getIsaCreatorInfo() {
         if (isaCreatorInfo == null)
             isaCreatorInfo = new IsaCreatorInfo();
         return isaCreatorInfo;
     }
 
-    private Assay getAssay(){
+    private static Assay getAssay(){
 
         Assay assay = getIsaCreatorInfo().getCurrentAssay();
 
@@ -192,30 +231,30 @@ public class MetabolomicsResultEditor extends AbstractPluginSpreadsheetWidget {
         return assay;
     }
 
-    private String getTechnology(){            //TODO, always returns MS, but NMR on new assay
+    private String getTechnology(){
            //Get the current assay
         Assay assay = getAssay();
-        logger.info("The current Assay is "+assay.getIdentifier());
+        System.out.println("The current Assay is "+assay.getIdentifier());
 
         //Get the Technology type from the assay NMR or MS
         String technology = assay.getTechnologyType();
-        logger.info("The current Assay Technology type is "+technology);
+        System.out.println("The current Assay Technology type is: "+technology);
+        System.out.println("Assay Measurement Endpoint: " + assay.getMeasurementEndpoint());
 
-        if (technology.contains(":")) {//Ontology reference, like "OBI:NMR spectroscopy"
-
+        if (technology.contains(":")) { //Ontology reference, like "OBI:NMR spectroscopy"
             String[] localTechnology = technology.split(":");
-            technology = localTechnology[1];     //Discard the first entry
-
+            technology = localTechnology[1]; //Discard the first entry, i.e. before the colon
         }
         return technology;
     }
+
 
     private boolean isIsaCreatorLoaded(){
     	return (getIsaCreatorInfo().getIsacreator() != null);
     }
 
     private boolean canComponentBeShown(){
-    	// If IsaCreator is not available...
+    	// If ISAcreator is not available...
     	if (!isIsaCreatorLoaded()){
     		return false;
     	// If the data has not been saved yet,...

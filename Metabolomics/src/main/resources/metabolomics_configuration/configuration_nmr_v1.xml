@@ -64,9 +64,9 @@
             <default-value></default-value>
         </field>
         <field header="reliability" data-type="List" is-file-field="false" is-multiple-value="false" is-required="false">
-            <description>NMR/MS: Rating</description>
+            <description>NMR/MS: Identified metabolites: MSI level 1 - identified metabolites, MSI level 2 - putatively annotated compounds, MSI level 3 - putatively characterised compound classes, MSI level 4 - unknown compounds</description>
             <default-value></default-value>
-            <list-values>0:non-significant identification,1:poor reliability,2:less poor reliability,3:medium reliability,4:good reliability,5:very good reliability</list-values>
+            <list-values>MSI:1, MSI:2, MSI:3, MSI:4</list-values>
         </field>
         <field header="uri" data-type="String" is-file-field="false" is-multiple-value="false" is-required="false">
             <description>NMR/MS: The MetaboLights experiment it was identified in (MTBLS id)</description>

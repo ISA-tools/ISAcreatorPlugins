@@ -156,7 +156,9 @@ public class DataEntrySheet extends JPanel {
 	private void addCustomCellEditors(){
 
 		// Add a metabolite cell editor to Description column
-        addMetaboliteCellEditorToColumn(AutoCompletionAction.DESCRIPTION_COL_NAME);
+        //addMetaboliteCellEditorToColumn(AutoCompletionAction.DESCRIPTION_COL_NAME);
+        // Add a metabolite cell editor to database_identifier instead of description column
+        addMetaboliteCellEditorToColumn(AutoCompletionAction.IDENTIFIER_COL_NAME);         //TODO, check
 
 		// Add a metabolite cell editor to Formula column
 		addMetaboliteCellEditorToColumn(AutoCompletionAction.FORMULA_COL_NAME);
@@ -166,7 +168,6 @@ public class DataEntrySheet extends JPanel {
         // Add Link style cell to Identifiers
         colindex  = sheet.getTable().getColumnModel().getColumnIndex(AutoCompletionAction.IDENTIFIER_COL_NAME);
 
-
         TableColumn col = sheet.getTable().getColumnModel().getColumn(colindex);
 
 		// non-editing state
@@ -174,13 +175,13 @@ public class DataEntrySheet extends JPanel {
 		col.setCellRenderer(mlcr);
 		sheet.getTable().addMouseListener(mlcr);
 
-
 	}
 
 	private void addMetaboliteCellEditorToColumn(String columnName){
 
-        System.out.println("Debug - trying to get column index for "+columnName);
-		int colindex  = sheet.getTable().getColumnModel().getColumnIndex(columnName);
+        System.out.println("Getting column index for " +columnName);
+
+        int colindex  = sheet.getTable().getColumnModel().getColumnIndex(columnName);
 		TableColumn col = sheet.getTable().getColumnModel().getColumn(colindex);
 		col.setCellEditor(new MetaboliteCellEditor(this));
 
@@ -197,7 +198,7 @@ public class DataEntrySheet extends JPanel {
 
                 if ( isVersion1File() ) return;  //TODO, determine if this should be supported.  Quick fix, only new versions of the id file can use the NCBI PubChem lookup
 
-                if ( !autocomplete ) return;  //Have the user turned off the autocomplete
+                if ( !autocomplete ) return;  //Have the user turned off autocomplete?
 
     	        TableCellListener tcl = (TableCellListener)e.getSource();
 
@@ -229,7 +230,6 @@ public class DataEntrySheet extends JPanel {
     	sheet.registerCopyPasteObserver(new CopyPasteObserver() {
             public void notifyOfEvent(SpreadsheetEvent event) {
 
-
             	// If event is paste
                 if(event == SpreadsheetEvent.PASTE) {
                 	// If autocomplete deactivated...exit
@@ -237,9 +237,7 @@ public class DataEntrySheet extends JPanel {
 
                 	//Auto-complete
                     Action getIds = new SelectionRunner(sheet.getTable(), new AutoCompletionAction(),parentFrame.getProgressTrigger());
-
                     getIds.actionPerformed(null);
-
                     sheet.getTable().repaint();
 
                 }
@@ -291,9 +289,7 @@ public class DataEntrySheet extends JPanel {
         });
 
         buttonContainer.add(okButton);
-
         bottomPannel.add(buttonContainer, BorderLayout.EAST);
-
         add(bottomPannel, BorderLayout.SOUTH);
 
 
@@ -335,27 +331,20 @@ public class DataEntrySheet extends JPanel {
             autocompleteCheck.setEnabled(false);
         }
 
-
-
         // Add the check box to the container
         buttonContainer.add(Box.createHorizontalStrut(5));
     	buttonContainer.add (autocompleteCheck);
 
-
         // Add a button to resolve IDs based on descriptions.
         final JLabel getIdButton = new JLabel(getIdIcon);
-        getIdButton.setToolTipText("Autocomplete other columns based on the current column looking up in PubChem.");
+        getIdButton.setToolTipText("Autocomplete other columns based on the current column looking up in our search.");
         getIdButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
                 getIdButton.setIcon(getIdIcon);
-
                 Action getIds = new SelectionRunner(sheet.getTable(), new AutoCompletionAction(),parentFrame.getProgressTrigger());
-
                 getIds.actionPerformed(null);
-
                 sheet.getTable().repaint();
-
             }
 
             @Override
@@ -373,14 +362,12 @@ public class DataEntrySheet extends JPanel {
         buttonContainer.add(Box.createHorizontalStrut(5));
     	buttonContainer.add (getIdButton);
 
-
         final JLabel importSpecieButton = new JLabel(importSpecieIcon);
         importSpecieButton.setToolTipText("Fill the columns [taxid] and [species] based on the data entered in the study sample.");
         importSpecieButton.addMouseListener(new MouseAdapter() {
           @Override
           public void mousePressed(MouseEvent mouseEvent) {
               importSpecieButton.setIcon(importSpecieIcon);
-
               //addChangesListener3();
               forceSpecieImport = true;
               importSampleData();
@@ -400,7 +387,6 @@ public class DataEntrySheet extends JPanel {
 
       	buttonContainer.add(Box.createHorizontalStrut(5));
       	buttonContainer.add (importSpecieButton);
-
 
       	topContainer.add(buttonContainer, BorderLayout.EAST);
         add(topContainer, BorderLayout.NORTH);
@@ -464,12 +450,11 @@ public class DataEntrySheet extends JPanel {
             FileLoader fl = new FileLoader();
 
             try {
-
                 //setTableReferenceObject(fl.loadFile(fileName, getTableReferenceObject()));
                 setTableReferenceObject(getIsaCreatorInfo().addDataFromFile(fileName));
                 //Just load the maf file, don't bother with the ISAcrator validations when reading the file
             } catch (Exception e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             }
             Spreadsheet loadedSheet = new Spreadsheet(parentFrame, getIsaCreatorInfo().addTableRefSampleColumns(getTableReferenceObject()),"");   //To map the columns that we load from the file
         	updateSpreadsheet(getIsaCreatorInfo().addSpreadsheetSampleColumns(loadedSheet));  // Load the existing spreadsheet and add any new sample columns
@@ -531,21 +516,25 @@ public class DataEntrySheet extends JPanel {
      */
     public void importSampleData(){
 
-		try{
+		try {
 
 			System.out.println("Importing sample data");
 			logger.info("Importing sample data");
 			// Get the study sample data
 			Assay studySample = isaCreatorInfo.getCurrentStudySample();
 
-
+            System.out.println("Attempting to load the assay sheet from ISAcreator to get sample (organism) data");
             AssaySpreadsheet assaySpreadsheet = (AssaySpreadsheet) ApplicationManager.getUserInterfaceForISASection(studySample);
 
-	    	// Check if we have to populate the sampledata
+            System.out.println("Successfully loaded the assay sheet from ISAcreator. Now checking if we have to load or update the Organism info");
+
+	    	// Check if we have to populate the sample data
 	    	if (haveToFillSampleData(assaySpreadsheet)){
 
+                System.out.println("The plugin need to import/update the sample rows from the assay sheet");
 	    		String termSourceREF="", termAccessionNumber="", organism = "", taxid="";
 
+                System.out.println("Now, where in the assay sheet is the species field? (Characteristics[organism])");
 	    		int column = assaySpreadsheet.getSpreadsheet().getSpreadsheetFunctions().getModelIndexForColumn(SPECIEFIELD);
 
 	    		//SpreadsheetCell cell = (SpreadsheetCell) assaySpreadsheet.getSpreadsheet().getTable().getValueAt(0, column);
@@ -554,7 +543,7 @@ public class DataEntrySheet extends JPanel {
 
 
 	    		logger.info("Importing sample data to metabolights plugin: " + value);
-                System.out.println("Importing sample data to metabolights plugin: " + value);
+                System.out.println("Importing sample data to metabolights plugin, the organism field is in column : " + value);
 
 	            OntologyTerm ontologyTerm = isaCreatorInfo.getOntologyTerm(value);
 
@@ -579,8 +568,10 @@ public class DataEntrySheet extends JPanel {
 	            }
 	    	}
 
+            System.out.println("Done with the organism import");
+
 		} catch (Exception e){
-			logger.error("Theres been an error while importing sample information into the maf file!!!.");
+			logger.error("There has been an error while importing sample information into the maf file!!!.");
 			logger.error(e);
 		}
 
@@ -596,7 +587,6 @@ public class DataEntrySheet extends JPanel {
 
     	// Check if there is data in the study sample assay (source)
     	boolean dataInSource = isThereSampleData(studySample);
-
 
     	return (dataInSource && !dataInTarget);
     }

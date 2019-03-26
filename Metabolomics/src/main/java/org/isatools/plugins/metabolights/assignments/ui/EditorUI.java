@@ -25,6 +25,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
+import static org.isatools.plugins.metabolights.assignments.MetabolomicsResultEditor.*;
+import static org.isatools.plugins.metabolights.assignments.io.ConfigurationLoader.MS_CONFIGURATION;
+import static org.isatools.plugins.metabolights.assignments.io.ConfigurationLoader.NMR_CONFIGURATION;
+
 @SuppressWarnings("restriction")
 public class EditorUI extends AnimatableJFrame implements PropertyChangeListener {
 
@@ -91,7 +95,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 
     public void createGUI(String technologyType, String fileName) {
 
-        logger.info("Metabolomics plugin starting up");
+        System.out.println("Metabolomics plugin starting up");
 
         setTitle("Assign metabolites");
         setUndecorated(true);
@@ -109,6 +113,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 
         ((JComponent) getContentPane()).setBorder(new EtchedBorder(UIHelper.LIGHT_GREEN_COLOR, UIHelper.LIGHT_GREEN_COLOR));
 
+        System.out.println("Creating central panel for "+technologyType);
         createCentralPanel(technologyType, fileName);
 
         createSouthPanel();
@@ -128,6 +133,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 
     private void createCentralPanel(String technologyType, String fileName) {
 
+        System.out.println("Create a new table using " + technologyType);
         TableReferenceObject tableReferenceObject = loadConfiguration(technologyType, fileName);
         DataEntrySheet sheet = new DataEntrySheet(EditorUI.this,
                 getIsaCreatorInfo().addTableRefSampleColumns(tableReferenceObject));  //Add sample columns to the table definition
@@ -153,10 +159,10 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 
         add(sheet, BorderLayout.CENTER);
 
-        // Check if he ISACreator is available
+        // Check if ISAcreator runtime is available
         if (!amIAlone) {
 
-        	// If so, try to load the file (if exists)
+        	// If so, try to load the file (if it exists)
         	sheet.loadFile();
 
         	// Fill sample data....
@@ -202,8 +208,7 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 
     public static void main(String[] args) {
         EditorUI ui = new EditorUI();
-        ui.createGUI(MetabolomicsResultEditor.MS, null);
-
+        ui.createGUI(MS, null);
         ui.setVisible(true);
     }
 
@@ -211,36 +216,50 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
         ConfigurationLoader loader = new ConfigurationLoader();
 
         try {
+            System.out.println(" - About to load the final config files");
+            System.out.println(" - The technology type for this assay is: " + techologyType);         //mass spectrometry
+            System.out.println(" - The measurement type for this assay is: " + MetabolomicsResultEditor.getMeasurement());    //isotopomer distribution analysis
 
-            if (fileName.contains(".csv") || isVersion1File()){           //TODO, should not have to test for the filename here, just the isVersionXXXFile methods
+            if (fileName.contains(".csv") || isVersion1File()){  //TODO, should not have to test for the filename here, just the isVersionXXXFile methods
                 return loader.loadGenericConfig(1,techologyType);
             } else {
 
-                if (techologyType.equals(MetabolomicsResultEditor.MS))
-                    return loader.loadConfigurationXML();
-                else
-                    return loader.loadNMRConfigurationXML();
+                if (techologyType.equalsIgnoreCase(MS)) {
+                    if (MetabolomicsResultEditor.getMeasurement().equalsIgnoreCase(ISOTOP)){
+                        System.out.println(" -- Loading MS Isotom config file");
+                        return loader.loadSIRMConfigurationXML(MS_CONFIGURATION, ISOTOP);
+                    } else {
+                        System.out.println(" -- Loading standard MS config file");
+                        return loader.loadConfigurationXML();
+                    }
+                } else { // techologyType.equals(NMR)
+                    if (MetabolomicsResultEditor.getMeasurement().equalsIgnoreCase(ISOTOM)) {
+                        System.out.println(" -- Loading NMR Isotop config file");
+                        return loader.loadSIRMConfigurationXML(NMR_CONFIGURATION, ISOTOM);
+                    } else {
+                        System.out.println(" -- Loading standard NMR config file");
+                        return loader.loadNMRConfigurationXML();
+                    }
+                }
+
             }
 
 
         } catch (XmlException e) {
             e.printStackTrace();
-            logger.error(e.getMessage().toString());
+            logger.error(e.getMessage());
             return null;
         } catch (IOException e) {
             e.printStackTrace();
-            logger.error(e.getMessage().toString());
+            logger.error(e.getMessage());
             return null;
         }
     }
 
 	public void propertyChange(PropertyChangeEvent arg0) {
 		// For the progress bar
-		if (arg0.getSource() instanceof ProgressTrigger){
+		if (arg0.getSource() instanceof ProgressTrigger)
 			propertyChangeProgressTrigger(arg0, (ProgressTrigger) arg0.getSource());
-
-		}
-
 	}
 
 	@SuppressWarnings("static-access")
@@ -249,21 +268,10 @@ public class EditorUI extends AnimatableJFrame implements PropertyChangeListener
 		// If the process is starting
 		if (arg0.getPropertyName().equals(pt.PROGRESS_START)){
 
-//			progressIndicator = new InfiniteProgressPanel(pt.getProcessDescription());
-//
-//
-//			progressIndicator.setSize(new Dimension(
-//											getWidth(),
-//											getHeight()));
-//			setGlassPane(progressIndicator);
-//	        progressIndicator.start();
-//	        validate();
-
 			// At this point activate the wait cursor
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
 		} else if (arg0.getPropertyName().equals(pt.PROGRESS_END)){
-//			progressIndicator.stop();
 			// Deactivate the wait cursor
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 

@@ -34,7 +34,7 @@ public class Activator implements BundleActivator {
         this.context = context;
 
         Hashtable dict = new Hashtable();
-        logger.info("Activating the ISAcreator metabolite bundle....");
+        logger.info("Activating the MetaboLights ISAcreator metabolite bundle....");
         context.registerService(
                 PluginSpreadsheetWidget.class.getName(), new MetabolomicsResultEditor(), dict);
     }
